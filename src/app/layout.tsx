@@ -1,3 +1,5 @@
+import { ClerkProvider } from "@clerk/nextjs";
+
 import "~/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
@@ -11,10 +13,10 @@ export const metadata: Metadata = {
 
 function BottomNav() {
   return (
-    <div className="bg-zing-300 fixed bottom-0 flex w-full justify-around rounded-t-3xl bg-gray-800 py-3 font-bold text-gray-300">
-      <a>Profile</a>
-      <a>Home</a>
-      <a>Preferences</a>
+    <div className="fixed bottom-0 flex w-full rounded-t-3xl bg-amber-200 py-3 font-bold text-gray-950">
+      <a className="flex w-1/3 justify-center">Profile</a>
+      <a className="flex w-1/3 justify-center">Home</a>
+      <a className="flex w-1/3 justify-center">Preferences</a>
     </div>
   );
 }
@@ -23,11 +25,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
-      <body className="flex flex-col items-center bg-gray-950">
-        {children}
-        <BottomNav />
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" className={`${GeistSans.variable}`}>
+        <body className="flex items-center">
+          {children}
+          <BottomNav />
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
