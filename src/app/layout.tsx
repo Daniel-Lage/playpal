@@ -2,6 +2,8 @@ import "~/styles/globals.css";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
+import { getServerSession } from "next-auth";
 
 export const metadata: Metadata = {
   title: "PlayPal",
@@ -11,7 +13,7 @@ export const metadata: Metadata = {
 
 function BottomNav() {
   return (
-    <div className="bg-zing-300 fixed bottom-0 flex w-full justify-around rounded-t-3xl bg-gray-800 py-3 font-bold text-gray-300">
+    <div className="fixed bottom-0 flex w-full justify-around rounded-t-3xl bg-amber-200 py-3 font-bold text-zinc-950">
       <a>Profile</a>
       <a>Home</a>
       <a>Preferences</a>
@@ -19,13 +21,15 @@ function BottomNav() {
   );
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body className="flex flex-col items-center bg-gray-950">
-        {children}
+      <body className="flex flex-col items-center">
+        <main className="flex min-h-screen w-full flex-col gap-4 px-4 pt-4 text-white md:w-3/5">
+          {children}
+        </main>
         <BottomNav />
       </body>
     </html>
