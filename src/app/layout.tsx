@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 
 function BottomNav() {
   return (
-    <div className="fixed bottom-0 flex w-full justify-around rounded-t-3xl bg-amber-200 py-3 font-bold text-zinc-950">
-      <a>Profile</a>
-      <a>Home</a>
-      <a>Preferences</a>
+    <div className="fixed bottom-0 flex w-full rounded-t-3xl bg-amber-200 py-3 font-bold text-zinc-950">
+      <a className="flex w-1/3 justify-center">Profile</a>
+      <a className="flex w-1/3 justify-center">Home</a>
+      <a className="flex w-1/3 justify-center">Preferences</a>
     </div>
   );
 }
