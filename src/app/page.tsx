@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Session } from "next-auth";
 import { getServerSession } from "next-auth";
 import Image from "next/image";
+
 export const dynamic = "force-dynamic";
 
 export function AccountView({ session }: { session: Session | null }) {
@@ -18,13 +19,15 @@ export function AccountView({ session }: { session: Session | null }) {
   return (
     <>
       {session.user.image && session.user.name && (
-        <Image
-          width={40}
-          height={40}
-          className="rounded-full"
-          src={session.user.image}
-          alt={session.user.name}
-        />
+        <Link href="/profile">
+          <Image
+            width={40}
+            height={40}
+            className="rounded-full"
+            src={session.user.image}
+            alt={session.user.name}
+          />
+        </Link>
       )}
       <div className="grow">{session.user.name}</div>
       <Link href="/api/auth/signout">Sair</Link>
