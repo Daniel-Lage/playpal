@@ -8,7 +8,7 @@ import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
-export function AccountView({ session }: { session: Session | null }) {
+function AccountView({ session }: { session: Session | null }) {
   if (!session || !session.user)
     return (
       <>
