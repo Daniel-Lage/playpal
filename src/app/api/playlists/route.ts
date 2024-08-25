@@ -1,10 +1,8 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Daniel n sei onde tu prefere colocar, aí vou deixar aqui
-// Mas pode botar em qualquer lugar, é só exportar
 interface PlaylistDataProps {
-  next?: URL;
+  next: URL | null;
   total: number;
   items: unknown[];
 }
@@ -30,7 +28,7 @@ export async function GET(req: NextRequest) {
   if (response.status != 200)
     return NextResponse.json({ error: "Request Form Error" });
 
-  const playlists = await response.json() as PlaylistDataProps;
+  const playlists = (await response.json()) as PlaylistDataProps;
 
   if (playlists.next) {
     const url = new URL(playlists.next);

@@ -1,47 +1,54 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
-import { type SimplifiedPlaylist } from "spotify-types";
+import { type Playlist } from "spotify-types";
 
 async function getData() {
   const response = await fetch("/api/playlists");
-  const json = (await response.json()) as SimplifiedPlaylist[];
+  const json = (await response.json()) as Playlist[];
 
   return json;
 }
 
 export function Playlists() {
-  const [playlists, setPlaylists] = useState<SimplifiedPlaylist[] | null>();
+  const [playlists, setPlaylists] = useState<Playlist[] | null>();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getData()
-      .then((data: SimplifiedPlaylist[]) => {
+      .then((data: Playlist[]) => {
         setPlaylists(data);
         setLoading(false);
       })
       .catch(console.log);
   }, []);
 
+  console.log(playlists);
+
   if (loading) return <div>loading</div>;
 
   if (!playlists?.map) return <div>error</div>;
 
   return (
-    <div>
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
       {playlists.map((playlist, index) => (
-        <div key={index}>
-          {typeof playlist.images[0]?.url == "string" && (
-            <Image
-              width={50}
-              height={50}
-              src={playlist.images[0]?.url}
-              alt={playlist.name}
-            />
-          )}
+        <Link
+          href="/playlist" // WIP
+          key={index}
+          className="flex flex-col items-center"
+        >
+          <Image
+            width={500}
+            height={500}
+            className="aspect-square w-full rounded-2xl"
+            src={playlist.images[0]?.url as string}
+            alt={playlist.name}
+          />
+
           <div>{playlist.name}</div>
-        </div>
+        </Link>
       ))}
     </div>
   );
