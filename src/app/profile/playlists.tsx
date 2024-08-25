@@ -6,7 +6,7 @@ import { type SimplifiedPlaylist } from "spotify-types";
 
 async function getData() {
   const response = await fetch("/api/playlists");
-  const json = await response.json() as SimplifiedPlaylist[];
+  const json = (await response.json()) as SimplifiedPlaylist[];
 
   return json;
 }
@@ -26,7 +26,8 @@ export function Playlists() {
 
   if (loading) return <div>loading</div>;
 
-  if (!playlists) return <div>error</div>;
+  if (!playlists?.map) return <div>error</div>;
+
   return (
     <div>
       {playlists.map((playlist, index) => (
