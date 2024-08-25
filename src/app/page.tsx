@@ -9,7 +9,7 @@ import Image from "next/image";
 export const dynamic = "force-dynamic";
 
 function AccountView({ session }: { session: Session | null }) {
-  if (!session || !session.user)
+  if (!session?.user)
     return (
       <>
         <Link href="/api/auth/signin">Entrar</Link>

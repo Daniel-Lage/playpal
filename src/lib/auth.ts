@@ -1,7 +1,7 @@
-import type { NextAuthOptions } from "next-auth";
+import type { AuthOptions } from "next-auth";
 import SpotifyProvider from "next-auth/providers/spotify";
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 
   session: {
@@ -10,7 +10,7 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     jwt: async ({ token, account }) => {
-      if (account && account.access_token) {
+      if (!!account && account.access_token) {
         // token.refreshToken = account.refresh_token; // <-- adding the refresh_token here
         token.accessToken = account.access_token; // <-- adding the access_token here
       }
@@ -19,8 +19,8 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     SpotifyProvider({
-      clientId: process.env.SPOTIFY_CLIENT_ID as string,
-      clientSecret: process.env.SPOTIFY_CLIENT_SECRET as string,
+      clientId: process.env.SPOTIFY_CLIENT_ID ?? '',
+      clientSecret: process.env.SPOTIFY_CLIENT_SECRET ?? '',
     }),
   ],
 };

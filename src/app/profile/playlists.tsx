@@ -2,11 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { SimplifiedPlaylist } from "spotify-types";
+import { type SimplifiedPlaylist } from "spotify-types";
 
 async function getData() {
   const response = await fetch("/api/playlists");
-  return await response.json();
+  const json = await response.json() as SimplifiedPlaylist[];
+
+  return json;
 }
 
 export function Playlists() {
@@ -14,10 +16,12 @@ export function Playlists() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    (async () => {
-      setPlaylists(await getData());
-      setLoading(false);
-    })();
+    getData()
+      .then((data: SimplifiedPlaylist[]) => {
+        setPlaylists(data);
+        setLoading(false);
+      })
+      .catch(console.log);
   }, []);
 
   if (loading) return <div>loading</div>;
@@ -25,8 +29,8 @@ export function Playlists() {
   if (!playlists) return <div>error</div>;
   return (
     <div>
-      {playlists.map((playlist) => (
-        <div>
+      {playlists.map((playlist, index) => (
+        <div key={index}>
           {typeof playlist.images[0]?.url == "string" && (
             <Image
               width={50}

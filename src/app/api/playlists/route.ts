@@ -1,6 +1,18 @@
 import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
+// Daniel n sei onde tu prefere colocar, aí vou deixar aqui
+// Mas pode botar em qualquer lugar, é só exportar
+interface PlaylistDataProps {
+  next?: URL;
+  total: number;
+  items: unknown[];
+}
+
+interface BatchProps {
+  items: unknown[];
+}
+
 export async function GET(req: NextRequest) {
   const token = await getToken({ req });
 
@@ -10,7 +22,7 @@ export async function GET(req: NextRequest) {
     "https://api.spotify.com/v1/me/playlists?limit=50",
     {
       headers: {
-        Authorization: "Bearer " + token.accessToken,
+        Authorization: `Bearer  ${token.accessToken as string}`,
       },
     },
   );
@@ -18,7 +30,7 @@ export async function GET(req: NextRequest) {
   if (response.status != 200)
     return NextResponse.json({ error: "Request Form Error" });
 
-  const playlists = await response.json();
+  const playlists = await response.json() as PlaylistDataProps;
 
   if (playlists.next) {
     const url = new URL(playlists.next);
@@ -30,7 +42,7 @@ export async function GET(req: NextRequest) {
       requests.push(
         fetch(url, {
           headers: {
-            Authorization: "Bearer " + token.accessToken,
+            Authorization: `Bearer ${token.accessToken as string}`,
           },
         }),
       );
@@ -42,7 +54,7 @@ export async function GET(req: NextRequest) {
       responses.map((response) => response.json()),
     );
 
-    batches.forEach((batch) => {
+    batches.forEach((batch: BatchProps) => {
       playlists.items = [...playlists.items, ...batch.items];
     });
   }

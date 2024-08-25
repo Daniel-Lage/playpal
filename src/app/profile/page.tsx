@@ -1,12 +1,10 @@
-import { db } from "~/server/db";
-
 import { getServerSession } from "next-auth";
 import { Playlists } from "./playlists";
 
 export default async function HomePage() {
   const session = await getServerSession();
 
-  if (!session || !session.user)
+  if (!session?.user)
     return (
       <>
         <div>meu amigo saia daqui logo</div>
