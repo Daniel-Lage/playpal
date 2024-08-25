@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { type Playlist } from "spotify-types";
+import { type Playlist } from "~/common/types";
 
 async function getData() {
   const response = await fetch("/api/playlists");
@@ -22,10 +22,8 @@ export function Playlists() {
         setPlaylists(data);
         setLoading(false);
       })
-      .catch(console.log);
+      .catch(console.error);
   }, []);
-
-  console.log(playlists);
 
   if (loading) return <div>loading</div>;
 
@@ -33,21 +31,21 @@ export function Playlists() {
 
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-      {playlists.map((playlist, index) => (
+      {playlists.map((playlist) => (
         <Link
-          href="/playlist" // WIP
-          key={index}
-          className="flex flex-col items-center"
+          href={`/playlist/${playlist.id}`} // WIP
+          key={playlist.id}
+          className="flex flex-col items-center overflow-hidden rounded-2xl bg-zinc-500 hover:bg-zinc-600"
         >
           <Image
             width={500}
             height={500}
-            className="aspect-square w-full rounded-2xl"
+            className="aspect-square"
             src={playlist.images[0]?.url ?? ""}
             alt={playlist.name}
           />
 
-          <div>{playlist.name}</div>
+          <div className="h-16 px-2 pt-2 text-center">{playlist.name}</div>
         </Link>
       ))}
     </div>

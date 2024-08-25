@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 
 function BottomNav({ session }: { session: Session | null }) {
   return (
-    <div className="fixed bottom-0 flex h-16 w-full rounded-t-3xl bg-amber-200 font-bold text-zinc-950">
+    <div className="fixed bottom-0 flex h-16 w-full bg-amber-200 font-bold">
       <div className="flex w-1/3 items-center justify-center">
         {session?.user?.image && session?.user?.name ? (
-          <Link className="rounded-full bg-black p-1" href="/profile">
+          <Link href="/profile">
             <Image
               width={40}
               height={40}
@@ -46,7 +46,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body className="flex flex-col items-center">
-        <main className="flex min-h-screen w-full flex-col gap-4 px-4 pb-16 pt-4 text-white md:w-3/5">
+        <main className="flex min-h-screen w-full flex-col gap-4 p-4 pb-20 md:w-3/5">
           {children}
         </main>
         <BottomNav session={session} />

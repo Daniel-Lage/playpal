@@ -1,34 +1,26 @@
-import { getToken } from "next-auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
-
-interface PlaylistDataProps {
-  next: URL | null;
-  total: number;
-  items: unknown[];
-}
-
-interface BatchProps {
-  items: unknown[];
-}
+import type { Paging, Playlist } from "~/common/types";
+import { refreshTokens } from "~/common/utils";
 
 export async function GET(req: NextRequest) {
-  const token = await getToken({ req });
+  const tokens = await refreshTokens(req);
 
-  if (!token) return NextResponse.json({ error: "Internal Server Error" });
+  if (!tokens?.access_token)
+    return NextResponse.json({ error: "Internal Server Error" });
 
   const response = await fetch(
     "https://api.spotify.com/v1/me/playlists?limit=50",
     {
       headers: {
-        Authorization: `Bearer  ${token.accessToken as string}`,
+        Authorization: `Bearer  ${tokens.access_token}`,
       },
     },
   );
 
   if (response.status != 200)
-    return NextResponse.json({ error: "Request Form Error" });
+    return NextResponse.json({ error: response.statusText });
 
-  const playlists = (await response.json()) as PlaylistDataProps;
+  const playlists = (await response.json()) as Paging<Playlist>;
 
   if (playlists.next) {
     const url = new URL(playlists.next);
@@ -40,7 +32,7 @@ export async function GET(req: NextRequest) {
       requests.push(
         fetch(url, {
           headers: {
-            Authorization: `Bearer ${token.accessToken as string}`,
+            Authorization: `Bearer ${tokens.access_token}`,
           },
         }),
       );
@@ -52,7 +44,7 @@ export async function GET(req: NextRequest) {
       responses.map((response) => response.json()),
     );
 
-    batches.forEach((batch: BatchProps) => {
+    batches.forEach((batch: Paging<Playlist>) => {
       playlists.items = [...playlists.items, ...batch.items];
     });
   }

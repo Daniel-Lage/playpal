@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  @apply text-black;
+}
+
 body {
-  @apply bg-black text-zinc-200;
+  @apply bg-black;
 }

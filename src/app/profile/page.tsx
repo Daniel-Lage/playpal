@@ -16,17 +16,15 @@ export default async function HomePage() {
 
   return (
     <>
-      <div className="flex w-full items-center gap-4 rounded-xl bg-zinc-700 p-4">
+      <div className="flex w-full items-center gap-4 rounded-2xl bg-lime-200 p-4">
         <div className="flex grow items-center gap-4">
-          <div className="rounded-full bg-black p-1">
-            <Image
-              width={64}
-              height={64}
-              className="rounded-full"
-              src={session.user.image}
-              alt={session.user.name}
-            />
-          </div>
+          <Image
+            width={64}
+            height={64}
+            className="rounded-full"
+            src={session.user.image}
+            alt={session.user.name}
+          />
           <div className="font-bold">{session.user.name}</div>
         </div>
         <Link href="/api/auth/signout">Logout</Link>

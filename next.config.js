@@ -10,15 +10,11 @@ const config = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "i.scdn.co",
+        hostname: "**.scdn.co",
       },
       {
         protocol: "https",
-        hostname: "image-cdn-fa.spotifycdn.com",
-      },
-      {
-        protocol: "https",
-        hostname: "image-cdn-ak.spotifycdn.com",
+        hostname: "**.spotifycdn.com",
       },
     ],
   },
