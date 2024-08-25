@@ -43,7 +43,7 @@ export function Playlists() {
             width={500}
             height={500}
             className="aspect-square w-full rounded-2xl"
-            src={playlist.images[0]?.url as string}
+            src={playlist.images[0]?.url ?? ""}
             alt={playlist.name}
           />
 
