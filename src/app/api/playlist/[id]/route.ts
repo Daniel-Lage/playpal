@@ -10,14 +10,15 @@ export async function GET(
 
   const tokens = await refreshTokens(req);
 
-  if (!tokens?.access_token)
-    return NextResponse.json({ error: "Internal Server Error" });
+  if (!tokens?.access_token) throw new Error("Internal Server Error");
 
   const response = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
     headers: {
       Authorization: `Bearer  ${tokens.access_token}`,
     },
   });
+
+  if (response.status != 200) throw new Error(response.statusText);
 
   const json = (await response.json()) as Playlist;
 

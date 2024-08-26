@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { type Playlist } from "~/common/types";
-import { Track } from "../track";
+import { Track } from "../../_components/track";
 
 async function getData(id: string) {
   const response = await fetch(`/api/playlist/${id}`);
@@ -29,9 +29,9 @@ export default function Playlist({
       .catch(console.error);
   }, [id]);
 
-  if (loading) return <div>loading</div>;
+  if (loading) return <div className="text-white">Loading...</div>;
 
-  if (!playlist) return <div>error</div>;
+  if (!playlist) return <div className="text-white">Error: Could not load</div>;
 
   return (
     <>

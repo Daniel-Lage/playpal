@@ -1,3 +1,19 @@
+import type { AdapterAccountType } from ".pnpm/@auth+core@0.34.2/node_modules/@auth/core/adapters";
+
+export interface Tokens {
+  userId: string;
+  type: AdapterAccountType;
+  provider: string;
+  providerAccountId: string;
+  refresh_token: string | null;
+  access_token: string | null;
+  expires_at: number | null;
+  token_type: string | null;
+  scope: string | null;
+  id_token: string | null;
+  session_state: string | null;
+}
+
 interface Image {
   url: string;
   height: number | null;
@@ -39,14 +55,6 @@ export interface Paging<T> {
   previous: string | null;
   total: number;
   items: T[];
-}
-
-export interface Tokens {
-  access_token: string;
-  token_type: "Bearer";
-  scope: string;
-  expires_in: number;
-  refresh_token: string;
 }
 
 interface Album {

@@ -5,8 +5,7 @@ import { refreshTokens } from "~/common/utils";
 export async function GET(req: NextRequest) {
   const tokens = await refreshTokens(req);
 
-  if (!tokens?.access_token)
-    return NextResponse.json({ error: "Internal Server Error" });
+  if (!tokens?.access_token) throw new Error("Internal Server Error");
 
   const response = await fetch(
     "https://api.spotify.com/v1/me/playlists?limit=50",
@@ -17,8 +16,7 @@ export async function GET(req: NextRequest) {
     },
   );
 
-  if (response.status != 200)
-    return NextResponse.json({ error: response.statusText });
+  if (response.status != 200) throw new Error(response.statusText);
 
   const playlists = (await response.json()) as Paging<Playlist>;
 

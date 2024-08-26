@@ -1,34 +1,20 @@
 import { getServerSession } from "next-auth";
-import { Playlists } from "./playlists";
+import { Playlists } from "../_components/playlists";
+import { UserView } from "../_components/userview";
 
-import Link from "next/link";
-import Image from "next/image";
-
-export default async function HomePage() {
+export default async function Profile() {
   const session = await getServerSession();
 
-  if (!session?.user?.image || !session?.user?.name)
+  if (!session?.user)
     return (
       <>
-        <div>Error 302: unauthorized</div>
+        <div className="text-white">Error 302: Unauthorized</div>
       </>
     );
 
   return (
     <>
-      <div className="flex w-full items-center gap-4 rounded-2xl bg-lime-200 p-4">
-        <div className="flex grow items-center gap-4">
-          <Image
-            width={64}
-            height={64}
-            className="rounded-full"
-            src={session.user.image}
-            alt={session.user.name}
-          />
-          <div className="font-bold">{session.user.name}</div>
-        </div>
-        <Link href="/api/auth/signout">Logout</Link>
-      </div>
+      <UserView session={session}></UserView>
       <Playlists />
     </>
   );

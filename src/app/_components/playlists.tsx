@@ -25,9 +25,10 @@ export function Playlists() {
       .catch(console.error);
   }, []);
 
-  if (loading) return <div>loading</div>;
+  if (loading) return <div className="text-white">Loading...</div>;
 
-  if (!playlists?.map) return <div>error</div>;
+  if (!playlists?.map)
+    return <div className="text-white">Error: Could not load</div>;
 
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">

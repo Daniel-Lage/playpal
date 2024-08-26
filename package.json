@@ -14,12 +14,14 @@
     "start": "next start"
   },
   "dependencies": {
+    "@auth/drizzle-adapter": "^1.4.2",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@vercel/postgres": "^0.9.0",
     "drizzle-orm": "^0.33.0",
     "geist": "^1.3.0",
     "next": "^14.2.4",
     "next-auth": "^4.24.7",
+    "only-server": "^0.0.1",
     "postgres": "^3.4.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

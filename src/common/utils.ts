@@ -1,27 +1,20 @@
+import { eq } from "drizzle-orm";
 import { getToken } from "next-auth/jwt";
 import { type NextRequest } from "next/server";
 import type { Tokens } from "~/common/types";
+import { db } from "~/server/db";
+import { accountsTable } from "~/server/db/schema";
 
-export async function refreshTokens(
-  req: NextRequest,
-): Promise<Tokens | undefined> {
+export async function refreshTokens(req: NextRequest): Promise<Tokens | null> {
   const token = await getToken({ req });
 
-  if (!token) return;
+  if (!token?.sub) return null;
 
-  const response = await fetch("https://accounts.spotify.com/api/token", {
-    method: "POST",
-    body: new URLSearchParams({
-      refresh_token: token.refreshToken as string,
-      grant_type: "refresh_token",
-    }).toString(),
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      Authorization: `Basic ${process.env.SPOTIFY_CLIENT_CODE ?? ""}`,
-    },
-  });
+  const data = await db
+    .select()
+    .from(accountsTable)
+    .where(eq(accountsTable.userId, token.sub))
+    .limit(1);
 
-  const json = (await response.json()) as Tokens;
-
-  return json;
+  return data[0] as Tokens;
 }
