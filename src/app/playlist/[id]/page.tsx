@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { type Playlist } from "~/common/types";
+import { type Playlist } from "~/lib/types";
 import { Track } from "../../_components/track";
 
 async function getData(id: string) {
@@ -31,11 +31,13 @@ export default function Playlist({
 
   if (loading) return <div className="text-white">Loading...</div>;
 
+  console.log(playlist);
+
   if (!playlist) return <div className="text-white">Error: Could not load</div>;
 
   return (
     <>
-      <div className="flex w-full items-center gap-4 rounded-2xl bg-lime-200 p-4">
+      <div className="flex w-full gap-4 rounded-2xl bg-lime-200 p-4">
         <Image
           width={300}
           height={300}
@@ -43,7 +45,7 @@ export default function Playlist({
           src={playlist.images[0]?.url ?? ""}
           alt={playlist.name}
         />
-        <div className="h-16 px-2 pt-2">
+        <div className="px-2 pt-2">
           <div className="text-6xl font-bold">{playlist.name}</div>
           {playlist.owner.display_name}
         </div>

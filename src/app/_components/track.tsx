@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import type { PlaylistTrack } from "~/common/types";
+import type { PlaylistTrack } from "~/lib/types";
 
 export function Track({ track }: { track: PlaylistTrack }) {
   if (track.is_local)

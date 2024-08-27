@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { refreshTokens } from "~/common/utils";
-import { type Playlist } from "~/common/types";
+import { refreshTokens } from "~/lib/utils";
+import type { Paging, PlaylistTrack, Playlist } from "~/lib/types";
 
 export async function GET(
   req: NextRequest,
@@ -10,7 +10,8 @@ export async function GET(
 
   const tokens = await refreshTokens(req);
 
-  if (!tokens?.access_token) throw new Error("Internal Server Error");
+  if (!tokens?.access_token)
+    return NextResponse.json({ error: "Internal Server Error" });
 
   const response = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
     headers: {
@@ -18,9 +19,37 @@ export async function GET(
     },
   });
 
-  if (response.status != 200) throw new Error(response.statusText);
+  if (response.status != 200)
+    return NextResponse.json({ error: response.statusText });
 
-  const json = (await response.json()) as Playlist;
+  const playlist = (await response.json()) as Playlist;
 
-  return NextResponse.json(json);
+  if (playlist.tracks.next) {
+    const url = new URL(playlist.tracks.next);
+    const requests = [];
+
+    for (let offset = 100; offset < playlist.tracks.total; offset += 100) {
+      url.searchParams.set("offset", offset.toString());
+
+      requests.push(
+        fetch(url, {
+          headers: {
+            Authorization: `Bearer ${tokens.access_token}`,
+          },
+        }),
+      );
+    }
+
+    const responses = await Promise.all(requests);
+
+    const batches = await Promise.all(
+      responses.map((response) => response.json()),
+    );
+
+    batches.forEach((batch: Paging<PlaylistTrack>) => {
+      playlist.tracks.items = [...playlist.tracks.items, ...batch.items];
+    });
+  }
+
+  return NextResponse.json(playlist);
 }

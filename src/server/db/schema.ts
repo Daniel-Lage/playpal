@@ -6,7 +6,6 @@ import {
   integer,
   pgTableCreator,
   varchar,
-  index,
 } from "drizzle-orm/pg-core";
 
 // import type { AdapterAccountType } from "next-auth/adapters" <- not here
@@ -92,22 +91,18 @@ export const authenticatorsTable = createTable(
   }),
 );
 
-export const postsTable = createTable(
-  "post",
-  {
-    id: varchar("id")
-      .primaryKey()
-      .$defaultFn(() => crypto.randomUUID()),
-    authorEmail: varchar("author_email", { length: 256 }).notNull(),
-    content: varchar("content", { length: 256 }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
-      () => new Date(),
-    ),
-  },
-  (example) => ({
-    authorIndex: index("name_idx").on(example.authorEmail),
-  }),
-);
+export const postsTable = createTable("post", {
+  id: varchar("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: text("userId")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  content: varchar("content", { length: 256 }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
+    () => new Date(),
+  ),
+});

@@ -3,23 +3,23 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { type Playlist } from "~/common/types";
-
-async function getData() {
-  const response = await fetch("/api/playlists");
-  const json = (await response.json()) as Playlist[];
-
-  return json;
-}
+import { type Playlist } from "~/lib/types";
 
 export function Playlists() {
   const [playlists, setPlaylists] = useState<Playlist[] | null>();
   const [loading, setLoading] = useState(true);
 
+  async function getPlaylists() {
+    const response = await fetch("/api/playlists");
+    const json = (await response.json()) as Playlist[];
+
+    return json;
+  }
+
   useEffect(() => {
-    getData()
-      .then((data: Playlist[]) => {
-        setPlaylists(data);
+    getPlaylists()
+      .then((playlists: Playlist[]) => {
+        setPlaylists(playlists);
         setLoading(false);
       })
       .catch(console.error);
