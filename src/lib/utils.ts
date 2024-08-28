@@ -1,24 +1,24 @@
 import { eq } from "drizzle-orm";
-import { getToken } from "next-auth/jwt";
-import { type NextRequest } from "next/server";
 import type { Tokens } from "~/lib/types";
 import { db } from "~/server/db";
 import { accountsTable } from "~/server/db/schema";
 
-export async function refreshTokens(req: NextRequest): Promise<Tokens | null> {
-  const token = await getToken({ req });
-
-  if (!token?.sub) return null;
+export async function refreshTokens(userId: string): Promise<Tokens | null> {
+  if (!userId) {
+    throw Error("Invalid userId");
+  }
 
   const account = (
     await db
       .select()
       .from(accountsTable)
-      .where(eq(accountsTable.userId, token.sub))
+      .where(eq(accountsTable.userId, userId))
       .limit(1)
   )[0];
 
-  if (!account?.refresh_token) return null;
+  if (!account?.refresh_token) {
+    throw Error("Invalid account");
+  }
 
   const response = await fetch("https://accounts.spotify.com/api/token", {
     method: "POST",

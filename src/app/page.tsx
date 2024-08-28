@@ -2,20 +2,21 @@ import { getServerSession } from "next-auth";
 import { getPosts } from "~/server/queries";
 import { PostCreator } from "./_components/postcreator";
 import Image from "next/image";
+import { authOptions } from "~/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   const posts = await getPosts();
 
   return (
     <>
-      {session && <PostCreator session={session} />}
+      <PostCreator session={session} />
       {posts.map((post) => (
         <div
           key={post.id}
-          className="flex w-full items-start rounded-xl bg-zinc-600 p-4"
+          className="flex items-start rounded-xl bg-zinc-600 p-4"
         >
           <Image
             width={40}

@@ -1,39 +1,26 @@
-"use client";
-
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { type Playlist } from "~/lib/types";
 import { Track } from "../../_components/track";
+import { getPlaylist } from "~/server/queries";
+import { getServerSession } from "next-auth";
+import { authOptions } from "~/lib/auth";
+import { UserView } from "~/app/_components/userview";
 
-async function getData(id: string) {
-  const response = await fetch(`/api/playlist/${id}`);
-  const json = (await response.json()) as Playlist;
-
-  return json;
-}
-
-export default function Playlist({
+export default async function Playlist({
   params: { id },
 }: {
   params: { id: string };
 }) {
-  const [playlist, setPlaylist] = useState<Playlist>();
-  const [loading, setLoading] = useState(true);
+  const session = await getServerSession(authOptions);
 
-  useEffect(() => {
-    getData(id)
-      .then((data: Playlist) => {
-        setPlaylist(data);
-        setLoading(false);
-      })
-      .catch(console.error);
-  }, [id]);
+  if (!session?.user)
+    return (
+      <>
+        <UserView session={session} />
+      </>
+    );
 
-  if (loading) return <div className="text-white">Loading...</div>;
-
-  console.log(playlist);
-
-  if (!playlist) return <div className="text-white">Error: Could not load</div>;
+  const playlist = await getPlaylist(session.user.id, id);
 
   return (
     <>

@@ -10,7 +10,7 @@ import {
 
 // import type { AdapterAccountType } from "next-auth/adapters" <- not here
 import type { AdapterAccountType } from ".pnpm/@auth+core@0.34.2/node_modules/@auth/core/adapters";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 
 export const createTable = pgTableCreator((name) => `playpal_${name}`);
 
@@ -106,3 +106,15 @@ export const postsTable = createTable("post", {
     () => new Date(),
   ),
 });
+
+export const usersTableRelations = relations(usersTable, ({ many }) => ({
+  author: many(postsTable, { relationName: "author" }),
+}));
+
+export const postsTableRelations = relations(postsTable, ({ one }) => ({
+  author: one(usersTable, {
+    fields: [postsTable.userId],
+    references: [usersTable.id],
+    relationName: "author",
+  }),
+}));

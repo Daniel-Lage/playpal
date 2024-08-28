@@ -1,4 +1,4 @@
-import { type AdapterUser } from "next-auth/adapters";
+import { type DefaultUser } from "next-auth";
 
 export interface Tokens {
   access_token: string | null;
@@ -107,10 +107,6 @@ export interface PlaylistTrack {
 
 declare module "next-auth" {
   interface Session {
-    user: AdapterUser;
+    user: DefaultUser & { id: string };
   }
-}
-
-export interface PostInput {
-  content: string;
 }
