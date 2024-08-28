@@ -5,7 +5,9 @@ import { accountsTable } from "~/server/db/schema";
 
 export async function refreshTokens(userId: string): Promise<Tokens | null> {
   if (!userId) {
-    throw Error("Invalid userId");
+    console.log("User ID: ", userId);
+
+    throw new Error("Invalid userId");
   }
 
   const account = (
@@ -17,7 +19,9 @@ export async function refreshTokens(userId: string): Promise<Tokens | null> {
   )[0];
 
   if (!account?.refresh_token) {
-    throw Error("Invalid account");
+    console.log("Account: ", account);
+
+    throw new Error("Invalid account");
   }
 
   const response = await fetch("https://accounts.spotify.com/api/token", {
