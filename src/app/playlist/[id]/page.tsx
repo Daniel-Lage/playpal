@@ -1,14 +1,91 @@
 "use client";
 
 import Image from "next/image";
-import type { Device, Playlist } from "~/lib/types";
+import type { Device, Playlist, PlaylistTrack } from "~/lib/types";
 import { Track } from "../../_components/track";
-import { getDevices, getPlaylist, play } from "~/server/queries";
+import { getDevices, getPlaylist } from "~/server/queries";
 import type { Session } from "next-auth";
 import { useEffect, useMemo, useState } from "react";
 import DevicePicker from "~/app/_components/devicepicker";
 import { UserView } from "~/app/_components/userview";
-import { takeRandomly } from "~/lib/utils";
+import { refreshTokens, takeRandomly } from "~/lib/utils";
+
+async function play(userId: string, tracks: PlaylistTrack[], deviceId: string) {
+  const tokens = await refreshTokens(userId);
+
+  if (!tokens?.access_token) {
+    console.log("Tokens: ", tokens);
+
+    throw new Error("Internal Server Error");
+  }
+
+  const firstTrack = tracks.shift();
+
+  if (!firstTrack) {
+    console.log("Tracks: ", tracks);
+    console.log("Shuffled Tracks: ", tracks);
+
+    throw new Error("Empty Track Array");
+  }
+
+  const response = await fetch(
+    "https://api.spotify.com/v1/me/player/queue?" +
+      new URLSearchParams({
+        uri: firstTrack.track.uri,
+        device_id: deviceId,
+      }).toString(),
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer  ${tokens.access_token}`,
+      },
+    },
+  );
+
+  if (response.status != 200) {
+    console.log("Response: ", response);
+
+    throw new Error(response.statusText);
+  }
+
+  await fetch(
+    "https://api.spotify.com/v1/me/player/next?" +
+      new URLSearchParams({
+        device_id: deviceId,
+      }).toString(),
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer  ${tokens.access_token}`,
+      },
+    },
+  );
+
+  let index = 0;
+  const interval = setInterval(() => {
+    index++;
+    if (index >= tracks.length) clearInterval(interval);
+    const track = tracks[index];
+    if (track) {
+      track.track.disc_number = index;
+      fetch(
+        "https://api.spotify.com/v1/me/player/queue?" +
+          new URLSearchParams({
+            uri: track.track.uri,
+            device_id: deviceId,
+          }).toString(),
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer  ${tokens.access_token}`,
+          },
+        },
+      ).catch(() => {
+        console.error(track.track.disc_number, "EXCEEDED", track.track.name);
+      });
+    }
+  }, 50);
+}
 
 export default function Playlist({
   params: { id },
