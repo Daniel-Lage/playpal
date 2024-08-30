@@ -36,7 +36,24 @@ export async function refreshTokens(userId: string): Promise<Tokens | null> {
     },
   });
 
+  if (response.status != 200) {
+    console.log("Response: ", response);
+
+    throw new Error(response.statusText);
+  }
+
   const json = (await response.json()) as Tokens;
 
   return json;
+}
+
+export function shuffleArray<T>(array: Array<T>): Array<T> {
+  const newArray: Array<T> = [];
+  const prevArray = [...array];
+  while (prevArray.length) {
+    const index = Math.floor(Math.random() * prevArray.length);
+    const item = prevArray.splice(index, 1)[0];
+    if (item) newArray.push(item);
+  }
+  return newArray;
 }

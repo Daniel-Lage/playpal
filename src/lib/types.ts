@@ -1,4 +1,6 @@
-import { type DefaultUser } from "next-auth";
+import type { usersTable } from "./../server/db/schema";
+import type { DefaultUser } from "next-auth";
+import type { postsTable } from "~/server/db/schema";
 
 export interface Tokens {
   access_token: string | null;
@@ -104,6 +106,25 @@ export interface PlaylistTrack {
   is_local: boolean;
   track: Track;
 }
+
+export interface Devices {
+  devices: Device[];
+}
+
+export interface Device {
+  id: string;
+  is_active: boolean;
+  is_private_session: boolean;
+  is_restricted: boolean;
+  name: string;
+  type: string;
+  volume_percent: number | null;
+  supports_volume: boolean;
+}
+
+type Author = typeof usersTable.$inferSelect;
+
+export type Post = typeof postsTable.$inferSelect & { author: Author };
 
 declare module "next-auth" {
   interface Session {

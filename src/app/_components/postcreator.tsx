@@ -1,11 +1,11 @@
 "use client";
 
-import { type Session } from "next-auth";
+import type { Session } from "next-auth";
 import { UserView } from "./userview";
 import { useState } from "react";
 import { postPost } from "~/server/queries";
 
-export function PostCreator({ session }: { session: Session | null }) {
+export function PostCreator({ session }: { session?: Session | null }) {
   const [input, setInput] = useState("");
   const [isPosting, setIsPosting] = useState(false);
 

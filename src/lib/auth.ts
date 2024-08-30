@@ -1,10 +1,9 @@
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { type NextAuthOptions } from "next-auth";
+import type { NextAuthOptions } from "next-auth";
+import type { Adapter } from "next-auth/adapters";
 
-import { type Adapter } from "next-auth/adapters";
 import SpotifyProvider from "next-auth/providers/spotify";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "~/server/db";
-
 import * as schema from "~/server/db/schema";
 
 export const authOptions: NextAuthOptions = {

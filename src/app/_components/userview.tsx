@@ -1,4 +1,4 @@
-import { type Session } from "next-auth";
+import type { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -6,7 +6,7 @@ export function UserView({
   session,
   children,
 }: {
-  session: Session | null;
+  session?: Session | null;
   children?: Readonly<React.ReactNode>;
 }) {
   if (!session?.user?.image || !session?.user?.name)
