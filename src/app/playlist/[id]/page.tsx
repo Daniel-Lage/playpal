@@ -8,7 +8,22 @@ import type { Session } from "next-auth";
 import { useEffect, useMemo, useState } from "react";
 import DevicePicker from "~/app/_components/devicepicker";
 import { UserView } from "~/app/_components/userview";
-import { refreshTokens, takeRandomly } from "~/lib/utils";
+import { refreshTokens } from "~/lib/utils";
+
+function takeRandomly<T>(array: Array<T>, limit?: number): Array<T> {
+  const size = !limit || limit > array.length ? array.length : limit;
+
+  const newArray: Array<T> = [];
+  const prevArray = [...array];
+
+  for (let index = 0; index < size; index++) {
+    const index = Math.floor(Math.random() * prevArray.length);
+    const item = prevArray.splice(index, 1)[0];
+    if (item) newArray.push(item);
+  }
+
+  return newArray;
+}
 
 async function play(userId: string, tracks: PlaylistTrack[], deviceId: string) {
   const tokens = await refreshTokens(userId);
@@ -61,10 +76,7 @@ async function play(userId: string, tracks: PlaylistTrack[], deviceId: string) {
     },
   );
 
-  let index = 0;
-  const interval = setInterval(() => {
-    index++;
-    if (index >= tracks.length) clearInterval(interval);
+  for (let index = 0; index < tracks.length; index++) {
     const track = tracks[index];
     if (track) {
       track.track.disc_number = index;
@@ -84,7 +96,7 @@ async function play(userId: string, tracks: PlaylistTrack[], deviceId: string) {
         console.error(track.track.disc_number, "EXCEEDED", track.track.name);
       });
     }
-  }, 50);
+  }
 }
 
 export default function Playlist({

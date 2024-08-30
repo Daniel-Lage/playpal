@@ -1,3 +1,5 @@
+"use server";
+
 import { eq } from "drizzle-orm";
 import type { Tokens } from "~/lib/types";
 import { db } from "~/server/db";
@@ -45,19 +47,4 @@ export async function refreshTokens(userId: string): Promise<Tokens | null> {
   const json = (await response.json()) as Tokens;
 
   return json;
-}
-
-export function takeRandomly<T>(array: Array<T>, limit?: number): Array<T> {
-  const size = !limit || limit > array.length ? array.length : limit;
-
-  const newArray: Array<T> = [];
-  const prevArray = [...array];
-
-  for (let index = 0; index < size; index++) {
-    const index = Math.floor(Math.random() * prevArray.length);
-    const item = prevArray.splice(index, 1)[0];
-    if (item) newArray.push(item);
-  }
-
-  return newArray;
 }
