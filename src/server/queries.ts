@@ -4,7 +4,7 @@ import { db } from "./db";
 import { postsTable } from "./db/schema";
 import { desc } from "drizzle-orm";
 import type { Devices, Paging, Playlist, PlaylistTrack } from "~/lib/types";
-import { refreshTokens, shuffleArray } from "~/lib/utils";
+import { refreshTokens } from "~/lib/utils";
 
 export async function getPosts() {
   const posts = await db.query.postsTable.findMany({
@@ -176,7 +176,6 @@ export async function play(
   userId: string,
   tracks: PlaylistTrack[],
   deviceId: string,
-  firstTrackUri?: string,
 ) {
   const tokens = await refreshTokens(userId);
 
@@ -186,25 +185,11 @@ export async function play(
     throw new Error("Internal Server Error");
   }
 
-  const shuffledTracks = shuffleArray(
-    tracks.filter((value) => !value.is_local),
-  );
-
-  if (firstTrackUri) {
-    const trackIndex = shuffledTracks.findIndex(
-      (track) => track.track.uri === firstTrackUri,
-    );
-
-    const track = shuffledTracks.splice(trackIndex, 1)[0];
-
-    if (track) shuffledTracks.unshift(track);
-  }
-
-  const firstTrack = shuffledTracks.shift();
+  const firstTrack = tracks.shift();
 
   if (!firstTrack) {
     console.log("Tracks: ", tracks);
-    console.log("Shuffled Tracks: ", shuffledTracks);
+    console.log("Shuffled Tracks: ", tracks);
 
     throw new Error("Empty Track Array");
   }
@@ -242,32 +227,28 @@ export async function play(
     },
   );
 
-  shuffledTracks.forEach((track) => {
-    void fetch(
-      "https://api.spotify.com/v1/me/player/queue?" +
-        new URLSearchParams({
-          uri: track.track.uri,
-          device_id: deviceId,
-        }).toString(),
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer  ${tokens.access_token}`,
+  let index = 0;
+  const interval = setInterval(() => {
+    index++;
+    if (index >= tracks.length) clearInterval(interval);
+    const track = tracks[index];
+    if (track) {
+      track.track.disc_number = index;
+      fetch(
+        "https://api.spotify.com/v1/me/player/queue?" +
+          new URLSearchParams({
+            uri: track.track.uri,
+            device_id: deviceId,
+          }).toString(),
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer  ${tokens.access_token}`,
+          },
         },
-      },
-    );
-  });
-}
-
-export async function playFrom(
-  userId: string,
-  tracks: PlaylistTrack[],
-  firstTrackUri: string,
-  deviceId?: string,
-) {
-  if (!deviceId) {
-    throw new Error("Invalid Device ID");
-  }
-
-  void play(userId, tracks, deviceId, firstTrackUri);
+      ).catch(() => {
+        console.error(track.track.disc_number, "EXCEEDED", track.track.name);
+      });
+    }
+  }, 50);
 }

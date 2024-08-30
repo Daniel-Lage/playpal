@@ -3,11 +3,12 @@
 import Image from "next/image";
 import type { Device, Playlist } from "~/lib/types";
 import { Track } from "../../_components/track";
-import { getDevices, getPlaylist, play, playFrom } from "~/server/queries";
+import { getDevices, getPlaylist, play } from "~/server/queries";
 import type { Session } from "next-auth";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DevicePicker from "~/app/_components/devicepicker";
 import { UserView } from "~/app/_components/userview";
+import { takeRandomly } from "~/lib/utils";
 
 export default function Playlist({
   params: { id },
@@ -19,6 +20,15 @@ export default function Playlist({
   const [target, setTarget] = useState<Device | undefined>();
   const [devices, setDevices] = useState<Device[]>([]);
   const [playing, setPlaying] = useState(false);
+
+  const shuffledTracks = useMemo(() => {
+    if (!playlist) return [];
+
+    return takeRandomly(
+      playlist.tracks.items.filter((value) => !value.is_local),
+      99,
+    );
+  }, [playlist]);
 
   useEffect(() => {
     fetch("/api/auth/session")
@@ -76,7 +86,13 @@ export default function Playlist({
               className="font-extrabold text-red-500 hover:text-red-700"
               onClick={async () => {
                 setPlaying(true);
-                play(session.user.id, playlist.tracks.items, target.id)
+
+                const shuffledTracks = takeRandomly(
+                  playlist.tracks.items.filter((value) => !value.is_local),
+                  99,
+                );
+
+                play(session.user.id, shuffledTracks, target.id)
                   .then(() => setPlaying(false))
                   .catch(console.error);
               }}
@@ -93,13 +109,21 @@ export default function Playlist({
           deviceId={target?.id}
           playing={playing}
           playFrom={() => {
+            if (!target) return;
+
             setPlaying(true);
-            playFrom(
-              session.user.id,
-              playlist.tracks.items,
-              track.track.uri,
-              target?.id,
-            )
+
+            const shuffledTracksWithFirstTrack = [...shuffledTracks];
+
+            const trackIndex = shuffledTracksWithFirstTrack.findIndex(
+              (other) => other.track.uri === track.track.uri,
+            );
+
+            void shuffledTracksWithFirstTrack.splice(trackIndex, 1)[0];
+
+            shuffledTracksWithFirstTrack.unshift(track);
+
+            play(session.user.id, shuffledTracksWithFirstTrack, target.id)
               .then(() => setPlaying(false))
               .catch(console.error);
           }}

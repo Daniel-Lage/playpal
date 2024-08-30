@@ -47,13 +47,17 @@ export async function refreshTokens(userId: string): Promise<Tokens | null> {
   return json;
 }
 
-export function shuffleArray<T>(array: Array<T>): Array<T> {
+export function takeRandomly<T>(array: Array<T>, limit?: number): Array<T> {
+  const size = !limit || limit > array.length ? array.length : limit;
+
   const newArray: Array<T> = [];
   const prevArray = [...array];
-  while (prevArray.length) {
+
+  for (let index = 0; index < size; index++) {
     const index = Math.floor(Math.random() * prevArray.length);
     const item = prevArray.splice(index, 1)[0];
     if (item) newArray.push(item);
   }
+
   return newArray;
 }
