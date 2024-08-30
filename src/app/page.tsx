@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { getPosts } from "~/server/queries";
 import { PostCreator } from "./_components/postcreator";
 import { authOptions } from "~/lib/auth";
-import { Posts } from "./_components/posts";
+import { Post } from "./_components/post";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,9 @@ export default async function HomePage() {
   return (
     <>
       <PostCreator session={session} />
-      <Posts posts={posts} />
+      {posts.map((post) => (
+        <Post key={post.id} post={post} />
+      ))}
     </>
   );
 }

@@ -6,7 +6,6 @@ import { Track } from "../../_components/track";
 import { getDevices, getPlaylist } from "~/server/queries";
 import type { Session } from "next-auth";
 import { useEffect, useMemo, useState } from "react";
-import DevicePicker from "~/app/_components/devicepicker";
 import { UserView } from "~/app/_components/userview";
 import { refreshTokens } from "~/lib/utils";
 
@@ -43,7 +42,7 @@ async function play(userId: string, tracks: PlaylistTrack[], deviceId: string) {
     throw new Error("Empty Track Array");
   }
 
-  const response = await fetch(
+  const addedToQueue = await fetch(
     "https://api.spotify.com/v1/me/player/queue?" +
       new URLSearchParams({
         uri: firstTrack.track.uri,
@@ -57,13 +56,13 @@ async function play(userId: string, tracks: PlaylistTrack[], deviceId: string) {
     },
   );
 
-  if (response.status != 200) {
-    console.log("Response: ", response);
+  if (addedToQueue.status != 200) {
+    console.log("Response: ", addedToQueue);
 
-    throw new Error(response.statusText);
+    throw new Error(addedToQueue.statusText);
   }
 
-  await fetch(
+  const skipped = await fetch(
     "https://api.spotify.com/v1/me/player/next?" +
       new URLSearchParams({
         device_id: deviceId,
@@ -75,6 +74,12 @@ async function play(userId: string, tracks: PlaylistTrack[], deviceId: string) {
       },
     },
   );
+
+  if (skipped.status != 200) {
+    console.log("Response: ", skipped);
+
+    throw new Error(skipped.statusText);
+  }
 
   for (let index = 0; index < tracks.length; index++) {
     const track = tracks[index];
@@ -150,47 +155,86 @@ export default function Playlist({
 
   return (
     <>
-      <div className="flex w-full gap-4 rounded-2xl bg-lime-200 p-4">
-        <Image
-          width={300}
-          height={300}
-          className="aspect-square rounded-xl"
-          src={playlist.images[0]?.url ?? ""}
-          alt={playlist.name}
-        />
-        <div className="flex flex-col items-start p-2">
-          <div className="text-6xl font-bold">{playlist.name}</div>
-          <div className="mb-4">{playlist.owner.display_name}</div>
-          <DevicePicker
-            {...{
-              devices,
-              setDevices,
-              target,
-              setTarget,
-              session,
-            }}
+      <div className="grid grid-cols-1 overflow-hidden md:rounded-2xl">
+        <div className="bg-main1 flex w-full flex-col items-center gap-2 p-2 md:flex-row md:items-start">
+          <Image
+            width={240}
+            height={240}
+            className="rounded-xl"
+            src={playlist.images[0]?.url ?? ""}
+            alt={playlist.name}
           />
+          <div className="flex flex-col items-start p-2">
+            <div className="text-xl font-bold md:text-6xl">{playlist.name}</div>
+            <div className="text-sm font-light md:text-lg">
+              {playlist.description}
+            </div>
+            <div className="text-sm font-bold md:text-xl">
+              {playlist.owner.display_name} - {playlist.tracks.total} songs
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-main2 flex w-full justify-between gap-4 p-4">
+          <div className="flex gap-2">
+            <div className="bg-main3 flex flex-col items-center rounded-xl text-center">
+              {devices.length > 0 && target ? (
+                <>
+                  <div className="w-full p-1 font-bold">
+                    Pick spotify device
+                  </div>
+                  <select
+                    className="bg-main1 w-full cursor-pointer rounded-b-lg p-1 text-center"
+                    onChange={(e) => {
+                      const target = devices.find(
+                        (value) => value.name == e.target.value,
+                      );
+                      setTarget(target);
+                    }}
+                  >
+                    {devices.map((device) => (
+                      <option key={device.id}>{device.name}</option>
+                    ))}
+                  </select>
+                </>
+              ) : (
+                <div className="p-2 font-bold">No active spotify device</div>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                getDevices(session.user.id)
+                  .then((devices) => {
+                    setDevices(devices);
+                    setTarget(devices[0]);
+                  })
+                  .catch(console.error);
+              }}
+            >
+              <Image
+                height={32}
+                width={32}
+                src="/reload.svg"
+                alt="reload icon"
+              />
+            </button>
+          </div>
           {target && !playing && (
             <button
-              className="font-extrabold text-red-500 hover:text-red-700"
+              className="font-extrabold text-red-500"
               onClick={async () => {
                 setPlaying(true);
-
-                const shuffledTracks = takeRandomly(
-                  playlist.tracks.items.filter((value) => !value.is_local),
-                  99,
-                );
-
                 play(session.user.id, shuffledTracks, target.id)
                   .then(() => setPlaying(false))
                   .catch(console.error);
               }}
             >
-              Play
+              <Image height={32} width={32} src="/play.svg" alt="play icon" />
             </button>
           )}
         </div>
       </div>
+
       {playlist.tracks.items.map((track) => (
         <Track
           key={track.track.uri}

@@ -14,51 +14,36 @@ export function Track({
   playFrom: () => void;
   playing: boolean;
 }) {
-  if (track.is_local)
-    return (
-      <div className="flex items-center gap-4 rounded-md bg-green-200 p-1 font-bold">
-        <button className="flex aspect-square h-10 w-10 items-center justify-center font-extrabold text-red-500 hover:text-red-700">
-          Local
-        </button>
-        <div className="aspect-square h-10 w-10 rounded-lg bg-black" />
-        <div className="grow text-left">{track.track.name}</div>
-        {track.track.artists.map((artist) => artist.name).join(", ")}
-      </div>
-    );
-
-  if (!deviceId || playing)
-    return (
-      <div className="flex items-center gap-4 rounded-md bg-green-200 p-1 font-bold">
-        <div className="flex aspect-square h-10 w-10 items-center justify-center font-extrabold text-red-500 hover:text-red-700"></div>
+  return (
+    <button
+      className="bg-secondary flex items-center gap-1 p-1 font-bold md:rounded-lg"
+      disabled={!deviceId || playing || track.is_local}
+      onClick={playFrom}
+    >
+      {track.track.album.images[0]?.url ? (
         <Image
           width={40}
           height={40}
-          className="aspect-square rounded-lg"
+          className="rounded-md"
           src={track.track.album.images[0]?.url ?? ""}
           alt={track.track.album.name}
         />
-        <div className="grow text-left">{track.track.name}</div>
-        {track.track.artists.map((artist) => artist.name).join(", ")}
+      ) : (
+        <div className="h-10 w-10 rounded-md bg-black" />
+      )}
+      <div className="grow overflow-hidden">
+        <div className="flex grow overflow-hidden">
+          <div className="w-full truncate text-left text-sm md:w-1/2">
+            {track.track.name}
+          </div>
+          <div className="w-0 truncate text-left text-sm md:w-1/2">
+            {track.track.album.name}
+          </div>
+        </div>
+        <div className="w-full truncate text-left text-xs">
+          {track.track.artists.map((artist) => artist.name).join(", ")}
+        </div>
       </div>
-    );
-
-  return (
-    <div className="flex items-center gap-4 rounded-md bg-green-200 p-1 font-bold">
-      <button
-        onClick={() => playFrom()}
-        className="flex aspect-square h-10 w-10 items-center justify-center font-extrabold text-red-500 hover:text-red-700"
-      >
-        Play
-      </button>
-      <Image
-        width={40}
-        height={40}
-        className="aspect-square rounded-lg"
-        src={track.track.album.images[0]?.url ?? ""}
-        alt={track.track.album.name}
-      />
-      <div className="grow text-left">{track.track.name}</div>
-      {track.track.artists.map((artist) => artist.name).join(", ")}
-    </div>
+    </button>
   );
 }

@@ -18,12 +18,12 @@ export function Playlists({ session }: { session: Session }) {
   }, [session]);
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-2 p-2 pt-0 md:grid-cols-4 md:gap-4">
       {playlists.map((playlist) => (
         <Link
-          href={`/playlist/${playlist.id}`} // WIP
+          href={`/playlist/${playlist.id}`}
           key={playlist.id}
-          className="flex flex-col items-center overflow-hidden rounded-2xl bg-zinc-500 hover:bg-zinc-600"
+          className="bg-secondary flex flex-col items-center overflow-hidden rounded-2xl"
         >
           <Image
             width={500}
