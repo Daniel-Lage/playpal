@@ -3,7 +3,7 @@ import type { Post } from "~/lib/types";
 
 export function Post({ post }: { post: Post }) {
   return (
-    <div className="bg-secondary flex flex-col gap-2 p-2 md:rounded-xl">
+    <div className="flex flex-col gap-2 bg-secondary p-2 md:rounded-xl">
       <div className="flex items-center">
         <Image
           width={32}
@@ -14,7 +14,7 @@ export function Post({ post }: { post: Post }) {
         />
         <div className="grow px-2 font-bold">{post.author?.name}</div>
         <button>
-          <Image height={32} width={32} src="/trash.svg" alt="trash icon" />
+          <Image height={24} width={24} src="/trash.png" alt="trash icon" />
         </button>
       </div>
       <div>{post.content}</div>

@@ -13,15 +13,15 @@ export const metadata: Metadata = {
 
 function BottomNav() {
   return (
-    <div className="bg-nav fixed bottom-0 flex h-16 w-full font-bold">
+    <div className="fixed bottom-0 flex h-16 w-full bg-nav font-bold">
       <div className="flex w-1/2 items-center justify-center">
         <Link href="/profile">
-          <Image height={32} width={32} src="/profile.svg" alt="profile icon" />
+          <Image height={32} width={32} src="/profile.png" alt="profile icon" />
         </Link>
       </div>
       <div className="flex w-1/2 items-center justify-center">
         <Link href="/">
-          <Image height={32} width={32} src="/home.svg" alt="home icon" />
+          <Image height={32} width={32} src="/home.png" alt="home icon" />
         </Link>
       </div>
     </div>

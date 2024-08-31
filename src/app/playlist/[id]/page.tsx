@@ -156,7 +156,7 @@ export default function Playlist({
   return (
     <>
       <div className="grid grid-cols-1 overflow-hidden md:rounded-2xl">
-        <div className="bg-main1 flex w-full flex-col items-center gap-2 p-2 md:flex-row md:items-start">
+        <div className="flex w-full flex-col items-center gap-2 bg-main1 p-2 md:flex-row md:items-start">
           <Image
             width={240}
             height={240}
@@ -175,16 +175,16 @@ export default function Playlist({
           </div>
         </div>
 
-        <div className="bg-main2 flex w-full justify-between gap-4 p-4">
+        <div className="flex w-full justify-between gap-4 bg-main2 p-4">
           <div className="flex gap-2">
-            <div className="bg-main3 flex flex-col items-center rounded-xl text-center">
+            <div className="flex flex-col items-center rounded-xl bg-main3 text-center">
               {devices.length > 0 && target ? (
                 <>
                   <div className="w-full p-1 font-bold">
                     Pick spotify device
                   </div>
                   <select
-                    className="bg-main1 w-full cursor-pointer rounded-b-lg p-1 text-center"
+                    className="w-full cursor-pointer rounded-b-lg bg-main1 p-1 text-center"
                     onChange={(e) => {
                       const target = devices.find(
                         (value) => value.name == e.target.value,
@@ -214,7 +214,7 @@ export default function Playlist({
               <Image
                 height={32}
                 width={32}
-                src="/reload.svg"
+                src="/reload.png"
                 alt="reload icon"
               />
             </button>
@@ -229,7 +229,7 @@ export default function Playlist({
                   .catch(console.error);
               }}
             >
-              <Image height={32} width={32} src="/play.svg" alt="play icon" />
+              <Image height={32} width={32} src="/play.png" alt="play icon" />
             </button>
           )}
         </div>
