@@ -8,6 +8,7 @@ import type { Session } from "next-auth";
 import { useEffect, useMemo, useState } from "react";
 import { UserView } from "~/app/_components/userview";
 import { refreshTokens } from "~/lib/utils";
+import { Logo } from "~/app/_components/logo";
 
 function takeRandomly<T>(array: Array<T>, limit?: number): Array<T> {
   const size = !limit || limit > array.length ? array.length : limit;
@@ -164,8 +165,11 @@ export default function Playlist({
             src={playlist.images[0]?.url ?? ""}
             alt={playlist.name}
           />
-          <div className="flex flex-col items-start p-2">
-            <div className="text-xl font-bold md:text-6xl">{playlist.name}</div>
+          <div className="flex w-full flex-col items-start p-2">
+            <div className="flex w-full justify-between text-xl font-bold md:text-6xl">
+              {playlist.name}
+              <Logo />
+            </div>
             <div className="text-sm font-light md:text-lg">
               {playlist.description}
             </div>

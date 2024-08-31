@@ -3,9 +3,9 @@
 import type { Session } from "next-auth";
 import { useState } from "react";
 import { postPost } from "~/server/queries";
-import Link from "next/link";
 import Image from "next/image";
 import { SignInButton } from "./signinbutton";
+import { Logo } from "./logo";
 
 export function PostCreator({ session }: { session?: Session | null }) {
   const [input, setInput] = useState("");
@@ -37,6 +37,7 @@ export function PostCreator({ session }: { session?: Session | null }) {
           alt={session.user.name}
         />
         <div className="grow px-2 font-bold">{session.user.name}</div>
+        <Logo />
       </div>
       <div className="flex">
         <input

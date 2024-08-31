@@ -2,6 +2,7 @@ import type { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { SignInButton } from "./signinbutton";
+import { Logo } from "./logo";
 
 export function UserView({ session }: { session?: Session | null }) {
   if (!session?.user?.image || !session?.user?.name) return <SignInButton />;
@@ -18,6 +19,8 @@ export function UserView({ session }: { session?: Session | null }) {
         />
         <div className="flex grow flex-col font-bold">{session.user.name}</div>
       </div>
+      <Logo />
+
       <Link href="/api/auth/signout">
         <Image height={32} width={32} src="/exit.png" alt="exit icon" />
       </Link>
