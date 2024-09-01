@@ -166,7 +166,7 @@ export default function Playlist({
             alt={playlist.name}
           />
           <div className="flex w-full flex-col items-start p-2">
-            <div className="flex w-full justify-between text-xl font-bold md:text-6xl">
+            <div className="flex w-full items-start justify-between text-xl font-bold md:text-6xl">
               {playlist.name}
               <Logo />
             </div>
