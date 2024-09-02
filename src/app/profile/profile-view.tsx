@@ -98,7 +98,7 @@ export function ProfileView({ session }: { session: Session }) {
                   Posts
                 </div>
                 <button
-                  className="flex w-1/2 justify-center p-1"
+                  className="flex w-1/2 justify-center bg-main1 p-1"
                   onClick={() => setShowPosts(false)}
                 >
                   Playlists
@@ -107,7 +107,7 @@ export function ProfileView({ session }: { session: Session }) {
             ) : (
               <>
                 <button
-                  className="flex w-1/2 justify-center p-1"
+                  className="flex w-1/2 justify-center bg-main1 p-1"
                   onClick={() => setShowPosts(true)}
                 >
                   Posts
