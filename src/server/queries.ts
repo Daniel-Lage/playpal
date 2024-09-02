@@ -1,15 +1,27 @@
 "use server";
+
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
-import { postsTable } from "./db/schema";
-import { desc } from "drizzle-orm";
-import type { Devices, Paging, Playlist, PlaylistTrack } from "~/lib/types";
-import { refreshTokens } from "~/lib/utils";
+import { postsTable, accountsTable } from "./db/schema";
+import { desc, eq } from "drizzle-orm";
+
+import type { Account } from "next-auth";
 
 export async function getPosts() {
   const posts = await db.query.postsTable.findMany({
     with: { author: true },
     orderBy: [desc(postsTable.createdAt)],
+    limit: 100,
+  });
+
+  return posts;
+}
+
+export async function getUsersPosts(userId: string) {
+  const posts = await db.query.postsTable.findMany({
+    with: { author: true },
+    orderBy: [desc(postsTable.createdAt)],
+    where: eq(postsTable.userId, userId),
     limit: 100,
   });
 
@@ -29,145 +41,31 @@ export async function postPost(content: string, userId: string) {
   )[0];
 
   revalidatePath("/");
+  revalidatePath("/profile");
 
   return post;
 }
 
-export async function getPlaylists(userId: string) {
-  const tokens = await refreshTokens(userId);
+export async function getAccount(userId: string): Promise<Account | null> {
+  if (!userId) {
+    console.log("User ID: ", userId);
 
-  if (!tokens?.access_token) {
-    console.log("Tokens: ", tokens);
-
-    throw new Error("Internal Server Error");
+    throw new Error("Invalid userId");
   }
 
-  const response = await fetch(
-    "https://api.spotify.com/v1/me/playlists?limit=50",
-    {
-      headers: {
-        Authorization: `Bearer ${tokens.access_token}`,
-      },
-    },
-  );
+  const account = (
+    await db
+      .select()
+      .from(accountsTable)
+      .where(eq(accountsTable.userId, userId))
+      .limit(1)
+  )[0] as Account;
 
-  if (response.status != 200) {
-    console.log("Response: ", response);
+  if (!account?.refresh_token) {
+    console.log("Account: ", account);
 
-    throw new Error(response.statusText);
+    throw new Error("Invalid account");
   }
 
-  const playlists = (await response.json()) as Paging<Playlist>;
-
-  if (playlists.next) {
-    const url = new URL(playlists.next);
-    const requests = [];
-
-    for (let offset = 50; offset < playlists.total; offset += 50) {
-      url.searchParams.set("offset", offset.toString());
-
-      requests.push(
-        fetch(url, {
-          headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-          },
-        }),
-      );
-    }
-
-    const responses = await Promise.all(requests);
-
-    const batches = await Promise.all(
-      responses.map((response) => response.json()),
-    );
-
-    batches.forEach((batch: Paging<Playlist>) => {
-      playlists.items = [...playlists.items, ...batch.items];
-    });
-  }
-
-  return playlists.items;
-}
-
-export async function getPlaylist(userId: string, id: string) {
-  const tokens = await refreshTokens(userId);
-
-  if (!tokens?.access_token) {
-    console.log("Tokens: ", tokens);
-
-    throw new Error("Internal Server Error");
-  }
-
-  const response = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
-    headers: {
-      Authorization: `Bearer  ${tokens.access_token}`,
-    },
-  });
-
-  if (response.status != 200) {
-    console.log("Response: ", response);
-
-    throw new Error(response.statusText);
-  }
-
-  const playlist = (await response.json()) as Playlist;
-
-  if (playlist.tracks.next) {
-    const url = new URL(playlist.tracks.next);
-    const requests = [];
-
-    for (let offset = 100; offset < playlist.tracks.total; offset += 100) {
-      url.searchParams.set("offset", offset.toString());
-
-      requests.push(
-        fetch(url, {
-          headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-          },
-        }),
-      );
-    }
-
-    const responses = await Promise.all(requests);
-
-    const batches = await Promise.all(
-      responses.map((response) => response.json()),
-    );
-
-    batches.forEach((batch: Paging<PlaylistTrack>) => {
-      playlist.tracks.items = [...playlist.tracks.items, ...batch.items];
-    });
-  }
-
-  return playlist;
-}
-
-export async function getDevices(userId: string) {
-  const tokens = await refreshTokens(userId);
-
-  if (!tokens?.access_token) {
-    console.log("Tokens: ", tokens);
-
-    throw new Error("Internal Server Error");
-  }
-
-  const response = await fetch("https://api.spotify.com/v1/me/player/devices", {
-    headers: {
-      Authorization: `Bearer  ${tokens.access_token}`,
-    },
-  });
-
-  if (response.statusText == "No Content") {
-    return [];
-  }
-
-  if (response.status != 200) {
-    console.log("Response: ", response);
-
-    throw new Error(response.statusText);
-  }
-
-  const devices = (await response.json()) as Devices;
-
-  return devices.devices;
+  return account;
 }

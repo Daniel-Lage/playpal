@@ -1,7 +1,7 @@
 import Image from "next/image";
-import type { Post } from "~/lib/types";
+import type { PostObject } from "~/server/types";
 
-export function Post({ post }: { post: Post }) {
+export function Post({ post }: { post: PostObject }) {
   return (
     <div className="flex flex-col gap-2 bg-secondary p-2 md:rounded-xl">
       <div className="flex items-center">

@@ -1,7 +1,3 @@
-import type { usersTable } from "./../server/db/schema";
-import type { DefaultUser } from "next-auth";
-import type { postsTable } from "~/server/db/schema";
-
 export interface Tokens {
   access_token: string | null;
   expires_at: number | null;
@@ -69,7 +65,7 @@ interface Album {
   artists: SimplifiedArtist[];
 }
 
-interface SimplifiedArtist {
+export interface SimplifiedArtist {
   external_urls: { spotify: string };
   href: string;
   id: string;
@@ -122,12 +118,5 @@ export interface Device {
   supports_volume: boolean;
 }
 
-type Author = typeof usersTable.$inferSelect;
-
-export type Post = typeof postsTable.$inferSelect & { author: Author };
-
-declare module "next-auth" {
-  interface Session {
-    user: DefaultUser & { id: string };
-  }
-}
+export type tracksSortingColumn = "Added at" | "Name" | "Album" | "Artists";
+export type playlistsSortingColumn = "Created at" | "Name" | "Owner";

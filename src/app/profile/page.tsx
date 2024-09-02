@@ -1,17 +1,12 @@
 import { getServerSession } from "next-auth";
-import { UserView } from "../_components/userview";
 import { authOptions } from "~/lib/auth";
-import { Playlists } from "../_components/playlists";
+import { SignInButton } from "~/app/_components/signin-button";
+import { ProfileView } from "./profile-view";
 
 export default async function Profile() {
   const session = await getServerSession(authOptions);
 
-  if (!session?.user) return <UserView session={session} />;
+  if (!session) return <SignInButton />;
 
-  return (
-    <>
-      <UserView session={session} />
-      <Playlists session={session} />
-    </>
-  );
+  return <ProfileView session={session} />;
 }
