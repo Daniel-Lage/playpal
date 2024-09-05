@@ -15,9 +15,6 @@ import Image from "next/image";
 import { Logo } from "../../_components/logo";
 import { SignInButton } from "../../_components/signin-button";
 
-const initialSortingColumn: tracksSortingColumn = "Added at";
-const initialReversed = false;
-
 export default function PlaylistView({
   session,
   id,
@@ -30,8 +27,31 @@ export default function PlaylistView({
   const [devices, setDevices] = useState<Device[]>([]);
   const [playing, setPlaying] = useState(false);
 
+  const initialSortingColumn = (window.localStorage.getItem(
+    `${session.user.providerAccountId}:tracks_sorting_column`,
+  ) || "Added at") as tracksSortingColumn;
+
   const [sortingColumn, setSortingColumn] = useState(initialSortingColumn);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      `${session.user.providerAccountId}:tracks_sorting_column`,
+      sortingColumn,
+    );
+  }, [sortingColumn]);
+  const initialReversed =
+    window.localStorage.getItem(
+      `${session.user.providerAccountId}:tracks_reversed`,
+    ) === "true";
+
   const [reversed, setReversed] = useState(initialReversed);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      `${session.user.providerAccountId}:tracks_reversed`,
+      reversed.toString(),
+    );
+  }, [reversed]);
   const [filter, setFilter] = useState("");
 
   const treatedTracks = useMemo(() => {
@@ -154,29 +174,28 @@ export default function PlaylistView({
           </div>
         </div>
 
-        <div className="flex flex-col justify-between gap-2 bg-main2 p-2 md:flex-row">
-          <div className="flex justify-end gap-2">
-            <div className="flex w-full flex-col items-center rounded-xl bg-main3 text-center text-sm md:w-auto md:text-base">
-              {devices.length > 0 && deviceId ? (
-                <>
-                  <div className="font-bold md:p-1">Spotify device</div>
-                  <select
-                    className="w-full cursor-pointer rounded-b-lg bg-main1 text-center md:p-1"
-                    onChange={(e) => {
-                      setDeviceId(e.target.value);
-                    }}
-                  >
-                    {devices.map((device) => (
-                      <option key={device.id} value={device.id}>
-                        {device.name}
-                      </option>
-                    ))}
-                  </select>
-                </>
-              ) : (
-                <div className="p-2 font-bold">No active spotify device</div>
-              )}
-            </div>
+        <div className="flex flex-col items-center justify-between gap-2 bg-main2 p-2 md:flex-row">
+          <div className="flex gap-2 md:w-1/3">
+            {devices.length > 0 && deviceId ? (
+              <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center">
+                <div className="font-bold md:p-1">Spotify device</div>
+                <select
+                  onChange={(e) => {
+                    setDeviceId(e.target.value);
+                  }}
+                >
+                  {devices.map((device) => (
+                    <option key={device.id} value={device.id}>
+                      {device.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="p-2 text-sm font-bold">
+                No active spotify device
+              </div>
+            )}
             <button
               onClick={() => {
                 getDevices(session.user.id)
@@ -196,11 +215,10 @@ export default function PlaylistView({
             </button>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <div className="flex w-full flex-col items-center rounded-xl bg-main3 text-center text-sm md:w-auto md:text-base">
-              <div className="font-bold md:p-1">Sorting column</div>
+          <div className="flex gap-2 md:w-1/3">
+            <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center">
+              <div className="font-bold md:p-1">Sort by</div>
               <select
-                className="w-full cursor-pointer rounded-b-lg bg-main1 text-center md:p-1"
                 onChange={(e) => {
                   setSortingColumn(e.target.value as tracksSortingColumn);
                 }}
@@ -229,7 +247,7 @@ export default function PlaylistView({
             </button>
           </div>
 
-          <div className="flex gap-2 text-sm md:text-base">
+          <div className="flex w-full gap-2 md:w-1/3">
             <input
               placeholder="Search something!"
               className="w-32 grow bg-transparent placeholder-zinc-600 outline-none md:w-48"

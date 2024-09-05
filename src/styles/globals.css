@@ -9,3 +9,19 @@ html {
 body {
   @apply bg-black;
 }
+
+select {
+  border: solid black;
+  border-width: 0 4px 4px 0;
+  font-size: 0px;
+  width: 14px;
+  height: 14px;
+  background-color: transparent;
+  rotate: 45deg;
+  display: inline-block;
+  cursor: pointer;
+}
+
+option {
+  @apply text-base;
+}

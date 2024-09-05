@@ -8,11 +8,6 @@ import * as schema from "~/server/db/schema";
 
 export const authOptions: NextAuthOptions = {
   adapter: DrizzleAdapter(db, schema) as Adapter,
-  secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60,
-  },
   providers: [
     SpotifyProvider({
       clientId: process.env.SPOTIFY_CLIENT_ID ?? "",
@@ -20,9 +15,14 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    session: async ({ session, token }) => {
-      if (token?.sub) {
-        session.user.id = token.sub;
+    signIn: async ({ user, account }) => {
+      if (account?.providerAccountId)
+        user.providerAccountId = account?.providerAccountId;
+      return true;
+    },
+    session: async ({ session, user }) => {
+      if (user) {
+        session.user = user;
       }
       return session;
     },

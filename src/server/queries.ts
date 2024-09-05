@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
-import { postsTable, accountsTable } from "./db/schema";
+import { postsTable, accountsTable, usersTable } from "./db/schema";
 import { desc, eq } from "drizzle-orm";
 
 import type { Account } from "next-auth";
@@ -17,11 +17,19 @@ export async function getPosts() {
   return posts;
 }
 
-export async function getUsersPosts(userId: string) {
+export async function getUserFromSpotifyUserId(spotifyUserId: string) {
+  const user = await db.query.usersTable.findFirst({
+    where: eq(usersTable.providerAccountId, spotifyUserId),
+  });
+
+  return user;
+}
+
+export async function getUsersPosts(authorId: string) {
   const posts = await db.query.postsTable.findMany({
     with: { author: true },
     orderBy: [desc(postsTable.createdAt)],
-    where: eq(postsTable.userId, userId),
+    where: eq(postsTable.userId, authorId),
     limit: 100,
   });
 

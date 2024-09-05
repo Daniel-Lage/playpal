@@ -3,7 +3,7 @@
 import { getAccount } from "~/server/queries";
 import type { Devices, PlaylistTrack, Tokens, Paging, Playlist } from "./types";
 
-export async function getPlaylists(userId: string) {
+export async function getPlaylists(userId: string, spotifyUserId?: string) {
   const tokens = await getTokens(userId);
 
   if (!tokens?.access_token) {
@@ -12,14 +12,20 @@ export async function getPlaylists(userId: string) {
     throw new Error("Internal Server Error");
   }
 
-  const response = await fetch(
-    "https://api.spotify.com/v1/me/playlists?limit=50",
-    {
-      headers: {
-        Authorization: `Bearer ${tokens.access_token}`,
-      },
-    },
-  );
+  const response = spotifyUserId
+    ? await fetch(
+        `https://api.spotify.com/v1/users/${spotifyUserId}/playlists?limit=50`,
+        {
+          headers: {
+            Authorization: `Bearer ${tokens.access_token}`,
+          },
+        },
+      )
+    : await fetch("https://api.spotify.com/v1/me/playlists?limit=50", {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`,
+        },
+      });
 
   if (response.status != 200) {
     console.log("Response: ", response);
@@ -172,4 +178,36 @@ export async function getTokens(userId: string) {
   const json = (await response.json()) as Tokens;
 
   return json;
+}
+
+export async function getSpotifyUser(userId: string, spotifyUserId?: string) {
+  const tokens = await getTokens(userId);
+
+  if (!tokens?.access_token) {
+    console.log("Tokens: ", tokens);
+
+    throw new Error("Internal Server Error");
+  }
+
+  const response = spotifyUserId
+    ? await fetch(`https://api.spotify.com/v1/users/${spotifyUserId}`, {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`,
+        },
+      })
+    : await fetch("https://api.spotify.com/v1/me", {
+        headers: {
+          Authorization: `Bearer ${tokens.access_token}`,
+        },
+      });
+
+  if (response.status != 200) {
+    console.log("Response: ", response);
+
+    throw new Error(response.statusText);
+  }
+
+  const user = await response.json();
+
+  return user;
 }

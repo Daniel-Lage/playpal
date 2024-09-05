@@ -1,28 +1,69 @@
 "use client";
 
-import type { Session } from "next-auth";
+import type { Session, User } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { SignInButton } from "~/app/_components/signin-button";
 import { Logo } from "~/app/_components/logo";
 import { useEffect, useMemo, useState } from "react";
 import type { Playlist, playlistsSortingColumn } from "~/api/types";
-import { getPlaylists } from "~/api/calls";
+import { getPlaylists, getSpotifyUser } from "~/api/calls";
 import type { PostObject } from "~/server/types";
 import { getUsersPosts } from "~/server/queries";
 import { Post } from "~/app/_components/post";
 import { PostCreator } from "~/app/_components/post-creator";
 
-const initialSortingColumn: playlistsSortingColumn = "Name";
-const initialReversed = false;
-
-export function ProfileView({ session }: { session: Session }) {
+export function ProfileView({
+  session,
+  user,
+}: {
+  session: Session;
+  user?: User;
+}) {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [posts, setPosts] = useState<PostObject[]>([]);
-  const [showPosts, setShowPosts] = useState(false);
+
+  const initialShowPosts =
+    window.localStorage.getItem(
+      `${session.user.providerAccountId}:show_posts`,
+    ) === "true";
+
+  const [showPosts, setShowPosts] = useState(initialShowPosts);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      `${session.user.providerAccountId}:show_posts`,
+      showPosts.toString(),
+    );
+  }, [showPosts]);
+
+  const initialSortingColumn = (window.localStorage.getItem(
+    `${session.user.providerAccountId}:playlists_sorting_column`,
+  ) || "Created at") as playlistsSortingColumn;
 
   const [sortingColumn, setSortingColumn] = useState(initialSortingColumn);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      `${session.user.providerAccountId}:playlists_sorting_column`,
+      sortingColumn,
+    );
+  }, [sortingColumn]);
+
+  const initialReversed =
+    window.localStorage.getItem(
+      `${session.user.providerAccountId}:playlists_reversed`,
+    ) === "true";
+
   const [reversed, setReversed] = useState(initialReversed);
+
+  useEffect(() => {
+    window.localStorage.setItem(
+      `${session.user.providerAccountId}:playlists_reversed`,
+      reversed.toString(),
+    );
+  }, [reversed]);
+
   const [filter, setFilter] = useState("");
 
   const treatedPlaylists = useMemo(() => {
@@ -61,13 +102,31 @@ export function ProfileView({ session }: { session: Session }) {
   }, [playlists, filter, sortingColumn, reversed]);
 
   useEffect(() => {
-    getPlaylists(session.user.id)
-      .then((value) => setPlaylists(value))
-      .catch(console.error);
+    if (user) {
+      getSpotifyUser(session.user.id, user.providerAccountId)
+        .then((value) => console.log(value))
+        .catch(console.error);
 
-    getUsersPosts(session.user.id)
-      .then((value) => setPosts(value))
-      .catch(console.error);
+      getPlaylists(session.user.id, user.providerAccountId)
+        .then((value) => setPlaylists(value))
+        .catch(console.error);
+
+      getUsersPosts(user.id)
+        .then((value) => setPosts(value))
+        .catch(console.error);
+    } else {
+      getSpotifyUser(session.user.id)
+        .then((value) => console.log(value))
+        .catch(console.error);
+
+      getPlaylists(session.user.id)
+        .then((value) => setPlaylists(value))
+        .catch(console.error);
+
+      getUsersPosts(session.user.id)
+        .then((value) => setPosts(value))
+        .catch(console.error);
+    }
   }, [session]);
 
   if (!session?.user?.image || !session?.user?.name) return <SignInButton />;
@@ -98,7 +157,7 @@ export function ProfileView({ session }: { session: Session }) {
                   Posts
                 </div>
                 <button
-                  className="flex w-1/2 justify-center p-1"
+                  className="flex w-1/2 justify-center bg-main1 p-1"
                   onClick={() => setShowPosts(false)}
                 >
                   Playlists
@@ -107,7 +166,7 @@ export function ProfileView({ session }: { session: Session }) {
             ) : (
               <>
                 <button
-                  className="flex w-1/2 justify-center p-1"
+                  className="flex w-1/2 justify-center bg-main1 p-1"
                   onClick={() => setShowPosts(true)}
                 >
                   Posts
@@ -119,27 +178,30 @@ export function ProfileView({ session }: { session: Session }) {
             )}
           </div>
           {showPosts ? (
-            <div className="flex p-2">
-              <PostCreator session={session} />
-            </div>
+            !user && (
+              <div className="flex p-2">
+                <PostCreator session={session} />
+              </div>
+            )
           ) : (
             <div className="flex flex-col gap-2 p-2 md:flex-row">
               <div className="flex gap-2">
-                <div className="flex grow flex-col items-center rounded-xl bg-main3 text-center text-sm">
-                  <div className="font-bold md:p-1">Sorting column</div>
-                  <select
-                    className="w-full cursor-pointer rounded-b-lg bg-main1 text-center md:p-1"
-                    onChange={(e) => {
-                      setSortingColumn(
-                        e.target.value as playlistsSortingColumn,
-                      );
-                    }}
-                    value={initialSortingColumn}
-                  >
-                    {["Created at", "Name", "Owner"].map((sortingColumn) => (
-                      <option key={sortingColumn}>{sortingColumn}</option>
-                    ))}
-                  </select>
+                <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center text-sm">
+                  <div className="font-bold">Sorting column</div>
+                  <div className="flex">
+                    <select
+                      onChange={(e) => {
+                        setSortingColumn(
+                          e.target.value as playlistsSortingColumn,
+                        );
+                      }}
+                      defaultValue={initialSortingColumn}
+                    >
+                      {["Created at", "Name", "Owner"].map((sortingColumn) => (
+                        <option key={sortingColumn}>{sortingColumn}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <button

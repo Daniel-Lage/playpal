@@ -22,6 +22,7 @@ export const usersTable = createTable("user", {
   email: text("email").unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
+  providerAccountId: text("providerAccountId").notNull(),
 });
 
 export const accountsTable = createTable(
