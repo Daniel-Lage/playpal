@@ -11,7 +11,7 @@ interface Image {
   width: number | null;
 }
 
-interface User {
+export interface User {
   external_urls: { spotify: string };
   followers: { href: string | null; total: number };
   href: string;

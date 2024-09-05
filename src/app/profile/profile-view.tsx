@@ -35,11 +35,11 @@ export function ProfileView({
       `${session.user.providerAccountId}:show_posts`,
       showPosts.toString(),
     );
-  }, [showPosts]);
+  }, [showPosts, session]);
 
   const initialSortingColumn = (window.localStorage.getItem(
     `${session.user.providerAccountId}:playlists_sorting_column`,
-  ) || "Created at") as playlistsSortingColumn;
+  ) ?? "Created at") as playlistsSortingColumn;
 
   const [sortingColumn, setSortingColumn] = useState(initialSortingColumn);
 
@@ -48,7 +48,7 @@ export function ProfileView({
       `${session.user.providerAccountId}:playlists_sorting_column`,
       sortingColumn,
     );
-  }, [sortingColumn]);
+  }, [sortingColumn, session]);
 
   const initialReversed =
     window.localStorage.getItem(
@@ -62,7 +62,7 @@ export function ProfileView({
       `${session.user.providerAccountId}:playlists_reversed`,
       reversed.toString(),
     );
-  }, [reversed]);
+  }, [reversed, session]);
 
   const [filter, setFilter] = useState("");
 
@@ -127,7 +127,7 @@ export function ProfileView({
         .then((value) => setPosts(value))
         .catch(console.error);
     }
-  }, [session]);
+  }, [session, user]);
 
   if (!session?.user?.image || !session?.user?.name) return <SignInButton />;
 

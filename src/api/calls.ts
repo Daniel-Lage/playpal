@@ -1,7 +1,14 @@
 "use server";
 
 import { getAccount } from "~/server/queries";
-import type { Devices, PlaylistTrack, Tokens, Paging, Playlist } from "./types";
+import type {
+  Devices,
+  PlaylistTrack,
+  Tokens,
+  Paging,
+  Playlist,
+  User,
+} from "./types";
 
 export async function getPlaylists(userId: string, spotifyUserId?: string) {
   const tokens = await getTokens(userId);
@@ -207,7 +214,7 @@ export async function getSpotifyUser(userId: string, spotifyUserId?: string) {
     throw new Error(response.statusText);
   }
 
-  const user = await response.json();
+  const user = (await response.json()) as User;
 
   return user;
 }

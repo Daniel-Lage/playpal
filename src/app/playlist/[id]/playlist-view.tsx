@@ -29,7 +29,7 @@ export default function PlaylistView({
 
   const initialSortingColumn = (window.localStorage.getItem(
     `${session.user.providerAccountId}:tracks_sorting_column`,
-  ) || "Added at") as tracksSortingColumn;
+  ) ?? "Added at") as tracksSortingColumn;
 
   const [sortingColumn, setSortingColumn] = useState(initialSortingColumn);
 
@@ -38,7 +38,8 @@ export default function PlaylistView({
       `${session.user.providerAccountId}:tracks_sorting_column`,
       sortingColumn,
     );
-  }, [sortingColumn]);
+  }, [sortingColumn, session]);
+
   const initialReversed =
     window.localStorage.getItem(
       `${session.user.providerAccountId}:tracks_reversed`,
@@ -51,7 +52,8 @@ export default function PlaylistView({
       `${session.user.providerAccountId}:tracks_reversed`,
       reversed.toString(),
     );
-  }, [reversed]);
+  }, [reversed, session]);
+
   const [filter, setFilter] = useState("");
 
   const treatedTracks = useMemo(() => {
