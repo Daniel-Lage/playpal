@@ -1,8 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/lib/auth";
-import { SignInButton } from "~/app/_components/signin-button";
 import { ProfileView } from "../profile-view";
-import { getUserFromSpotifyUserId } from "~/server/queries";
+import { getUserFromSpotifyUserId, getUsersPosts } from "~/server/queries";
 
 export default async function Profile({
   params: { id },
@@ -11,12 +10,21 @@ export default async function Profile({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session) return <SignInButton />;
+  if (!session) {
+    return;
+  }
 
-  if (session.user.providerAccountId === id)
-    return <ProfileView session={session} />;
+  if (session?.user?.providerAccountId === id) {
+    const posts = await getUsersPosts(session.user.id);
+
+    return <ProfileView session={session} user={session.user} posts={posts} />;
+  }
 
   const user = await getUserFromSpotifyUserId(id);
 
-  return <ProfileView session={session} user={user} />;
+  if (!user) return <div>no user?</div>;
+
+  const posts = await getUsersPosts(user.id);
+
+  return <ProfileView session={session} user={user} posts={posts} />;
 }

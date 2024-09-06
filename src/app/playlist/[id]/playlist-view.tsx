@@ -7,7 +7,7 @@ import type {
   SimplifiedArtist,
   tracksSortingColumn,
 } from "~/api/types";
-import { getDevices, getPlaylist } from "~/api/calls";
+import { getDevices, getMySpotifyUser, getPlaylist } from "~/api/calls";
 import type { Session } from "next-auth";
 import { useEffect, useMemo, useState } from "react";
 import { getTokens } from "~/api/calls";
@@ -26,6 +26,8 @@ export default function PlaylistView({
   const [deviceId, setDeviceId] = useState<string | undefined>();
   const [devices, setDevices] = useState<Device[]>([]);
   const [playing, setPlaying] = useState(false);
+
+  const [premium, setPremium] = useState(false);
 
   const initialSortingColumn = (window.localStorage.getItem(
     `${session.user.providerAccountId}:tracks_sorting_column`,
@@ -145,6 +147,10 @@ export default function PlaylistView({
         if (devices[0]?.id) setDeviceId(devices[0]?.id);
       })
       .catch(console.error);
+
+    getMySpotifyUser(session.user.id).then((spotifyUser) =>
+      setPremium(spotifyUser.product === "premium"),
+    );
   }, [id, session]);
 
   if (!playlist || !session) return <SignInButton />;
@@ -257,7 +263,7 @@ export default function PlaylistView({
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
             />
-            {deviceId && !playing && (
+            {deviceId && !playing && premium && (
               <button
                 className="font-extrabold text-red-500"
                 onClick={async () => {
@@ -278,7 +284,7 @@ export default function PlaylistView({
         <button
           key={track.track.uri}
           className="flex items-center gap-1 bg-secondary p-1 font-bold md:rounded-lg"
-          disabled={!deviceId || playing || track.is_local}
+          disabled={!deviceId || playing || !premium || track.is_local}
           onClick={() => {
             if (!deviceId) return;
 

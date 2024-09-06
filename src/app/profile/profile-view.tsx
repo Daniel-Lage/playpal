@@ -7,74 +7,78 @@ import { SignInButton } from "~/app/_components/signin-button";
 import { Logo } from "~/app/_components/logo";
 import { useEffect, useMemo, useState } from "react";
 import type { Playlist, playlistsSortingColumn } from "~/api/types";
-import { getPlaylists, getSpotifyUser } from "~/api/calls";
+import {
+  getMyPlaylists,
+  getMySpotifyUser,
+  getPlaylists,
+  getSpotifyUser,
+} from "~/api/calls";
 import type { PostObject } from "~/server/types";
-import { getUsersPosts } from "~/server/queries";
 import { Post } from "~/app/_components/post";
 import { PostCreator } from "~/app/_components/post-creator";
+import { deleteUser } from "~/server/queries";
 
 export function ProfileView({
   session,
   user,
+  posts,
 }: {
   session: Session;
-  user?: User;
+  user: User;
+  posts: PostObject[];
 }) {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [posts, setPosts] = useState<PostObject[]>([]);
 
-  const initialShowPosts =
-    window.localStorage.getItem(
-      `${session.user.providerAccountId}:show_posts`,
-    ) === "true";
+  const [showPosts, setShowPosts] = useState<boolean | undefined>();
 
-  const [showPosts, setShowPosts] = useState(initialShowPosts);
+  const [sortingColumn, setSortingColumn] = useState<
+    playlistsSortingColumn | undefined
+  >();
 
-  useEffect(() => {
-    window.localStorage.setItem(
-      `${session.user.providerAccountId}:show_posts`,
-      showPosts.toString(),
-    );
-  }, [showPosts, session]);
+  const [reversed, setReversed] = useState<boolean | undefined>();
 
-  const initialSortingColumn = (window.localStorage.getItem(
-    `${session.user.providerAccountId}:playlists_sorting_column`,
-  ) ?? "Created at") as playlistsSortingColumn;
-
-  const [sortingColumn, setSortingColumn] = useState(initialSortingColumn);
+  const spotifyUserId = useMemo(
+    () => session?.user.providerAccountId,
+    [session],
+  );
 
   useEffect(() => {
-    window.localStorage.setItem(
-      `${session.user.providerAccountId}:playlists_sorting_column`,
-      sortingColumn,
-    );
-  }, [sortingColumn, session]);
-
-  const initialReversed =
-    window.localStorage.getItem(
-      `${session.user.providerAccountId}:playlists_reversed`,
-    ) === "true";
-
-  const [reversed, setReversed] = useState(initialReversed);
+    if (showPosts !== undefined) {
+      localStorage.setItem(`${spotifyUserId}:showPosts`, showPosts.toString());
+    }
+  }, [showPosts, spotifyUserId]);
 
   useEffect(() => {
-    window.localStorage.setItem(
-      `${session.user.providerAccountId}:playlists_reversed`,
-      reversed.toString(),
-    );
-  }, [reversed, session]);
+    if (sortingColumn !== undefined) {
+      localStorage.setItem(`${spotifyUserId}:sortingColumn`, sortingColumn);
+    }
+  }, [sortingColumn, spotifyUserId]);
+
+  useEffect(() => {
+    if (reversed !== undefined) {
+      localStorage.setItem(`${spotifyUserId}:reversed`, reversed.toString());
+    }
+  }, [reversed, spotifyUserId]);
 
   const [filter, setFilter] = useState("");
 
   const treatedPlaylists = useMemo(() => {
     const temp = [...playlists]
-      .filter(
-        (playlist) =>
+      .filter((playlist) => {
+        if (
+          session?.user?.providerAccountId !== user.providerAccountId &&
+          !playlist.public
+        ) {
+          return false;
+        }
+
+        return (
           playlist.name.toLowerCase().includes(filter.toLowerCase()) ||
           playlist.owner.display_name
             .toLowerCase()
-            .includes(filter.toLowerCase()),
-      )
+            .includes(filter.toLowerCase())
+        );
+      })
       .sort((playlistA, playlistB) => {
         let keyA = "";
         let keyB = "";
@@ -102,34 +106,36 @@ export function ProfileView({
   }, [playlists, filter, sortingColumn, reversed]);
 
   useEffect(() => {
-    if (user) {
+    setShowPosts(
+      localStorage.getItem(`${spotifyUserId}:showPosts`) !== "false",
+    );
+    setSortingColumn(
+      localStorage.getItem(
+        `${spotifyUserId}:sortingColumn`,
+      ) as playlistsSortingColumn,
+    );
+    setReversed(localStorage.getItem(`${spotifyUserId}:reversed`) === "true");
+
+    if (session?.user?.providerAccountId === user.providerAccountId) {
+      getMySpotifyUser(session.user.id)
+        .then((value) => console.log(value, user))
+        .catch(console.error);
+
+      getMyPlaylists(session.user.id)
+        .then((value) => setPlaylists(value))
+        .catch(console.error);
+    } else {
       getSpotifyUser(session.user.id, user.providerAccountId)
-        .then((value) => console.log(value))
+        .then((value) => console.log(value, user))
         .catch(console.error);
 
       getPlaylists(session.user.id, user.providerAccountId)
         .then((value) => setPlaylists(value))
         .catch(console.error);
-
-      getUsersPosts(user.id)
-        .then((value) => setPosts(value))
-        .catch(console.error);
-    } else {
-      getSpotifyUser(session.user.id)
-        .then((value) => console.log(value))
-        .catch(console.error);
-
-      getPlaylists(session.user.id)
-        .then((value) => setPlaylists(value))
-        .catch(console.error);
-
-      getUsersPosts(session.user.id)
-        .then((value) => setPosts(value))
-        .catch(console.error);
     }
   }, [session, user]);
 
-  if (!session?.user?.image || !session?.user?.name) return <SignInButton />;
+  if (!user?.image || !user?.name) return <SignInButton />;
 
   return (
     <>
@@ -139,19 +145,32 @@ export function ProfileView({
             width={40}
             height={40}
             className="rounded-full"
-            src={session.user.image}
-            alt={session.user.name}
+            src={user.image}
+            alt={user.name}
           />
-          <div className="grow px-2 font-bold">{session.user.name}</div>
+          <div className="grow px-2 font-bold">{user.name}</div>
           <Logo />
 
-          <Link href="/api/auth/signout">
-            <Image height={32} width={32} src="/exit.png" alt="exit icon" />
-          </Link>
+          {session?.user?.providerAccountId === user.providerAccountId && (
+            <>
+              <Link href="/" onClick={() => deleteUser(session.user.id)}>
+                <Image
+                  height={32}
+                  width={32}
+                  src="/trash.png"
+                  alt="trash icon"
+                />
+              </Link>
+              <Link href="/api/auth/signout">
+                <Image height={32} width={32} src="/exit.png" alt="exit icon" />
+              </Link>
+            </>
+          )}
         </div>
+
         <div className="flex flex-col bg-main2">
           <div className="flex font-bold">
-            {showPosts ? (
+            {showPosts !== false ? (
               <>
                 <div className="flex w-1/2 justify-center bg-main3 p-1">
                   Posts
@@ -177,8 +196,8 @@ export function ProfileView({
               </>
             )}
           </div>
-          {showPosts ? (
-            !user && (
+          {showPosts !== false ? (
+            session?.user?.providerAccountId === user.providerAccountId && (
               <div className="flex p-2">
                 <PostCreator session={session} />
               </div>
@@ -195,7 +214,7 @@ export function ProfileView({
                           e.target.value as playlistsSortingColumn,
                         );
                       }}
-                      defaultValue={initialSortingColumn}
+                      defaultValue={sortingColumn || "Created at"}
                     >
                       {["Created at", "Name", "Owner"].map((sortingColumn) => (
                         <option key={sortingColumn}>{sortingColumn}</option>
@@ -230,8 +249,10 @@ export function ProfileView({
         </div>
       </div>
 
-      {showPosts ? (
-        posts.map((post) => <Post key={post.id} post={post} />)
+      {showPosts !== false ? (
+        posts.map((post) => (
+          <Post key={post.id} post={post} session={session} />
+        ))
       ) : (
         <div className="grid grid-cols-2 gap-2 p-2 pt-0 md:grid-cols-4 md:gap-4">
           {treatedPlaylists.map((playlist) => (

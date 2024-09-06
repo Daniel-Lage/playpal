@@ -1,8 +1,18 @@
+"use client";
+
+import { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
+import { deletePost } from "~/server/queries";
 import type { PostObject } from "~/server/types";
 
-export function Post({ post }: { post: PostObject }) {
+export function Post({
+  post,
+  session,
+}: {
+  post: PostObject;
+  session?: Session | null;
+}) {
   return (
     <div className="flex flex-col gap-2 bg-secondary p-2 md:rounded-xl">
       <div className="flex items-center justify-between">
@@ -20,9 +30,11 @@ export function Post({ post }: { post: PostObject }) {
           <div className="px-2 font-bold">{post.author?.name}</div>
         </Link>
 
-        <button>
-          <Image height={24} width={24} src="/trash.png" alt="trash icon" />
-        </button>
+        {session?.user?.id === post.userId && (
+          <button onClick={() => deletePost(post.id)}>
+            <Image height={24} width={24} src="/trash.png" alt="trash icon" />
+          </button>
+        )}
       </div>
       <div>{post.content}</div>
     </div>

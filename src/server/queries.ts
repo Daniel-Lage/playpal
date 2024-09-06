@@ -37,30 +37,15 @@ export async function getUsersPosts(authorId: string) {
 }
 
 export async function postPost(content: string, userId: string) {
-  if (!content || !userId) {
-    console.log("Content: ", content);
-    console.log("User ID: ", userId);
+  // used in client
 
-    throw new Error("Invalid Post Input");
-  }
-
-  const post = (
-    await db.insert(postsTable).values({ content, userId }).returning()
-  )[0];
+  await db.insert(postsTable).values({ content, userId }).returning();
 
   revalidatePath("/");
   revalidatePath("/profile");
-
-  return post;
 }
 
 export async function getAccount(userId: string): Promise<Account | null> {
-  if (!userId) {
-    console.log("User ID: ", userId);
-
-    throw new Error("Invalid userId");
-  }
-
   const account = (
     await db
       .select()
@@ -76,4 +61,22 @@ export async function getAccount(userId: string): Promise<Account | null> {
   }
 
   return account;
+}
+
+export async function deleteUser(userId: string) {
+  // used in client
+
+  await db.delete(usersTable).where(eq(usersTable.id, userId));
+
+  revalidatePath("/");
+  revalidatePath("/profile");
+}
+
+export async function deletePost(postId: string) {
+  // used in client
+
+  await db.delete(postsTable).where(eq(postsTable.id, postId));
+
+  revalidatePath("/");
+  revalidatePath("/profile");
 }

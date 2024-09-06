@@ -11,7 +11,7 @@ interface Image {
   width: number | null;
 }
 
-export interface User {
+interface SimplifiedUser {
   external_urls: { spotify: string };
   followers: { href: string | null; total: number };
   href: string;
@@ -30,7 +30,7 @@ export interface Playlist {
   id: string;
   images: Image[];
   name: string;
-  owner: User;
+  owner: SimplifiedUser;
   public: boolean;
   snapshot_id: string;
   tracks: Paging<PlaylistTrack>;
@@ -98,7 +98,7 @@ interface Track {
 
 export interface PlaylistTrack {
   added_at: string | null;
-  added_by: User | null;
+  added_by: SimplifiedUser | null;
   is_local: boolean;
   track: Track;
 }
@@ -116,6 +116,18 @@ export interface Device {
   type: string;
   volume_percent: number | null;
   supports_volume: boolean;
+}
+
+export interface SpotifyError {
+  error: string;
+  error_description: string;
+}
+
+export interface SpotifyUser extends SimplifiedUser {
+  country: string;
+  email: string;
+  explicit_content: { filter_enabled: boolean; filter_locked: boolean };
+  product: "premium" | "free" | "open";
 }
 
 export type tracksSortingColumn = "Added at" | "Name" | "Album" | "Artists";

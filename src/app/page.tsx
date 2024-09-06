@@ -42,7 +42,7 @@ export default async function HomePage() {
         <SignInButton />
       )}
       {posts.map((post) => (
-        <Post key={post.id} post={post} />
+        <Post key={post.id} post={post} session={session} />
       ))}
     </>
   );

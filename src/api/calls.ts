@@ -7,10 +7,12 @@ import type {
   Tokens,
   Paging,
   Playlist,
-  User,
+  SpotifyError,
+  SpotifyUser,
 } from "./types";
+import { Account } from "next-auth";
 
-export async function getPlaylists(userId: string, spotifyUserId?: string) {
+export async function getMyPlaylists(userId: string) {
   const tokens = await getTokens(userId);
 
   if (!tokens?.access_token) {
@@ -19,27 +21,78 @@ export async function getPlaylists(userId: string, spotifyUserId?: string) {
     throw new Error("Internal Server Error");
   }
 
-  const response = spotifyUserId
-    ? await fetch(
-        `https://api.spotify.com/v1/users/${spotifyUserId}/playlists?limit=50`,
-        {
+  const response = await fetch(
+    "https://api.spotify.com/v1/me/playlists?limit=50",
+    {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`,
+      },
+    },
+  );
+
+  if (response.status != 200) {
+    const json = (await response.json()) as SpotifyError;
+
+    throw new Error(
+      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+    );
+  }
+  const playlists = (await response.json()) as Paging<Playlist>;
+
+  if (playlists.next) {
+    const url = new URL(playlists.next);
+    const requests = [];
+
+    for (let offset = 50; offset < playlists.total; offset += 50) {
+      url.searchParams.set("offset", offset.toString());
+
+      requests.push(
+        fetch(url, {
           headers: {
             Authorization: `Bearer ${tokens.access_token}`,
           },
-        },
-      )
-    : await fetch("https://api.spotify.com/v1/me/playlists?limit=50", {
-        headers: {
-          Authorization: `Bearer ${tokens.access_token}`,
-        },
-      });
+        }),
+      );
+    }
 
-  if (response.status != 200) {
-    console.log("Response: ", response);
+    const responses = await Promise.all(requests);
 
-    throw new Error(response.statusText);
+    const batches = await Promise.all(
+      responses.map((response) => response.json()),
+    );
+
+    batches.forEach((batch: Paging<Playlist>) => {
+      playlists.items = [...playlists.items, ...batch.items];
+    });
   }
 
+  return playlists.items;
+}
+export async function getPlaylists(userId?: string, spotifyUserId?: string) {
+  const tokens = await getTokens(userId);
+
+  if (!tokens?.access_token) {
+    console.log("Tokens: ", tokens);
+
+    throw new Error("Internal Server Error");
+  }
+
+  const response = await fetch(
+    `https://api.spotify.com/v1/users/${spotifyUserId}/playlists?limit=50`,
+    {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`,
+      },
+    },
+  );
+
+  if (response.status != 200) {
+    const json = (await response.json()) as SpotifyError;
+
+    throw new Error(
+      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+    );
+  }
   const playlists = (await response.json()) as Paging<Playlist>;
 
   if (playlists.next) {
@@ -88,9 +141,11 @@ export async function getPlaylist(userId: string, id: string) {
   });
 
   if (response.status != 200) {
-    console.log("Response: ", response);
+    const json = (await response.json()) as SpotifyError;
 
-    throw new Error(response.statusText);
+    throw new Error(
+      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+    );
   }
 
   const playlist = (await response.json()) as Playlist;
@@ -145,9 +200,11 @@ export async function getDevices(userId: string) {
   }
 
   if (response.status != 200) {
-    console.log("Response: ", response);
+    const json = (await response.json()) as SpotifyError;
 
-    throw new Error(response.statusText);
+    throw new Error(
+      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+    );
   }
 
   const devices = (await response.json()) as Devices;
@@ -155,8 +212,12 @@ export async function getDevices(userId: string) {
   return devices.devices;
 }
 
-export async function getTokens(userId: string) {
-  const account = await getAccount(userId);
+export async function getTokens(userId?: string) {
+  const account = userId
+    ? await getAccount(userId)
+    : process.env.FALLBACK_REFRESH_TOKEN
+      ? ({ refresh_token: process.env.FALLBACK_REFRESH_TOKEN } as Account)
+      : null;
 
   if (!account?.refresh_token) {
     console.log("Account: ", account);
@@ -177,9 +238,11 @@ export async function getTokens(userId: string) {
   });
 
   if (response.status != 200) {
-    console.log("Response: ", response);
+    const json = (await response.json()) as SpotifyError;
 
-    throw new Error(response.statusText);
+    throw new Error(
+      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+    );
   }
 
   const json = (await response.json()) as Tokens;
@@ -187,7 +250,7 @@ export async function getTokens(userId: string) {
   return json;
 }
 
-export async function getSpotifyUser(userId: string, spotifyUserId?: string) {
+export async function getMySpotifyUser(userId: string) {
   const tokens = await getTokens(userId);
 
   if (!tokens?.access_token) {
@@ -196,25 +259,52 @@ export async function getSpotifyUser(userId: string, spotifyUserId?: string) {
     throw new Error("Internal Server Error");
   }
 
-  const response = spotifyUserId
-    ? await fetch(`https://api.spotify.com/v1/users/${spotifyUserId}`, {
-        headers: {
-          Authorization: `Bearer ${tokens.access_token}`,
-        },
-      })
-    : await fetch("https://api.spotify.com/v1/me", {
-        headers: {
-          Authorization: `Bearer ${tokens.access_token}`,
-        },
-      });
+  const response = await fetch("https://api.spotify.com/v1/me", {
+    headers: {
+      Authorization: `Bearer ${tokens.access_token}`,
+    },
+  });
 
   if (response.status != 200) {
-    console.log("Response: ", response);
+    const json = (await response.json()) as SpotifyError;
 
-    throw new Error(response.statusText);
+    throw new Error(
+      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+    );
   }
 
-  const user = (await response.json()) as User;
+  const user = (await response.json()) as SpotifyUser;
+
+  return user;
+}
+
+export async function getSpotifyUser(userId: string, spotifyUserId: string) {
+  const tokens = await getTokens(userId);
+
+  if (!tokens?.access_token) {
+    console.log("Tokens: ", tokens);
+
+    throw new Error("Internal Server Error");
+  }
+
+  const response = await fetch(
+    `https://api.spotify.com/v1/users/${spotifyUserId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`,
+      },
+    },
+  );
+
+  if (response.status != 200) {
+    const json = (await response.json()) as SpotifyError;
+
+    throw new Error(
+      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+    );
+  }
+
+  const user = (await response.json()) as SpotifyUser;
 
   return user;
 }
