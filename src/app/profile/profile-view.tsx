@@ -37,48 +37,37 @@ export function ProfileView({
 
   const [reversed, setReversed] = useState<boolean | undefined>();
 
-  const spotifyUserId = useMemo(
-    () => session?.user.providerAccountId,
-    [session],
-  );
+  const SUPAID = useMemo(() => session?.user.providerAccountId, [session]);
 
   useEffect(() => {
     if (showPosts !== undefined) {
-      localStorage.setItem(`${spotifyUserId}:showPosts`, showPosts.toString());
+      localStorage.setItem(`${SUPAID}:showPosts`, showPosts.toString());
     }
-  }, [showPosts, spotifyUserId]);
+  }, [showPosts, SUPAID]);
 
   useEffect(() => {
     if (sortingColumn !== undefined) {
-      localStorage.setItem(`${spotifyUserId}:sortingColumn`, sortingColumn);
+      localStorage.setItem(`${SUPAID}:sortingColumn`, sortingColumn);
     }
-  }, [sortingColumn, spotifyUserId]);
+  }, [sortingColumn, SUPAID]);
 
   useEffect(() => {
     if (reversed !== undefined) {
-      localStorage.setItem(`${spotifyUserId}:reversed`, reversed.toString());
+      localStorage.setItem(`${SUPAID}:reversed`, reversed.toString());
     }
-  }, [reversed, spotifyUserId]);
+  }, [reversed, SUPAID]);
 
   const [filter, setFilter] = useState("");
 
   const treatedPlaylists = useMemo(() => {
     const temp = [...playlists]
-      .filter((playlist) => {
-        if (
-          session?.user?.providerAccountId !== user.providerAccountId &&
-          !playlist.public
-        ) {
-          return false;
-        }
-
-        return (
+      .filter(
+        (playlist) =>
           playlist.name.toLowerCase().includes(filter.toLowerCase()) ||
           playlist.owner.display_name
             .toLowerCase()
-            .includes(filter.toLowerCase())
-        );
-      })
+            .includes(filter.toLowerCase()),
+      )
       .sort((playlistA, playlistB) => {
         let keyA = "";
         let keyB = "";
@@ -106,15 +95,11 @@ export function ProfileView({
   }, [playlists, filter, sortingColumn, reversed]);
 
   useEffect(() => {
-    setShowPosts(
-      localStorage.getItem(`${spotifyUserId}:showPosts`) !== "false",
-    );
+    setShowPosts(localStorage.getItem(`${SUPAID}:showPosts`) !== "false");
     setSortingColumn(
-      localStorage.getItem(
-        `${spotifyUserId}:sortingColumn`,
-      ) as playlistsSortingColumn,
+      localStorage.getItem(`${SUPAID}:sortingColumn`) as playlistsSortingColumn,
     );
-    setReversed(localStorage.getItem(`${spotifyUserId}:reversed`) === "true");
+    setReversed(localStorage.getItem(`${SUPAID}:reversed`) === "true");
 
     if (session?.user?.providerAccountId === user.providerAccountId) {
       getMySpotifyUser(session.user.id)
@@ -133,7 +118,7 @@ export function ProfileView({
         .then((value) => setPlaylists(value))
         .catch(console.error);
     }
-  }, [session, user]);
+  }, [session, user, SUPAID]);
 
   if (!user?.image || !user?.name) return <SignInButton />;
 
@@ -214,7 +199,7 @@ export function ProfileView({
                           e.target.value as playlistsSortingColumn,
                         );
                       }}
-                      defaultValue={sortingColumn || "Created at"}
+                      defaultValue={sortingColumn ?? "Created at"}
                     >
                       {["Created at", "Name", "Owner"].map((sortingColumn) => (
                         <option key={sortingColumn}>{sortingColumn}</option>

@@ -148,9 +148,9 @@ export default function PlaylistView({
       })
       .catch(console.error);
 
-    getMySpotifyUser(session.user.id).then((spotifyUser) =>
-      setPremium(spotifyUser.product === "premium"),
-    );
+    getMySpotifyUser(session.user.id)
+      .then((spotifyUser) => setPremium(spotifyUser.product === "premium"))
+      .catch(console.error);
   }, [id, session]);
 
   if (!playlist || !session) return <SignInButton />;

@@ -10,7 +10,7 @@ import type {
   SpotifyError,
   SpotifyUser,
 } from "./types";
-import { Account } from "next-auth";
+import type { Account } from "next-auth";
 
 export async function getMyPlaylists(userId: string) {
   const tokens = await getTokens(userId);
