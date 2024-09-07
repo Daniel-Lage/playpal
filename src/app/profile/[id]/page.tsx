@@ -3,7 +3,7 @@ import { authOptions } from "~/lib/auth";
 import { ProfileView } from "../profile-view";
 import { getUserFromSpotifyUserId, getUsersPosts } from "~/server/queries";
 
-export default async function Profile({
+export default async function OthersProfilePage({
   params: { id },
 }: {
   params: { id: string };

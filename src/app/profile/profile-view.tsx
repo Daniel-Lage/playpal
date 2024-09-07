@@ -102,17 +102,17 @@ export function ProfileView({
     setReversed(localStorage.getItem(`${SUPAID}:reversed`) === "true");
 
     if (session?.user?.providerAccountId === user.providerAccountId) {
-      getMySpotifyUser(session.user.id)
-        .then((value) => console.log(value, user))
-        .catch(console.error);
+      // getMySpotifyUser(session.user.id)
+      //   .then((value) => console.log(value, user))
+      //   .catch(console.error);
 
       getMyPlaylists(session.user.id)
         .then((value) => setPlaylists(value))
         .catch(console.error);
     } else {
-      getSpotifyUser(session.user.id, user.providerAccountId)
-        .then((value) => console.log(value, user))
-        .catch(console.error);
+      // getSpotifyUser(session.user.id, user.providerAccountId)
+      //   .then((value) => console.log(value, user))
+      //   .catch(console.error);
 
       getPlaylists(session.user.id, user.providerAccountId)
         .then((value) => setPlaylists(value))

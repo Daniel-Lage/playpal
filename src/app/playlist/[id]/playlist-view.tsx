@@ -12,8 +12,8 @@ import type { Session } from "next-auth";
 import { useEffect, useMemo, useState } from "react";
 import { getTokens } from "~/api/calls";
 import Image from "next/image";
-import { Logo } from "../../_components/logo";
-import { SignInButton } from "../../_components/signin-button";
+import { Logo } from "~/app/_components/logo";
+import { SignInButton } from "~/app/_components/signin-button";
 
 export default function PlaylistView({
   session,

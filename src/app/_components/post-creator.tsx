@@ -4,7 +4,13 @@ import type { Session } from "next-auth";
 import { useState } from "react";
 import { postPost } from "~/server/queries";
 
-export function PostCreator({ session }: { session: Session }) {
+export function PostCreator({
+  session,
+  thread,
+}: {
+  session: Session;
+  thread?: string[];
+}) {
   const [input, setInput] = useState("");
   const [isPosting, setIsPosting] = useState(false);
 
@@ -13,7 +19,7 @@ export function PostCreator({ session }: { session: Session }) {
 
     setIsPosting(true);
 
-    postPost(input, session.user.id)
+    postPost(input, session.user.id, thread)
       .then(() => {
         setIsPosting(false);
         setInput("");

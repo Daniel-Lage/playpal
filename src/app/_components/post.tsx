@@ -36,7 +36,7 @@ export function Post({
           </button>
         )}
       </div>
-      <div>{post.content}</div>
+      <Link href={`/post/${post.id}`}>{post.content}</Link>
     </div>
   );
 }

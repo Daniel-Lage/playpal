@@ -106,6 +106,10 @@ export const postsTable = createTable("post", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date(),
   ),
+  thread: varchar("thread")
+    .array()
+    .notNull()
+    .default(sql`ARRAY[]::text[]`),
 });
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({

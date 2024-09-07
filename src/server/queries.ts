@@ -3,9 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
 import { postsTable, accountsTable, usersTable } from "./db/schema";
-import { desc, eq } from "drizzle-orm";
+import { arrayContains, asc, desc, eq, inArray } from "drizzle-orm";
 
 import type { Account } from "next-auth";
+import { PostObject } from "./types";
 
 export async function getPosts() {
   const posts = await db.query.postsTable.findMany({
@@ -36,23 +37,26 @@ export async function getUsersPosts(authorId: string) {
   return posts;
 }
 
-export async function postPost(content: string, userId: string) {
+export async function postPost(
+  content: string,
+  userId: string,
+  thread?: string[],
+) {
   // used in client
 
-  await db.insert(postsTable).values({ content, userId }).returning();
+  if (thread && thread.length > 0) {
+    await db.insert(postsTable).values({ content, userId, thread }).returning();
+    thread.forEach((postId) => revalidatePath(`post/${postId}`));
+  } else await db.insert(postsTable).values({ content, userId }).returning();
 
   revalidatePath("/");
   revalidatePath("/profile");
 }
 
-export async function getAccount(userId: string): Promise<Account | null> {
-  const account = (
-    await db
-      .select()
-      .from(accountsTable)
-      .where(eq(accountsTable.userId, userId))
-      .limit(1)
-  )[0] as Account;
+export async function getAccount(userId: string) {
+  const account = (await db.query.accountsTable.findFirst({
+    where: eq(accountsTable.userId, userId),
+  })) as Account;
 
   if (!account?.refresh_token) {
     console.log("Account: ", account);
@@ -79,4 +83,35 @@ export async function deletePost(postId: string) {
 
   revalidatePath("/");
   revalidatePath("/profile");
+}
+
+export async function getPost(postId: string) {
+  const post = (await db.query.postsTable.findFirst({
+    where: eq(postsTable.id, postId),
+    with: { author: true },
+  })) as PostObject;
+
+  return post;
+}
+
+export async function getReplies(postId: string) {
+  const posts = await db.query.postsTable.findMany({
+    with: { author: true },
+    orderBy: [desc(postsTable.createdAt)],
+    where: arrayContains(postsTable.thread, [postId]),
+    limit: 100,
+  });
+
+  return posts;
+}
+
+export async function getThread(thread: string[]) {
+  const posts = await db.query.postsTable.findMany({
+    with: { author: true },
+    orderBy: [asc(postsTable.thread)],
+    where: inArray(postsTable.id, thread),
+    limit: 100,
+  });
+
+  return posts;
 }
