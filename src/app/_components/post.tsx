@@ -18,7 +18,7 @@ export function Post({
       <div className="flex items-center justify-between">
         <Link
           className="flex items-center"
-          href={`profile/${post.author.providerAccountId}`}
+          href={`/profile/${post.author.providerAccountId}`}
         >
           <Image
             width={32}
