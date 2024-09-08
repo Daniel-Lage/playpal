@@ -12,12 +12,20 @@ import type { PostObject } from "~/models/post.model";
 export function Post({
   post,
   session,
+  focused,
 }: {
   post: PostObject;
   session?: Session | null;
+  focused?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-2 bg-secondary p-2 md:rounded-xl">
+    <div
+      className={
+        focused
+          ? "flex flex-col gap-2 bg-secondary p-2 md:rounded-t-xl"
+          : "flex flex-col gap-2 bg-secondary p-2 md:rounded-xl"
+      }
+    >
       <div className="flex items-center justify-between">
         <Link
           className="flex items-center"
@@ -33,7 +41,14 @@ export function Post({
           <div className="px-2 font-bold">{post.author?.name}</div>
         </Link>
 
-        {session?.user?.id === post.userId && (
+        {session?.user?.id === post.userId && focused ? (
+          <Link
+            href={post.thread.length > 0 ? `/post/${post.thread.pop()}` : "/"}
+            onClick={() => deletePost(post.id)}
+          >
+            <Image height={24} width={24} src="/trash.png" alt="trash icon" />
+          </Link>
+        ) : (
           <button onClick={() => deletePost(post.id)}>
             <Image height={24} width={24} src="/trash.png" alt="trash icon" />
           </button>

@@ -15,6 +15,7 @@ export default {
         main2: "#e9d5ff",
         main3: "#c084fc",
         secondary: "#ACFDD4",
+        secondary2: "#66CC95",
       },
     },
   },

@@ -24,7 +24,8 @@ export default async function OthersProfilePage({
 
   const user = await getUserFromSpotifyUserId(id);
 
-  if (!user) return <div>no user?</div>;
+  if (!user)
+    return <div className="self-center text-xl text-red-500">Error</div>;
 
   const posts = await getUsersPosts(user.id);
 

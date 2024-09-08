@@ -9,17 +9,13 @@ import { PostCreator } from "~/app/_components/post-creator";
 import { Post } from "~/app/_components/post";
 import { Logo } from "~/app/_components/logo";
 import { deleteUser } from "~/server/queries";
-import {
-  getMyPlaylists,
-  getMySpotifyUser,
-  getPlaylists,
-  // getSpotifyUser,
-} from "~/api/calls";
+import { getMyPlaylists, getPlaylists } from "~/api/calls";
 
 import type { Session, User } from "next-auth";
 
 import type { Playlist, playlistsSortingColumn } from "~/models/playlist.model";
 import type { PostObject } from "~/models/post.model";
+import { SpotifyUser } from "~/models/user.model";
 
 export function ProfileView({
   session,
@@ -31,6 +27,7 @@ export function ProfileView({
   posts: PostObject[];
 }) {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [spotifyUser, setSpotifyUser] = useState<SpotifyUser | undefined>();
 
   const [showPosts, setShowPosts] = useState<boolean | undefined>();
 
@@ -50,7 +47,7 @@ export function ProfileView({
 
   useEffect(() => {
     if (sortingColumn !== undefined) {
-      localStorage.setItem(`${SUPAID}:sortingColumn`, sortingColumn);
+      localStorage.setItem(`${SUPAID}:playlists_sorting_column`, sortingColumn);
     }
   }, [sortingColumn, SUPAID]);
 
@@ -100,23 +97,16 @@ export function ProfileView({
   useEffect(() => {
     setShowPosts(localStorage.getItem(`${SUPAID}:showPosts`) !== "false");
     setSortingColumn(
-      localStorage.getItem(`${SUPAID}:sortingColumn`) as playlistsSortingColumn,
+      (localStorage.getItem(`${SUPAID}:playlists_sorting_column`) ??
+        "Created at") as playlistsSortingColumn,
     );
     setReversed(localStorage.getItem(`${SUPAID}:reversed`) === "true");
 
     if (session?.user?.providerAccountId === user.providerAccountId) {
-      getMySpotifyUser(session.user.id)
-        .then((value) => console.log(value, user))
-        .catch(console.error);
-
       getMyPlaylists(session.user.id)
         .then((value) => setPlaylists(value))
         .catch(console.error);
     } else {
-      // getSpotifyUser(session.user.id, user.providerAccountId)
-      //   .then((value) => console.log(value, user))
-      //   .catch(console.error);
-
       getPlaylists(session.user.id, user.providerAccountId)
         .then((value) => setPlaylists(value))
         .catch(console.error);
@@ -124,6 +114,8 @@ export function ProfileView({
   }, [session, user, SUPAID]);
 
   if (!user?.image || !user?.name) return <SignInButton />;
+
+  console.log(spotifyUser);
 
   return (
     <>
@@ -137,7 +129,17 @@ export function ProfileView({
             alt={user.name}
           />
           <div className="grow px-2 font-bold">{user.name}</div>
-          <Logo />
+
+          <Link
+            href={`https://open.spotify.com/user/${user.providerAccountId}`}
+          >
+            <Image
+              height={32}
+              width={32}
+              src="/spotify.png"
+              alt="spotify icon"
+            />
+          </Link>
 
           {session?.user?.providerAccountId === user.providerAccountId && (
             <>
@@ -154,6 +156,7 @@ export function ProfileView({
               </Link>
             </>
           )}
+          <Logo />
         </div>
 
         <div className="flex flex-col bg-main2">

@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "./db";
 
 import type { PostObject } from "~/models/post.model";
-import type { Account } from "next-auth";
+import type { Account, User } from "next-auth";
 
 export async function getPosts() {
   const posts = await db.query.postsTable.findMany({
@@ -18,7 +18,9 @@ export async function getPosts() {
   return posts;
 }
 
-export async function getUserFromSpotifyUserId(spotifyUserId: string) {
+export async function getUserFromSpotifyUserId(
+  spotifyUserId: string,
+): Promise<User | undefined> {
   const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.providerAccountId, spotifyUserId),
   });
@@ -46,11 +48,9 @@ export async function postPost(
 
   if (thread && thread.length > 0) {
     await db.insert(postsTable).values({ content, userId, thread }).returning();
-    thread.forEach((postId) => revalidatePath(`post/${postId}`));
   } else await db.insert(postsTable).values({ content, userId }).returning();
 
   revalidatePath("/");
-  revalidatePath("/profile");
 }
 
 export async function getAccount(userId: string) {
@@ -73,7 +73,6 @@ export async function deleteUser(userId: string) {
   await db.delete(usersTable).where(eq(usersTable.id, userId));
 
   revalidatePath("/");
-  revalidatePath("/profile");
 }
 
 export async function deletePost(postId: string) {
@@ -82,10 +81,9 @@ export async function deletePost(postId: string) {
   await db.delete(postsTable).where(eq(postsTable.id, postId));
 
   revalidatePath("/");
-  revalidatePath("/profile");
 }
 
-export async function getPost(postId: string) {
+export async function getPost(postId: string): Promise<PostObject | undefined> {
   const post = (await db.query.postsTable.findFirst({
     where: eq(postsTable.id, postId),
     with: { author: true },

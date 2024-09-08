@@ -1,4 +1,4 @@
 export interface SpotifyError {
-  error: string;
-  error_description: string;
+  error?: string;
+  error_description?: string;
 }

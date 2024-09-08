@@ -68,6 +68,7 @@ export async function getMyPlaylists(userId: string) {
 
   return playlists.items;
 }
+
 export async function getPlaylists(userId?: string, spotifyUserId?: string) {
   const tokens = await getTokens(userId);
 
@@ -125,7 +126,10 @@ export async function getPlaylists(userId?: string, spotifyUserId?: string) {
   return playlists.items;
 }
 
-export async function getPlaylist(userId: string, id: string) {
+export async function getPlaylist(
+  userId: string,
+  id: string,
+): Promise<Playlist | undefined> {
   const tokens = await getTokens(userId);
 
   if (!tokens?.access_token) {
@@ -143,9 +147,12 @@ export async function getPlaylist(userId: string, id: string) {
   if (response.status != 200) {
     const json = (await response.json()) as SpotifyError;
 
-    throw new Error(
-      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
-    );
+    if (json?.error && json?.error_description)
+      throw new Error(
+        `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+      );
+
+    throw new Error(`Status: ${response.statusText}`);
   }
 
   const playlist = (await response.json()) as Playlist;
@@ -264,37 +271,6 @@ export async function getMySpotifyUser(userId: string) {
       Authorization: `Bearer ${tokens.access_token}`,
     },
   });
-
-  if (response.status != 200) {
-    const json = (await response.json()) as SpotifyError;
-
-    throw new Error(
-      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
-    );
-  }
-
-  const user = (await response.json()) as SpotifyUser;
-
-  return user;
-}
-
-export async function getSpotifyUser(userId: string, spotifyUserId: string) {
-  const tokens = await getTokens(userId);
-
-  if (!tokens?.access_token) {
-    console.log("Tokens: ", tokens);
-
-    throw new Error("Internal Server Error");
-  }
-
-  const response = await fetch(
-    `https://api.spotify.com/v1/users/${spotifyUserId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${tokens.access_token}`,
-      },
-    },
-  );
 
   if (response.status != 200) {
     const json = (await response.json()) as SpotifyError;

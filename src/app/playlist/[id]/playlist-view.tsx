@@ -14,6 +14,7 @@ import type { PlaylistTrack, tracksSortingColumn } from "~/models/track.model";
 import type { SimplifiedArtist } from "~/models/artist.model";
 import type { Playlist } from "~/models/playlist.model";
 import type { Device } from "~/models/device.model";
+import Link from "next/link";
 
 export default function PlaylistView({
   session,
@@ -22,6 +23,8 @@ export default function PlaylistView({
   session: Session;
   id: string;
 }) {
+  const [loading, setLoading] = useState(true);
+
   const [playlist, setPlaylist] = useState<Playlist | undefined>();
   const [deviceId, setDeviceId] = useState<string | undefined>();
   const [devices, setDevices] = useState<Device[]>([]);
@@ -29,32 +32,24 @@ export default function PlaylistView({
 
   const [premium, setPremium] = useState(false);
 
-  const initialSortingColumn = (window.localStorage.getItem(
-    `${session.user.providerAccountId}:tracks_sorting_column`,
-  ) ?? "Added at") as tracksSortingColumn;
+  const [sortingColumn, setSortingColumn] = useState<
+    tracksSortingColumn | undefined
+  >();
+  const [reversed, setReversed] = useState<boolean | undefined>();
 
-  const [sortingColumn, setSortingColumn] = useState(initialSortingColumn);
-
-  useEffect(() => {
-    window.localStorage.setItem(
-      `${session.user.providerAccountId}:tracks_sorting_column`,
-      sortingColumn,
-    );
-  }, [sortingColumn, session]);
-
-  const initialReversed =
-    window.localStorage.getItem(
-      `${session.user.providerAccountId}:tracks_reversed`,
-    ) === "true";
-
-  const [reversed, setReversed] = useState(initialReversed);
+  const SUPAID = useMemo(() => session?.user.providerAccountId, [session]);
 
   useEffect(() => {
-    window.localStorage.setItem(
-      `${session.user.providerAccountId}:tracks_reversed`,
-      reversed.toString(),
-    );
-  }, [reversed, session]);
+    if (sortingColumn !== undefined) {
+      localStorage.setItem(`${SUPAID}:tracks_sorting_column`, sortingColumn);
+    }
+  }, [sortingColumn, SUPAID]);
+
+  useEffect(() => {
+    if (reversed !== undefined) {
+      localStorage.setItem(`${SUPAID}:reversed`, reversed.toString());
+    }
+  }, [reversed, SUPAID]);
 
   const [filter, setFilter] = useState("");
 
@@ -135,8 +130,15 @@ export default function PlaylistView({
   }, [playlist]);
 
   useEffect(() => {
+    setSortingColumn(
+      (localStorage.getItem(`${SUPAID}:tracks_sorting_column`) ??
+        "Added at") as tracksSortingColumn,
+    );
+    setReversed(localStorage.getItem(`${SUPAID}:reversed`) === "true");
+
     getPlaylist(session.user.id, id)
       .then((playlist) => {
+        setLoading(false);
         setPlaylist(playlist);
       })
       .catch(console.error);
@@ -153,7 +155,12 @@ export default function PlaylistView({
       .catch(console.error);
   }, [id, session]);
 
-  if (!playlist || !session) return <SignInButton />;
+  if (loading) return;
+
+  if (!playlist)
+    return <div className="self-center text-xl text-red-500">Error</div>;
+
+  if (!session) return <SignInButton />;
 
   return (
     <>
@@ -166,7 +173,7 @@ export default function PlaylistView({
             src={playlist.images[0]?.url ?? ""}
             alt={playlist.name}
           />
-          <div className="flex items-start">
+          <div className="flex w-full grow items-start justify-between">
             <div className="flex flex-col items-start">
               <div className="flex items-start justify-between text-2xl font-bold md:text-6xl">
                 {playlist.name}
@@ -178,7 +185,17 @@ export default function PlaylistView({
                 {playlist.owner.display_name} - {playlist.tracks.total} songs
               </div>
             </div>
-            <Logo />
+            <div className="flex flex-col items-center gap-2 p-2 md:flex-row">
+              <Link href={playlist.external_urls.spotify}>
+                <Image
+                  height={32}
+                  width={32}
+                  src="/spotify.png"
+                  alt="spotify icon"
+                />
+              </Link>
+              <Logo />
+            </div>
           </div>
         </div>
 
@@ -230,7 +247,7 @@ export default function PlaylistView({
                 onChange={(e) => {
                   setSortingColumn(e.target.value as tracksSortingColumn);
                 }}
-                value={initialSortingColumn}
+                defaultValue={sortingColumn}
               >
                 {["Name", "Artists", "Album", "Added at"].map(
                   (sortingColumn) => (
@@ -324,6 +341,14 @@ export default function PlaylistView({
               <div className="w-0 truncate text-left text-sm md:w-1/2">
                 {track.track.album.name}
               </div>
+              <Link href={track.track.external_urls.spotify}>
+                <Image
+                  height={32}
+                  width={32}
+                  src="/spotify.png"
+                  alt="spotify icon"
+                />
+              </Link>
             </div>
             <div className="truncate text-left text-xs">
               {track.track.artists.map((artist) => artist.name).join(", ")}
