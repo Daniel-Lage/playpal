@@ -1,7 +1,9 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "~/lib/auth";
-import PlaylistView from "./playlist-view";
+
 import { SignInButton } from "~/app/_components/signin-button";
+import { authOptions } from "~/lib/auth";
+
+import PlaylistView from "./playlist-view";
 
 export default async function PlaylistPage({
   params: { id },

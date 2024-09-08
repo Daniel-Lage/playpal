@@ -1,8 +1,10 @@
 import { getServerSession } from "next-auth";
+
 import { authOptions } from "~/lib/auth";
 import { SignInButton } from "~/app/_components/signin-button";
-import { ProfileView } from "./profile-view";
 import { getUsersPosts } from "~/server/queries";
+
+import { ProfileView } from "./profile-view";
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);

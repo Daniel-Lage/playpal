@@ -1,12 +1,13 @@
 import { getServerSession } from "next-auth";
-import { getPost, getPosts, getReplies, getThread } from "~/server/queries";
-import { PostCreator } from "~/app/_components/post-creator";
-import { authOptions } from "~/lib/auth";
-import { Post } from "~/app/_components/post";
 import Image from "next/image";
-import { Logo } from "~/app/_components/logo";
-import { SignInButton } from "~/app/_components/signin-button";
 import Link from "next/link";
+
+import { getPost, getReplies, getThread } from "~/server/queries";
+import { SignInButton } from "~/app/_components/signin-button";
+import { PostCreator } from "~/app/_components/post-creator";
+import { Post } from "~/app/_components/post";
+import { Logo } from "~/app/_components/logo";
+import { authOptions } from "~/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default async function PostPage({
           <div className="flex items-center justify-between">
             <Link
               className="flex items-center"
-              href={`profile/${session.user.providerAccountId}`}
+              href={`/profile/${session.user.providerAccountId}`}
             >
               <Image
                 width={40}

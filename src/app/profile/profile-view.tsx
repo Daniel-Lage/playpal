@@ -1,22 +1,25 @@
 "use client";
 
-import type { Session, User } from "next-auth";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
 import { SignInButton } from "~/app/_components/signin-button";
+import { PostCreator } from "~/app/_components/post-creator";
+import { Post } from "~/app/_components/post";
 import { Logo } from "~/app/_components/logo";
-import { useEffect, useMemo, useState } from "react";
-import type { Playlist, playlistsSortingColumn } from "~/api/types";
+import { deleteUser } from "~/server/queries";
 import {
   getMyPlaylists,
   getMySpotifyUser,
   getPlaylists,
-  getSpotifyUser,
+  // getSpotifyUser,
 } from "~/api/calls";
-import type { PostObject } from "~/server/types";
-import { Post } from "~/app/_components/post";
-import { PostCreator } from "~/app/_components/post-creator";
-import { deleteUser } from "~/server/queries";
+
+import type { Session, User } from "next-auth";
+
+import type { Playlist, playlistsSortingColumn } from "~/models/playlist.model";
+import type { PostObject } from "~/models/post.model";
 
 export function ProfileView({
   session,
@@ -102,9 +105,9 @@ export function ProfileView({
     setReversed(localStorage.getItem(`${SUPAID}:reversed`) === "true");
 
     if (session?.user?.providerAccountId === user.providerAccountId) {
-      // getMySpotifyUser(session.user.id)
-      //   .then((value) => console.log(value, user))
-      //   .catch(console.error);
+      getMySpotifyUser(session.user.id)
+        .then((value) => console.log(value, user))
+        .catch(console.error);
 
       getMyPlaylists(session.user.id)
         .then((value) => setPlaylists(value))

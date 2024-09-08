@@ -1,19 +1,19 @@
 "use client";
 
-import type {
-  Device,
-  Playlist,
-  PlaylistTrack,
-  SimplifiedArtist,
-  tracksSortingColumn,
-} from "~/api/types";
 import { getDevices, getMySpotifyUser, getPlaylist } from "~/api/calls";
-import type { Session } from "next-auth";
 import { useEffect, useMemo, useState } from "react";
-import { getTokens } from "~/api/calls";
 import Image from "next/image";
-import { Logo } from "~/app/_components/logo";
+
 import { SignInButton } from "~/app/_components/signin-button";
+import { Logo } from "~/app/_components/logo";
+import { getTokens } from "~/api/calls";
+
+import type { Session } from "next-auth";
+
+import type { PlaylistTrack, tracksSortingColumn } from "~/models/track.model";
+import type { SimplifiedArtist } from "~/models/artist.model";
+import type { Playlist } from "~/models/playlist.model";
+import type { Device } from "~/models/device.model";
 
 export default function PlaylistView({
   session,

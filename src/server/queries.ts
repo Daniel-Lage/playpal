@@ -1,12 +1,12 @@
 "use server";
 
+import { arrayContains, asc, desc, eq, inArray } from "drizzle-orm";
+import { postsTable, accountsTable, usersTable } from "./db/schema";
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
-import { postsTable, accountsTable, usersTable } from "./db/schema";
-import { arrayContains, asc, desc, eq, inArray } from "drizzle-orm";
 
+import type { PostObject } from "~/models/post.model";
 import type { Account } from "next-auth";
-import { PostObject } from "./types";
 
 export async function getPosts() {
   const posts = await db.query.postsTable.findMany({

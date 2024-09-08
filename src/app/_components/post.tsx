@@ -1,10 +1,13 @@
 "use client";
 
-import type { Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
+
 import { deletePost } from "~/server/queries";
-import type { PostObject } from "~/server/types";
+
+import type { Session } from "next-auth";
+
+import type { PostObject } from "~/models/post.model";
 
 export function Post({
   post,
@@ -18,7 +21,7 @@ export function Post({
       <div className="flex items-center justify-between">
         <Link
           className="flex items-center"
-          href={`profile/${post.author.providerAccountId}`}
+          href={`/profile/${post.author.providerAccountId}`}
         >
           <Image
             width={32}

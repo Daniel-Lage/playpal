@@ -1,7 +1,9 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "~/lib/auth";
-import { ProfileView } from "../profile-view";
+
 import { getUserFromSpotifyUserId, getUsersPosts } from "~/server/queries";
+import { authOptions } from "~/lib/auth";
+
+import { ProfileView } from "../profile-view";
 
 export default async function OthersProfilePage({
   params: { id },

@@ -2,6 +2,7 @@
 
 import type { Session } from "next-auth";
 import { useState } from "react";
+
 import { postPost } from "~/server/queries";
 
 export function PostCreator({

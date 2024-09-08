@@ -1,16 +1,16 @@
 "use server";
 
 import { getAccount } from "~/server/queries";
-import type {
-  Devices,
-  PlaylistTrack,
-  Tokens,
-  Paging,
-  Playlist,
-  SpotifyError,
-  SpotifyUser,
-} from "./types";
+
 import type { Account } from "next-auth";
+
+import type { PlaylistTrack } from "~/models/track.model";
+import type { SpotifyError } from "~/models/error.model";
+import type { Playlist } from "~/models/playlist.model";
+import type { SpotifyUser } from "~/models/user.model";
+import type { Devices } from "~/models/device.model";
+import type { Tokens } from "~/models/tokens.model";
+import type { Paging } from "~/models/paging.model";
 
 export async function getMyPlaylists(userId: string) {
   const tokens = await getTokens(userId);
