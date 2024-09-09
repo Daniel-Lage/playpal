@@ -175,17 +175,15 @@ export default function PlaylistView({
           />
           <div className="flex w-full grow items-start justify-between">
             <div className="flex flex-col items-start">
-              <div className="flex items-start justify-between text-2xl font-bold md:text-6xl">
+              <div className="flex items-start justify-between text-2xl font-bold">
                 {playlist.name}
               </div>
-              <div className="text-base font-light md:text-lg">
-                {playlist.description}
-              </div>
-              <div className="text-base font-bold md:text-lg">
+              <div className="font-light">{playlist.description}</div>
+              <div className="font-bold">
                 {playlist.owner.display_name} - {playlist.tracks.total} songs
               </div>
             </div>
-            <div className="flex flex-col items-center gap-2 p-2 md:flex-row">
+            <div className="flex shrink-0 flex-col items-center gap-2 p-2 md:flex-row">
               <Link href={playlist.external_urls.spotify}>
                 <Image
                   height={32}
@@ -335,7 +333,7 @@ export default function PlaylistView({
           )}
           <div className="grow overflow-hidden">
             <div className="flex grow overflow-hidden">
-              <div className="truncate text-left text-sm md:w-1/2">
+              <div className="w-full truncate text-left text-sm md:w-1/2">
                 {track.track.name}
               </div>
               <div className="w-0 truncate text-left text-sm md:w-1/2">
