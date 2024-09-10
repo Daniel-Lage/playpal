@@ -18,7 +18,7 @@ export default async function HomePage() {
   return (
     <>
       {session?.user?.image && session?.user?.name ? (
-        <div className="flex flex-col gap-2 bg-main1 p-2 md:rounded-xl">
+        <div className="bg-main flex flex-col gap-2 p-2 md:rounded-xl">
           <div className="flex items-center justify-between">
             <Link
               className="flex items-center"

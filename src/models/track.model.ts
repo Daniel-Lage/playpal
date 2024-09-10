@@ -10,7 +10,7 @@ interface Track {
   duration_ms: number;
   explicit: boolean;
   external_ids?: { isrc?: string; ean?: string; upc?: string };
-  external_urls: { spotify: string };
+  external_urls: { spotify?: string };
   href: string;
   id: string;
   is_playable: boolean;
@@ -31,4 +31,11 @@ export interface PlaylistTrack {
   track: Track;
 }
 
-export type tracksSortingColumn = "Added at" | "Name" | "Album" | "Artists";
+export enum TracksSortingColumn {
+  AddedAt = "Added at",
+  Name = "Name",
+  Album = "Album",
+  Artists = "Artists",
+}
+
+export const TracksSortingColumnOptions = Object.values(TracksSortingColumn);

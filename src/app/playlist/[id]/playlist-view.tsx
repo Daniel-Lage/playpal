@@ -10,7 +10,12 @@ import { getTokens } from "~/api/calls";
 
 import type { Session } from "next-auth";
 
-import type { PlaylistTrack, tracksSortingColumn } from "~/models/track.model";
+import {
+  TracksSortingColumnOptions,
+  TracksSortingColumn,
+  type PlaylistTrack,
+} from "~/models/track.model";
+
 import type { SimplifiedArtist } from "~/models/artist.model";
 import type { Playlist } from "~/models/playlist.model";
 import type { Device } from "~/models/device.model";
@@ -33,7 +38,7 @@ export default function PlaylistView({
   const [premium, setPremium] = useState(false);
 
   const [sortingColumn, setSortingColumn] = useState<
-    tracksSortingColumn | undefined
+    TracksSortingColumn | undefined
   >();
   const [reversed, setReversed] = useState<boolean | undefined>();
 
@@ -132,7 +137,7 @@ export default function PlaylistView({
   useEffect(() => {
     setSortingColumn(
       (localStorage.getItem(`${SUPAID}:tracks_sorting_column`) ??
-        "Added at") as tracksSortingColumn,
+        "Added at") as TracksSortingColumn,
     );
     setReversed(localStorage.getItem(`${SUPAID}:reversed`) === "true");
 
@@ -165,35 +170,35 @@ export default function PlaylistView({
   return (
     <>
       <div className="flex flex-col overflow-hidden md:rounded-2xl">
-        <div className="flex flex-col items-center gap-2 bg-main1 p-2 md:flex-row md:items-start">
+        <div className="bg-main flex flex-col items-center gap-2 p-2 md:flex-row md:items-start">
           <Image
-            width={240}
-            height={240}
+            width={200}
+            height={200}
             className="rounded-xl"
             src={playlist.images[0]?.url ?? ""}
             alt={playlist.name}
           />
-          <div className="flex w-full grow items-start justify-between">
-            <div className="flex flex-col items-start">
-              <div className="flex items-start justify-between text-2xl font-bold">
+          <div className="flex w-full px-2">
+            <div className="flex grow flex-col items-start justify-between truncate">
+              <div className="flex items-start justify-between text-wrap text-2xl font-bold">
                 {playlist.name}
               </div>
-              <div className="font-light">{playlist.description}</div>
-              <div className="font-bold">
+              <div className="text-wrap text-sm font-light">
+                {playlist.description}
+              </div>
+              <div className="text-wrap text-sm font-bold">
                 {playlist.owner.display_name} - {playlist.tracks.total} songs
               </div>
             </div>
-            <div className="flex shrink-0 flex-col items-center gap-2 p-2 md:flex-row">
-              <Link href={playlist.external_urls.spotify}>
-                <Image
-                  height={32}
-                  width={32}
-                  src="/spotify.png"
-                  alt="spotify icon"
-                />
-              </Link>
-              <Logo />
-            </div>
+
+            <Link href={playlist.external_urls.spotify} className="shrink-0">
+              <Image
+                height={32}
+                width={32}
+                src="/spotify.png"
+                alt="spotify icon"
+              />
+            </Link>
           </div>
         </div>
 
@@ -243,15 +248,13 @@ export default function PlaylistView({
               <div className="font-bold md:p-1">Sort by</div>
               <select
                 onChange={(e) => {
-                  setSortingColumn(e.target.value as tracksSortingColumn);
+                  setSortingColumn(e.target.value as TracksSortingColumn);
                 }}
-                defaultValue={sortingColumn}
+                defaultValue={sortingColumn ?? TracksSortingColumn.AddedAt}
               >
-                {["Name", "Artists", "Album", "Added at"].map(
-                  (sortingColumn) => (
-                    <option key={sortingColumn}>{sortingColumn}</option>
-                  ),
-                )}
+                {TracksSortingColumnOptions.map((sortingColumn) => (
+                  <option key={sortingColumn}>{sortingColumn}</option>
+                ))}
               </select>
             </div>
 
@@ -339,14 +342,16 @@ export default function PlaylistView({
               <div className="w-0 truncate text-left text-sm md:w-1/2">
                 {track.track.album.name}
               </div>
-              <Link href={track.track.external_urls.spotify}>
-                <Image
-                  height={32}
-                  width={32}
-                  src="/spotify.png"
-                  alt="spotify icon"
-                />
-              </Link>
+              {!!track.track.external_urls?.spotify && (
+                <Link href={track.track.external_urls.spotify}>
+                  <Image
+                    height={32}
+                    width={32}
+                    src="/spotify.png"
+                    alt="spotify icon"
+                  />
+                </Link>
+              )}
             </div>
             <div className="truncate text-left text-xs">
               {track.track.artists.map((artist) => artist.name).join(", ")}

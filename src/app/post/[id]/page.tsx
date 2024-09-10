@@ -34,7 +34,7 @@ export default async function PostPage({
           return (
             <div
               key={index}
-              className="bg-secondary2 flex flex-col gap-2 p-6 md:rounded-xl"
+              className="flex flex-col gap-2 bg-secondary2 p-6 md:rounded-xl"
             >
               Post Was Deleted
             </div>
@@ -45,7 +45,7 @@ export default async function PostPage({
       <div>
         <Post post={post} session={session} focused={true} />
         {session?.user?.image && session?.user?.name ? (
-          <div className="flex flex-col gap-2 bg-main1 p-2 md:rounded-b-xl">
+          <div className="bg-main flex flex-col gap-2 p-2 md:rounded-b-xl">
             <div className="flex items-center justify-between">
               <Link
                 className="flex items-center"

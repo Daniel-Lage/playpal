@@ -20,4 +20,19 @@ export interface Playlist {
   uri: string;
 }
 
-export type playlistsSortingColumn = "Created at" | "Name" | "Owner";
+export enum PlaylistsSortingColumn {
+  CreatedAt = "Created at",
+  Name = "Name",
+  Owner = "Owner",
+  Length = "Length",
+}
+export const PlaylistsSortingColumnOptions = Object.values(
+  PlaylistsSortingColumn,
+);
+
+export enum PlaylistFeedStyle {
+  Simple = "Simple",
+  Detailed = "Detailed",
+  Compact = "Compact",
+}
+export const PlaylistFeedStyleOptions = Object.values(PlaylistFeedStyle);

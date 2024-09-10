@@ -13,7 +13,13 @@ import { getMyPlaylists, getPlaylists } from "~/api/calls";
 
 import type { Session, User } from "next-auth";
 
-import type { Playlist, playlistsSortingColumn } from "~/models/playlist.model";
+import {
+  PlaylistFeedStyleOptions,
+  PlaylistsSortingColumn,
+  PlaylistsSortingColumnOptions,
+  PlaylistFeedStyle,
+  type Playlist,
+} from "~/models/playlist.model";
 import type { PostObject } from "~/models/post.model";
 import { SpotifyUser } from "~/models/user.model";
 
@@ -32,10 +38,12 @@ export function ProfileView({
   const [showPosts, setShowPosts] = useState<boolean | undefined>();
 
   const [sortingColumn, setSortingColumn] = useState<
-    playlistsSortingColumn | undefined
+    PlaylistsSortingColumn | undefined
   >();
 
   const [reversed, setReversed] = useState<boolean | undefined>();
+
+  const [feedStyle, setFeedStyle] = useState<PlaylistFeedStyle | undefined>();
 
   const SUPAID = useMemo(() => session?.user.providerAccountId, [session]);
 
@@ -57,6 +65,12 @@ export function ProfileView({
     }
   }, [reversed, SUPAID]);
 
+  useEffect(() => {
+    if (feedStyle !== undefined) {
+      localStorage.setItem(`${SUPAID}:playlists_feed_style`, feedStyle);
+    }
+  }, [feedStyle, SUPAID]);
+
   const [filter, setFilter] = useState("");
 
   const treatedPlaylists = useMemo(() => {
@@ -72,12 +86,16 @@ export function ProfileView({
         let keyA = "";
         let keyB = "";
 
-        if (sortingColumn === "Name") {
+        if (sortingColumn === PlaylistsSortingColumn.Length) {
+          return -playlistA.tracks.total + playlistB.tracks.total;
+        }
+
+        if (sortingColumn === PlaylistsSortingColumn.Name) {
           keyA = playlistA.name.toLowerCase();
           keyB = playlistB.name.toLowerCase();
         }
 
-        if (sortingColumn === "Owner") {
+        if (sortingColumn === PlaylistsSortingColumn.Owner) {
           keyA = playlistA.owner.display_name.toLowerCase();
           keyB = playlistB.owner.display_name.toLowerCase();
         }
@@ -97,10 +115,16 @@ export function ProfileView({
   useEffect(() => {
     setShowPosts(localStorage.getItem(`${SUPAID}:showPosts`) !== "false");
     setSortingColumn(
-      (localStorage.getItem(`${SUPAID}:playlists_sorting_column`) ??
-        "Created at") as playlistsSortingColumn,
+      (localStorage.getItem(
+        `${SUPAID}:playlists_sorting_column`,
+      ) as PlaylistsSortingColumn) ?? PlaylistsSortingColumn.CreatedAt,
     );
     setReversed(localStorage.getItem(`${SUPAID}:reversed`) === "true");
+    setFeedStyle(
+      (localStorage.getItem(
+        `${SUPAID}:playlists_feed_style`,
+      ) as PlaylistFeedStyle) ?? PlaylistFeedStyle.Simple,
+    );
 
     if (session?.user?.providerAccountId === user.providerAccountId) {
       getMyPlaylists(session.user.id)
@@ -115,11 +139,9 @@ export function ProfileView({
 
   if (!user?.image || !user?.name) return <SignInButton />;
 
-  console.log(spotifyUser);
-
   return (
     <>
-      <div className="flex flex-col gap-2 overflow-hidden bg-main1 md:rounded-xl">
+      <div className="bg-main flex flex-col gap-2 overflow-hidden md:rounded-xl">
         <div className="flex items-center gap-2 p-2">
           <Image
             width={40}
@@ -167,7 +189,7 @@ export function ProfileView({
                   Posts
                 </div>
                 <button
-                  className="flex w-1/2 justify-center bg-main1 p-1"
+                  className="bg-main flex w-1/2 justify-center p-1"
                   onClick={() => setShowPosts(false)}
                 >
                   Playlists
@@ -176,7 +198,7 @@ export function ProfileView({
             ) : (
               <>
                 <button
-                  className="flex w-1/2 justify-center bg-main1 p-1"
+                  className="bg-main flex w-1/2 justify-center p-1"
                   onClick={() => setShowPosts(true)}
                 >
                   Posts
@@ -195,23 +217,23 @@ export function ProfileView({
             )
           ) : (
             <div className="flex flex-col gap-2 p-2 md:flex-row">
-              <div className="flex gap-2">
-                <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center text-sm">
+              <div className="flex items-start gap-2">
+                <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 p-2 text-center text-sm">
                   <div className="font-bold">Sorting column</div>
-                  <div className="flex">
-                    <select
-                      onChange={(e) => {
-                        setSortingColumn(
-                          e.target.value as playlistsSortingColumn,
-                        );
-                      }}
-                      defaultValue={sortingColumn ?? "Created at"}
-                    >
-                      {["Created at", "Name", "Owner"].map((sortingColumn) => (
-                        <option key={sortingColumn}>{sortingColumn}</option>
-                      ))}
-                    </select>
-                  </div>
+                  <select
+                    onChange={(e) => {
+                      setSortingColumn(
+                        e.target.value as PlaylistsSortingColumn,
+                      );
+                    }}
+                    defaultValue={
+                      sortingColumn ?? PlaylistsSortingColumn.CreatedAt
+                    }
+                  >
+                    {PlaylistsSortingColumnOptions.map((sortingColumn) => (
+                      <option key={sortingColumn}>{sortingColumn}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <button
@@ -228,6 +250,21 @@ export function ProfileView({
                   />
                 </button>
               </div>
+
+              <div className="flex items-center justify-center gap-2 self-start rounded-xl bg-main3 p-2 text-center text-sm">
+                <div className="font-bold">Feed Style</div>
+                <select
+                  onChange={(e) => {
+                    setFeedStyle(e.target.value as PlaylistFeedStyle);
+                  }}
+                  defaultValue={sortingColumn ?? PlaylistFeedStyle.Compact}
+                >
+                  {PlaylistFeedStyleOptions.map((PlaylistFeedStyle) => (
+                    <option key={PlaylistFeedStyle}>{PlaylistFeedStyle}</option>
+                  ))}
+                </select>
+              </div>
+
               <input
                 placeholder="Search something!"
                 className="grow bg-transparent placeholder-zinc-600 outline-none"
@@ -245,26 +282,140 @@ export function ProfileView({
           <Post key={post.id} post={post} session={session} />
         ))
       ) : (
-        <div className="grid grid-cols-2 gap-2 p-2 pt-0 md:grid-cols-4 md:gap-4">
-          {treatedPlaylists.map((playlist) => (
-            <Link
-              href={`/playlist/${playlist.id}`}
-              key={playlist.id}
-              className="flex flex-col items-center overflow-hidden rounded-2xl bg-secondary"
-            >
-              <Image
-                width={500}
-                height={500}
-                className="aspect-square"
-                src={playlist.images[0]?.url ?? ""}
-                alt={playlist.name}
-              />
-
-              <div className="h-16 px-2 pt-2 text-center">{playlist.name}</div>
-            </Link>
-          ))}
-        </div>
+        <PlaylistFeed
+          treatedPlaylists={treatedPlaylists}
+          style={feedStyle ?? PlaylistFeedStyle.Simple}
+        />
       )}
     </>
+  );
+}
+
+function PlaylistFeed({
+  treatedPlaylists,
+  style,
+}: {
+  treatedPlaylists: Playlist[];
+  style: PlaylistFeedStyle;
+}) {
+  if (style === PlaylistFeedStyle.Compact)
+    return (
+      <div className="flex flex-col gap-2">
+        {treatedPlaylists.map((playlist) => (
+          <PlaylistCompact key={playlist.id} playlist={playlist} />
+        ))}
+      </div>
+    );
+
+  if (style === PlaylistFeedStyle.Detailed)
+    return (
+      <div className="flex flex-col gap-2">
+        {treatedPlaylists.map((playlist) => (
+          <PlaylistDetailed key={playlist.id} playlist={playlist} />
+        ))}
+      </div>
+    );
+
+  return (
+    <div className="grid grid-cols-2 gap-2 p-2 pt-0 md:grid-cols-4 md:gap-4">
+      {treatedPlaylists.map((playlist) => (
+        <PlaylistSimple key={playlist.id} playlist={playlist} />
+      ))}
+    </div>
+  );
+}
+
+function PlaylistSimple({ playlist }: { playlist: Playlist }) {
+  return (
+    <Link
+      href={`/playlist/${playlist.id}`}
+      className="flex flex-col items-center rounded-xl bg-secondary p-2"
+    >
+      <Image
+        width={500}
+        height={500}
+        className="aspect-square rounded-lg"
+        src={playlist.images[0]?.url ?? ""}
+        alt={playlist.name}
+      />
+
+      <div className="h-16 px-2 pt-2 text-center font-bold">
+        {playlist.name}
+      </div>
+    </Link>
+  );
+}
+
+function PlaylistCompact({ playlist }: { playlist: Playlist }) {
+  return (
+    <Link
+      href={`/playlist/${playlist.id}`}
+      className="flex items-center gap-2 overflow-hidden bg-secondary p-1 font-bold md:rounded-lg"
+    >
+      <Image
+        width={32}
+        height={32}
+        src={playlist.images[0]?.url ?? ""}
+        alt={playlist.name}
+      />
+
+      <div className="grow overflow-hidden">
+        <div className="flex grow overflow-hidden">
+          <div className="w-full truncate text-left md:w-1/2">
+            {playlist.name}
+          </div>
+          <div className="w-0 truncate text-left md:w-1/2">
+            {playlist.owner.display_name}
+          </div>
+          <Link href={playlist.external_urls.spotify} className="shrink-0">
+            <Image
+              height={20}
+              width={20}
+              src="/spotify.png"
+              alt="spotify icon"
+            />
+          </Link>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function PlaylistDetailed({ playlist }: { playlist: Playlist }) {
+  return (
+    <Link
+      href={`/playlist/${playlist.id}`}
+      className="flex items-start gap-2 bg-secondary p-2 font-bold md:rounded-lg"
+    >
+      <Image
+        width={64}
+        height={64}
+        className="rounded-md"
+        src={playlist.images[0]?.url ?? ""}
+        alt={playlist.name}
+      />
+
+      <div className="grow overflow-hidden">
+        <div className="flex grow overflow-hidden">
+          <div className="w-full truncate text-left text-xl md:w-1/2 md:text-2xl">
+            {playlist.name}
+          </div>
+          <div className="w-0 truncate text-left md:w-1/2">
+            {playlist.tracks.total} tracks
+          </div>
+          <Link href={playlist.external_urls.spotify} className="shrink-0">
+            <Image
+              height={32}
+              width={32}
+              src="/spotify.png"
+              alt="spotify icon"
+            />
+          </Link>
+        </div>
+        <div className="truncate text-left text-sm">
+          {playlist.owner.display_name}
+        </div>
+      </div>
+    </Link>
   );
 }
