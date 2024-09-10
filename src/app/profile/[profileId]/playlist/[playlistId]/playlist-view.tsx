@@ -4,11 +4,8 @@ import { getDevices, getMySpotifyUser, getPlaylist } from "~/api/calls";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
-import { SignInButton } from "~/app/_components/signin-button";
 import { Logo } from "~/app/_components/logo";
 import { getTokens } from "~/api/calls";
-
-import type { Session } from "next-auth";
 
 import {
   TracksSortingColumnOptions,
@@ -20,13 +17,14 @@ import type { SimplifiedArtist } from "~/models/artist.model";
 import type { Playlist } from "~/models/playlist.model";
 import type { Device } from "~/models/device.model";
 import Link from "next/link";
+import { SpotifyLink } from "~/app/_components/spotify-link";
 
 export default function PlaylistView({
-  session,
-  id,
+  userId,
+  playlistId,
 }: {
-  session: Session;
-  id: string;
+  userId: string | null;
+  playlistId: string;
 }) {
   const [loading, setLoading] = useState(true);
 
@@ -42,19 +40,17 @@ export default function PlaylistView({
   >();
   const [reversed, setReversed] = useState<boolean | undefined>();
 
-  const SUPAID = useMemo(() => session?.user.providerAccountId, [session]);
-
   useEffect(() => {
     if (sortingColumn !== undefined) {
-      localStorage.setItem(`${SUPAID}:tracks_sorting_column`, sortingColumn);
+      localStorage.setItem(`${userId}:tracks_sorting_column`, sortingColumn);
     }
-  }, [sortingColumn, SUPAID]);
+  }, [sortingColumn, userId]);
 
   useEffect(() => {
     if (reversed !== undefined) {
-      localStorage.setItem(`${SUPAID}:reversed`, reversed.toString());
+      localStorage.setItem(`${userId}:tracks_reversed`, reversed.toString());
     }
-  }, [reversed, SUPAID]);
+  }, [reversed, userId]);
 
   const [filter, setFilter] = useState("");
 
@@ -136,41 +132,41 @@ export default function PlaylistView({
 
   useEffect(() => {
     setSortingColumn(
-      (localStorage.getItem(`${SUPAID}:tracks_sorting_column`) ??
+      (localStorage.getItem(`${userId}:tracks_sorting_column`) ??
         "Added at") as TracksSortingColumn,
     );
-    setReversed(localStorage.getItem(`${SUPAID}:reversed`) === "true");
+    setReversed(localStorage.getItem(`${userId}:tracks_reversed`) === "true");
 
-    getPlaylist(session.user.id, id)
+    getPlaylist(userId, playlistId)
       .then((playlist) => {
         setLoading(false);
         setPlaylist(playlist);
       })
       .catch(console.error);
 
-    getDevices(session.user.id)
-      .then((devices) => {
-        setDevices(devices);
-        if (devices[0]?.id) setDeviceId(devices[0]?.id);
-      })
-      .catch(console.error);
+    if (userId) {
+      getDevices(userId)
+        .then((devices) => {
+          setDevices(devices);
+          if (devices[0]?.id) setDeviceId(devices[0]?.id);
+        })
+        .catch(console.error);
 
-    getMySpotifyUser(session.user.id)
-      .then((spotifyUser) => setPremium(spotifyUser.product === "premium"))
-      .catch(console.error);
-  }, [id, session]);
+      getMySpotifyUser(userId)
+        .then((spotifyUser) => setPremium(spotifyUser.product === "premium"))
+        .catch(console.error);
+    }
+  }, [playlistId, userId]);
 
   if (loading) return;
 
   if (!playlist)
     return <div className="self-center text-xl text-red-500">Error</div>;
 
-  if (!session) return <SignInButton />;
-
   return (
     <>
       <div className="flex flex-col overflow-hidden md:rounded-2xl">
-        <div className="bg-main flex flex-col items-center gap-2 p-2 md:flex-row md:items-start">
+        <div className="flex flex-col items-center gap-2 bg-main p-2 md:flex-row md:items-start">
           <Image
             width={200}
             height={200}
@@ -179,7 +175,7 @@ export default function PlaylistView({
             alt={playlist.name}
           />
           <div className="flex w-full px-2">
-            <div className="flex grow flex-col items-start justify-between truncate">
+            <div className="flex grow flex-col items-start truncate">
               <div className="flex items-start justify-between text-wrap text-2xl font-bold">
                 {playlist.name}
               </div>
@@ -191,59 +187,60 @@ export default function PlaylistView({
               </div>
             </div>
 
-            <Link href={playlist.external_urls.spotify} className="shrink-0">
-              <Image
-                height={32}
-                width={32}
-                src="/spotify.png"
-                alt="spotify icon"
+            <div className="flex flex-col items-end gap-2">
+              <Logo />
+              <SpotifyLink
+                size={32}
+                external_url={playlist.external_urls.spotify}
               />
-            </Link>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-2 bg-main2 p-2 md:flex-row">
-          <div className="flex gap-2 md:w-1/3">
-            {devices.length > 0 && deviceId ? (
-              <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center">
-                <div className="font-bold md:p-1">Spotify device</div>
-                <select
-                  onChange={(e) => {
-                    setDeviceId(e.target.value);
-                  }}
-                >
-                  {devices.map((device) => (
-                    <option key={device.id} value={device.id}>
-                      {device.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            ) : (
-              <div className="p-2 text-sm font-bold">
-                No active spotify device
-              </div>
-            )}
-            <button
-              onClick={() => {
-                getDevices(session.user.id)
-                  .then((devices) => {
-                    setDevices(devices);
-                    if (devices[0]?.id) setDeviceId(devices[0]?.id);
-                  })
-                  .catch(console.error);
-              }}
-            >
-              <Image
-                height={32}
-                width={32}
-                src="/reload.png"
-                alt="reload icon"
-              />
-            </button>
-          </div>
+        <div className="flex flex-col items-center justify-between gap-2 bg-main2 p-2 md:grid md:grid-cols-3">
+          {userId && (
+            <div className="flex gap-2">
+              {devices.length > 0 && deviceId ? (
+                <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center">
+                  <div className="font-bold md:p-1">Spotify device</div>
+                  <select
+                    onChange={(e) => {
+                      setDeviceId(e.target.value);
+                    }}
+                  >
+                    {devices.map((device) => (
+                      <option key={device.id} value={device.id}>
+                        {device.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : (
+                <div className="p-2 text-sm font-bold">
+                  No active spotify device
+                </div>
+              )}
+              <button
+                onClick={() => {
+                  getDevices(userId)
+                    .then((devices) => {
+                      setDevices(devices);
+                      if (devices[0]?.id) setDeviceId(devices[0]?.id);
+                    })
+                    .catch(console.error);
+                }}
+              >
+                <Image
+                  height={32}
+                  width={32}
+                  src="/reload.png"
+                  alt="reload icon"
+                />
+              </button>
+            </div>
+          )}
 
-          <div className="flex gap-2 md:w-1/3">
+          <div className="flex gap-2">
             <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center">
               <div className="font-bold md:p-1">Sort by</div>
               <select
@@ -273,7 +270,7 @@ export default function PlaylistView({
             </button>
           </div>
 
-          <div className="flex w-full gap-2 md:w-1/3">
+          <div className="flex w-full gap-2">
             <input
               placeholder="Search something!"
               className="w-32 grow bg-transparent placeholder-zinc-600 outline-none md:w-48"
@@ -281,12 +278,12 @@ export default function PlaylistView({
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
             />
-            {deviceId && !playing && premium && (
+            {userId && deviceId && !playing && premium && (
               <button
                 className="font-extrabold text-red-500"
                 onClick={async () => {
                   setPlaying(true);
-                  play(session.user.id, shuffledTracks, deviceId)
+                  play(userId, shuffledTracks, deviceId)
                     .then(() => setPlaying(false))
                     .catch(console.error);
                 }}
@@ -304,7 +301,7 @@ export default function PlaylistView({
           className="flex items-center gap-1 bg-secondary p-1 font-bold md:rounded-lg"
           disabled={!deviceId || playing || !premium || track.is_local}
           onClick={() => {
-            if (!deviceId) return;
+            if (!userId || !deviceId) return;
 
             setPlaying(true);
 
@@ -318,7 +315,7 @@ export default function PlaylistView({
 
             shuffledTracksWithFirstTrack.unshift(track);
 
-            play(session.user.id, shuffledTracksWithFirstTrack, deviceId)
+            play(userId, shuffledTracksWithFirstTrack, deviceId)
               .then(() => setPlaying(false))
               .catch(console.error);
           }}
@@ -342,21 +339,17 @@ export default function PlaylistView({
               <div className="w-0 truncate text-left text-sm md:w-1/2">
                 {track.track.album.name}
               </div>
-              {!!track.track.external_urls?.spotify && (
-                <Link href={track.track.external_urls.spotify}>
-                  <Image
-                    height={32}
-                    width={32}
-                    src="/spotify.png"
-                    alt="spotify icon"
-                  />
-                </Link>
-              )}
             </div>
             <div className="truncate text-left text-xs">
               {track.track.artists.map((artist) => artist.name).join(", ")}
             </div>
           </div>
+          {!!track.track.external_urls?.spotify && (
+            <SpotifyLink
+              size={32}
+              external_url={track.track.external_urls.spotify}
+            />
+          )}
         </button>
       ))}
     </>

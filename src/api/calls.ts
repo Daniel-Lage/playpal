@@ -2,8 +2,6 @@
 
 import { getAccount } from "~/server/queries";
 
-import type { Account } from "next-auth";
-
 import type { PlaylistTrack } from "~/models/track.model";
 import type { SpotifyError } from "~/models/error.model";
 import type { Playlist } from "~/models/playlist.model";
@@ -69,8 +67,8 @@ export async function getMyPlaylists(userId: string) {
   return playlists.items;
 }
 
-export async function getPlaylists(userId?: string, spotifyUserId?: string) {
-  const tokens = await getTokens(userId);
+export async function getPlaylists(userId: string | null, profileId: string) {
+  const tokens = await getTokens(userId ?? process.env.FALLBACK_USERID);
 
   if (!tokens?.access_token) {
     console.log("Tokens: ", tokens);
@@ -79,7 +77,7 @@ export async function getPlaylists(userId?: string, spotifyUserId?: string) {
   }
 
   const response = await fetch(
-    `https://api.spotify.com/v1/users/${spotifyUserId}/playlists?limit=50`,
+    `https://api.spotify.com/v1/users/${profileId}/playlists?limit=50`,
     {
       headers: {
         Authorization: `Bearer ${tokens.access_token}`,
@@ -127,10 +125,10 @@ export async function getPlaylists(userId?: string, spotifyUserId?: string) {
 }
 
 export async function getPlaylist(
-  userId: string,
-  id: string,
+  userId: string | null,
+  playlistId: string,
 ): Promise<Playlist | undefined> {
-  const tokens = await getTokens(userId);
+  const tokens = await getTokens(userId ?? process.env.FALLBACK_USERID);
 
   if (!tokens?.access_token) {
     console.log("Tokens: ", tokens);
@@ -138,11 +136,14 @@ export async function getPlaylist(
     throw new Error("Internal Server Error");
   }
 
-  const response = await fetch(`https://api.spotify.com/v1/playlists/${id}`, {
-    headers: {
-      Authorization: `Bearer  ${tokens.access_token}`,
+  const response = await fetch(
+    `https://api.spotify.com/v1/playlists/${playlistId}`,
+    {
+      headers: {
+        Authorization: `Bearer  ${tokens.access_token}`,
+      },
     },
-  });
+  );
 
   if (response.status != 200) {
     const json = (await response.json()) as SpotifyError;
@@ -220,12 +221,9 @@ export async function getDevices(userId: string) {
 }
 
 export async function getTokens(userId?: string) {
-  const account = userId
-    ? await getAccount(userId)
-    : process.env.FALLBACK_REFRESH_TOKEN
-      ? ({ refresh_token: process.env.FALLBACK_REFRESH_TOKEN } as Account)
-      : null;
+  if (!userId) return;
 
+  const account = await getAccount(userId);
   if (!account?.refresh_token) {
     console.log("Account: ", account);
 

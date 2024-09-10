@@ -18,11 +18,9 @@ export async function getPosts() {
   return posts;
 }
 
-export async function getUserFromSpotifyUserId(
-  spotifyUserId: string,
-): Promise<User | undefined> {
+export async function getUser(profileId: string): Promise<User | undefined> {
   const user = await db.query.usersTable.findFirst({
-    where: eq(usersTable.providerAccountId, spotifyUserId),
+    where: eq(usersTable.providerAccountId, profileId),
   });
 
   return user;

@@ -6,29 +6,25 @@ import { useState } from "react";
 import { postPost } from "~/server/queries";
 
 export function PostCreator({
-  session,
+  userId,
   thread,
 }: {
-  session: Session;
+  userId: string;
   thread?: string[];
 }) {
   const [input, setInput] = useState("");
   const [isPosting, setIsPosting] = useState(false);
 
   async function send() {
-    if (!session) return;
-
     setIsPosting(true);
 
-    postPost(input, session.user.id, thread)
+    postPost(input, userId, thread)
       .then(() => {
         setIsPosting(false);
         setInput("");
       })
       .catch(console.error);
   }
-
-  if (!session?.user?.image || !session?.user?.name) return;
 
   return (
     <>

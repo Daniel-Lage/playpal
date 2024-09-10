@@ -8,6 +8,7 @@ import { Post } from "~/app/_components/post";
 import { Logo } from "~/app/_components/logo";
 import { getPosts } from "~/server/queries";
 import { authOptions } from "~/lib/auth";
+import getMetaData from "metadata-scraper";
 
 export const dynamic = "force-dynamic";
 
@@ -18,12 +19,9 @@ export default async function HomePage() {
   return (
     <>
       {session?.user?.image && session?.user?.name ? (
-        <div className="bg-main flex flex-col gap-2 p-2 md:rounded-xl">
+        <div className="flex flex-col gap-2 bg-main p-2 md:rounded-xl">
           <div className="flex items-center justify-between">
-            <Link
-              className="flex items-center"
-              href={`/profile/${session.user.providerAccountId}`}
-            >
+            <Link className="flex items-center" href={"/profile"}>
               <Image
                 width={40}
                 height={40}
@@ -36,14 +34,14 @@ export default async function HomePage() {
             <Logo />
           </div>
           <div className="flex">
-            <PostCreator session={session} />
+            <PostCreator userId={session.user.id} />
           </div>
         </div>
       ) : (
         <SignInButton />
       )}
       {posts.map((post) => (
-        <Post key={post.id} post={post} session={session} />
+        <Post key={post.id} post={post} userId={session?.user.id} />
       ))}
     </>
   );

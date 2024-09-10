@@ -5,17 +5,15 @@ import Link from "next/link";
 
 import { deletePost } from "~/server/queries";
 
-import type { Session } from "next-auth";
-
 import type { PostObject } from "~/models/post.model";
 
 export function Post({
   post,
-  session,
+  userId,
   focused,
 }: {
   post: PostObject;
-  session?: Session | null;
+  userId?: string | null;
   focused?: boolean;
 }) {
   return (
@@ -41,9 +39,13 @@ export function Post({
           <div className="px-2 font-bold">{post.author?.name}</div>
         </Link>
 
-        {session?.user?.id === post.userId && focused ? (
+        {userId === post.userId && focused ? (
           <Link
-            href={post.thread.length > 0 ? `/post/${post.thread.pop()}` : "/"}
+            href={
+              post.thread.length > 0
+                ? `/profile/${post.author.providerAccountId}/post/${post.thread.pop()}`
+                : "/"
+            }
             onClick={() => deletePost(post.id)}
           >
             <Image height={24} width={24} src="/trash.png" alt="trash icon" />
@@ -54,7 +56,9 @@ export function Post({
           </button>
         )}
       </div>
-      <Link href={`/post/${post.id}`}>{post.content}</Link>
+      <Link href={`/profile/${post.author.providerAccountId}/post/${post.id}`}>
+        {post.content}
+      </Link>
     </div>
   );
 }

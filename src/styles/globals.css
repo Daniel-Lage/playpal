@@ -11,14 +11,13 @@ body {
 }
 
 select {
-  border: solid black;
-  border-width: 0 4px 4px 0;
   font-size: 0px;
-  width: 14px;
-  height: 14px;
-  background-color: transparent;
-  rotate: 45deg;
-  display: inline-block;
+  height: 20px;
+  width: 20px;
+  @apply bg-main3;
+  background-image: url("/open-menu.png");
+  background-position: center;
+  background-size: contain;
   cursor: pointer;
   outline: none;
 }

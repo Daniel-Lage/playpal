@@ -2,22 +2,52 @@ import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 
-import { getPost, getReplies, getThread } from "~/server/queries";
+import { getPost, getReplies, getThread, getUser } from "~/server/queries";
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
 import { Post } from "~/app/_components/post";
 import { Logo } from "~/app/_components/logo";
 import { authOptions } from "~/lib/auth";
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export default async function PostPage({
-  params: { id },
+export async function generateMetadata({
+  params: { profileId, postId },
 }: {
-  params: { id: string };
+  params: { profileId: string; postId: string };
+}): Promise<Metadata> {
+  const user = await getUser(profileId);
+
+  if (!user)
+    return {
+      title: "Playpal | Post",
+      openGraph: {
+        images: ["/favicon.ico"],
+        title: "Playpal | Post",
+        creators: [`${process.env.NEXTAUTH_URL}/profile/${profileId}`],
+        url: `${process.env.NEXTAUTH_URL}/profile/${profileId}/post/${postId}`,
+      },
+    };
+
+  return {
+    title: `Playpal | Post by ${user.name}`,
+    openGraph: {
+      images: [user?.image ?? "/favicon.ico"],
+      title: `Playpal | Post by ${user.name}`,
+      creators: [`${process.env.NEXTAUTH_URL}/profile/${profileId}`],
+      url: `${process.env.NEXTAUTH_URL}/profile/${profileId}/post/${postId}`,
+    },
+  };
+}
+
+export default async function PostPage({
+  params: { postId },
+}: {
+  params: { postId: string };
 }) {
   const session = await getServerSession(authOptions);
-  const post = await getPost(id);
+  const post = await getPost(postId);
 
   if (!post)
     return <div className="self-center text-xl text-red-500">Error</div>;
@@ -40,16 +70,16 @@ export default async function PostPage({
             </div>
           );
 
-        return <Post key={post.id} post={post} session={session} />;
+        return <Post key={post.id} post={post} userId={session?.user.id} />;
       })}
       <div>
-        <Post post={post} session={session} focused={true} />
+        <Post post={post} userId={session?.user.id} focused={true} />
         {session?.user?.image && session?.user?.name ? (
-          <div className="bg-main flex flex-col gap-2 p-2 md:rounded-b-xl">
+          <div className="flex flex-col gap-2 bg-main p-2 md:rounded-b-xl">
             <div className="flex items-center justify-between">
               <Link
                 className="flex items-center"
-                href={`/profile/${session.user.providerAccountId}`}
+                href={`/profile/${session.user.id}`}
               >
                 <Image
                   width={40}
@@ -64,7 +94,7 @@ export default async function PostPage({
             </div>
             <div className="flex">
               <PostCreator
-                session={session}
+                userId={session?.user.id}
                 thread={[...post.thread, post.id]}
               />
             </div>
@@ -75,7 +105,7 @@ export default async function PostPage({
       </div>
 
       {replies.map((reply) => (
-        <Post key={reply.id} post={reply} session={session} />
+        <Post key={reply.id} post={reply} userId={session?.user.id} />
       ))}
     </>
   );
