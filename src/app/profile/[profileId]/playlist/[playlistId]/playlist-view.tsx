@@ -16,7 +16,6 @@ import {
 import type { SimplifiedArtist } from "~/models/artist.model";
 import type { Playlist } from "~/models/playlist.model";
 import type { Device } from "~/models/device.model";
-import Link from "next/link";
 import { SpotifyLink } from "~/app/_components/spotify-link";
 
 export default function PlaylistView({
@@ -70,17 +69,17 @@ export default function PlaylistView({
         let keyA = "";
         let keyB = "";
 
-        if (sortingColumn === "Name") {
+        if (sortingColumn === TracksSortingColumn.Name) {
           keyA = trackA.track.name.toLowerCase();
           keyB = trackB.track.name.toLowerCase();
         }
 
-        if (sortingColumn === "Album") {
+        if (sortingColumn === TracksSortingColumn.Album) {
           keyA = trackA.track.album.name.toLowerCase();
           keyB = trackB.track.album.name.toLowerCase();
         }
 
-        if (sortingColumn === "Artists") {
+        if (sortingColumn === TracksSortingColumn.Artists) {
           function getHighestArtist(
             artistA: SimplifiedArtist,
             artistB: SimplifiedArtist,

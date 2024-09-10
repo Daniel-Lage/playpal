@@ -8,7 +8,6 @@ import { Post } from "~/app/_components/post";
 import { Logo } from "~/app/_components/logo";
 import { getPosts } from "~/server/queries";
 import { authOptions } from "~/lib/auth";
-import getMetaData from "metadata-scraper";
 
 export const dynamic = "force-dynamic";
 

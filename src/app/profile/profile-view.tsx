@@ -11,7 +11,7 @@ import { Logo } from "~/app/_components/logo";
 import { deleteUser } from "~/server/queries";
 import { getMyPlaylists, getPlaylists } from "~/api/calls";
 
-import type { Session, User } from "next-auth";
+import type { User } from "next-auth";
 
 import {
   PlaylistFeedStyleOptions,
@@ -21,7 +21,6 @@ import {
   type Playlist,
 } from "~/models/playlist.model";
 import type { PostObject } from "~/models/post.model";
-import { SpotifyUser } from "~/models/user.model";
 import { SpotifyLink } from "../_components/spotify-link";
 
 export function ProfileView({
@@ -34,7 +33,6 @@ export function ProfileView({
   posts: PostObject[];
 }) {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [spotifyUser, setSpotifyUser] = useState<SpotifyUser | undefined>();
 
   const [showPosts, setShowPosts] = useState<boolean | undefined>();
 
@@ -153,7 +151,7 @@ export function ProfileView({
 
           <SpotifyLink
             size={32}
-            external_url={`https://open.spotify.com/user/${spotifyUser?.external_urls.spotify}`}
+            external_url={`https://open.spotify.com/user/${user.providerAccountId}`}
           />
 
           {userId === user.id && (

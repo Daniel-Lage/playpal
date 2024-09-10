@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
+import type { Metadata } from "next";
 
 import { getPost, getReplies, getThread, getUser } from "~/server/queries";
 import { SignInButton } from "~/app/_components/signin-button";
@@ -8,7 +9,6 @@ import { PostCreator } from "~/app/_components/post-creator";
 import { Post } from "~/app/_components/post";
 import { Logo } from "~/app/_components/logo";
 import { authOptions } from "~/lib/auth";
-import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
