@@ -8,7 +8,7 @@ export async function FormattedPost({
   focused,
 }: {
   post: PostObject;
-  userId?: string;
+  userId?: string | null;
   focused?: boolean;
 }) {
   const pattern =

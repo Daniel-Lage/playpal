@@ -6,7 +6,6 @@ import Link from "next/link";
 
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
-import { Post } from "~/app/_components/post";
 import { Logo } from "~/app/_components/logo";
 import { deleteUser } from "~/server/queries";
 import { getMyPlaylists, getPlaylists } from "~/api/calls";
@@ -22,6 +21,7 @@ import {
 } from "~/models/playlist.model";
 import type { PostObject } from "~/models/post.model";
 import { SpotifyLink } from "../_components/spotify-link";
+import { FormattedPost } from "../_components/formatted-post";
 
 export function ProfileView({
   userId,
@@ -269,7 +269,9 @@ export function ProfileView({
       </div>
 
       {showPosts !== false ? (
-        posts.map((post) => <Post key={post.id} post={post} userId={userId} />)
+        posts.map((post) => (
+          <FormattedPost key={post.id} post={post} userId={userId} />
+        ))
       ) : (
         <PlaylistFeed
           treatedPlaylists={treatedPlaylists}
