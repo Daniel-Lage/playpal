@@ -7,6 +7,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXTAUTH_URL ?? ""),
   title: "PlayPal",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
   openGraph: {
