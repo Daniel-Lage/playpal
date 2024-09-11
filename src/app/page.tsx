@@ -8,6 +8,9 @@ import { Post } from "~/app/_components/post";
 import { Logo } from "~/app/_components/logo";
 import { getPosts } from "~/server/queries";
 import { authOptions } from "~/lib/auth";
+import getMetaData from "metadata-scraper";
+import { PostObject } from "~/models/post.model";
+import { FormattedPost } from "~/app/_components/formatted-post";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +43,7 @@ export default async function HomePage() {
         <SignInButton />
       )}
       {posts.map((post) => (
-        <Post key={post.id} post={post} userId={session?.user.id} />
+        <FormattedPost post={post} userId={session?.user.id} />
       ))}
     </>
   );

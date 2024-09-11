@@ -28,7 +28,7 @@ export async function generateMetadata({
     return {
       title: `Playpal | ${user.name}`,
       openGraph: {
-        title: "PlayPal | Profile",
+        title: `Playpal | ${user.name}`,
         type: "profile",
         images: ["/favicon.ico"],
         url: `${process.env.NEXTAUTH_URL}/profile`,
@@ -38,8 +38,8 @@ export async function generateMetadata({
   return {
     title: `Playpal | ${user.name}`,
     openGraph: {
+      title: `Playpal | ${user.name}`,
       images: [user.image],
-      title: `${user.name}'s profile`,
       type: "profile",
       url: `${process.env.NEXTAUTH_URL}/profile/${profileId}`,
     },

@@ -20,9 +20,11 @@ import { SpotifyLink } from "~/app/_components/spotify-link";
 
 export default function PlaylistView({
   userId,
+  profileId,
   playlistId,
 }: {
   userId: string | null;
+  profileId: string;
   playlistId: string;
 }) {
   const [loading, setLoading] = useState(true);
@@ -32,8 +34,9 @@ export default function PlaylistView({
   const [devices, setDevices] = useState<Device[]>([]);
   const [playing, setPlaying] = useState(false);
 
-  const [premium, setPremium] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
 
+  const [premium, setPremium] = useState(false);
   const [sortingColumn, setSortingColumn] = useState<
     TracksSortingColumn | undefined
   >();
@@ -164,16 +167,39 @@ export default function PlaylistView({
 
   return (
     <>
+      {modalIsOpen && (
+        <div className="fixed left-0 top-0 flex h-screen w-screen items-center justify-center backdrop-brightness-75">
+          <div className="flex flex-col items-center gap-1 rounded-md bg-main p-2">
+            <div className="rounded-sm bg-main3 p-1">{`https://playpal-sepia.vercel.app/profile/${profileId}/playlist/${playlistId}`}</div>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  `https://playpal-sepia.vercel.app/profile/${profileId}/playlist/${playlistId}`,
+                );
+                setModalIsOpen(false);
+              }}
+              className="font-bold"
+            >
+              Copy
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col overflow-hidden md:rounded-2xl">
         <div className="flex flex-col items-center gap-2 bg-main p-2 md:flex-row md:items-start">
-          <Image
-            width={200}
-            height={200}
-            className="rounded-xl"
-            src={playlist.images[0]?.url ?? ""}
-            alt={playlist.name}
-          />
-          <div className="flex w-full px-2">
+          <div className="flex items-start gap-2">
+            <Image
+              width={200}
+              height={200}
+              className="rounded-xl"
+              src={playlist.images[0]?.url ?? ""}
+              alt={playlist.name}
+            />
+
+            <Logo />
+          </div>
+
+          <div className="flex w-full px-2 md:mt-12">
             <div className="flex grow flex-col items-start truncate">
               <div className="flex items-start justify-between text-wrap text-2xl font-bold">
                 {playlist.name}
@@ -187,11 +213,22 @@ export default function PlaylistView({
             </div>
 
             <div className="flex flex-col items-end gap-2">
-              <Logo />
               <SpotifyLink
                 size={32}
                 external_url={playlist.external_urls.spotify}
               />
+              <button
+                onClick={() => {
+                  setModalIsOpen(true);
+                }}
+              >
+                <Image
+                  height={32}
+                  width={32}
+                  src="/share.png"
+                  alt="share icon"
+                />
+              </button>
             </div>
           </div>
         </div>

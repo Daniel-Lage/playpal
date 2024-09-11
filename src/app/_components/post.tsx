@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type { MetaData } from "metadata-scraper";
 
 import { deletePost } from "~/server/queries";
 
@@ -11,10 +12,12 @@ export function Post({
   post,
   userId,
   focused,
+  link,
 }: {
   post: PostObject;
   userId?: string | null;
   focused?: boolean;
+  link: MetaData | null;
 }) {
   return (
     <div
@@ -59,6 +62,22 @@ export function Post({
       <Link href={`/profile/${post.author.providerAccountId}/post/${post.id}`}>
         {post.content}
       </Link>
+      {link?.url && link.image && link.title && (
+        <Link
+          href={link.url}
+          className="flex items-center gap-2 rounded-lg bg-secondary2 p-2"
+        >
+          <Image
+            width={40}
+            height={40}
+            className="rounded-md"
+            src={link.image}
+            alt={link.title}
+          />
+          <div>{link.title}</div>
+          <div>{link.description}</div>
+        </Link>
+      )}
     </div>
   );
 }

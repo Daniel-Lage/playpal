@@ -19,9 +19,9 @@ export async function generateMetadata({
 
   if (!playlist)
     return {
-      title: `Playpal | Playlist`,
+      title: `Playpal | playlist`,
       openGraph: {
-        title: `Playpal | Playlist`,
+        title: `Playpal | playlist`,
         type: "music.playlist",
         images: ["/playpal.ico"],
         creators: [`${process.env.NEXTAUTH_URL}/profile/${profileId}`],
@@ -30,11 +30,11 @@ export async function generateMetadata({
     };
 
   return {
-    title: `Playpal | ${playlist.name}`,
-    description: playlist.description ?? "",
+    title: `${playlist.name} | playlist by ${playlist.owner.display_name}`,
+    description: `Playlist - ${playlist.owner.display_name} - ${playlist.tracks.total} tracks`,
     openGraph: {
-      description: playlist.description ?? "",
-      title: `Playpal | ${playlist.name}`,
+      description: `Playlist - ${playlist.owner.display_name} - ${playlist.tracks.total} tracks`,
+      title: `${playlist.name} | playlist by ${playlist.owner.display_name}`,
       type: "music.playlist",
       images: [playlist?.images[0]?.url ?? "/playpal.ico"],
       creators: [`${process.env.NEXTAUTH_URL}/profile/${profileId}`],
@@ -44,13 +44,26 @@ export async function generateMetadata({
 }
 
 export default async function PlaylistPage({
-  params: { playlistId },
+  params: { playlistId, profileId },
 }: {
-  params: { playlistId: string };
+  params: { playlistId: string; profileId: string };
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session) return <PlaylistView userId={null} playlistId={playlistId} />;
+  if (!session)
+    return (
+      <PlaylistView
+        userId={null}
+        playlistId={playlistId}
+        profileId={profileId}
+      />
+    );
 
-  return <PlaylistView userId={session.user.id} playlistId={playlistId} />;
+  return (
+    <PlaylistView
+      userId={session.user.id}
+      playlistId={playlistId}
+      profileId={profileId}
+    />
+  );
 }

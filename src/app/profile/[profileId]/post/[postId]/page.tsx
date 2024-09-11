@@ -9,6 +9,7 @@ import { PostCreator } from "~/app/_components/post-creator";
 import { Post } from "~/app/_components/post";
 import { Logo } from "~/app/_components/logo";
 import { authOptions } from "~/lib/auth";
+import { FormattedPost } from "~/app/_components/formatted-post";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,7 @@ export async function generateMetadata({
 
   if (!user)
     return {
-      title: "Playpal | Post",
+      title: "Playpal | post",
       openGraph: {
         images: ["/favicon.ico"],
         title: "Playpal | Post",
@@ -31,7 +32,7 @@ export async function generateMetadata({
     };
 
   return {
-    title: `Playpal | Post by ${user.name}`,
+    title: `Playpal | post by ${user.name}`,
     openGraph: {
       images: [user?.image ?? "/favicon.ico"],
       title: `Playpal | Post by ${user.name}`,
@@ -70,10 +71,12 @@ export default async function PostPage({
             </div>
           );
 
-        return <Post key={post.id} post={post} userId={session?.user.id} />;
+        return (
+          <FormattedPost key={post.id} post={post} userId={session?.user.id} />
+        );
       })}
       <div>
-        <Post post={post} userId={session?.user.id} focused={true} />
+        <FormattedPost post={post} userId={session?.user.id} focused={true} />
         {session?.user?.image && session?.user?.name ? (
           <div className="flex flex-col gap-2 bg-main p-2 md:rounded-b-xl">
             <div className="flex items-center justify-between">
@@ -105,7 +108,7 @@ export default async function PostPage({
       </div>
 
       {replies.map((reply) => (
-        <Post key={reply.id} post={reply} userId={session?.user.id} />
+        <FormattedPost key={reply.id} post={reply} userId={session?.user.id} />
       ))}
     </>
   );

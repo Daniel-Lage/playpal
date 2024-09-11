@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import getMetaData, { type MetaData } from "metadata-scraper";
 
 import { postPost } from "~/server/queries";
 
@@ -12,6 +14,20 @@ export function PostCreator({
   thread?: string[];
 }) {
   const [input, setInput] = useState("");
+
+  const [link, setLink] = useState<MetaData>();
+
+  useEffect(() => {
+    const pattern =
+      /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+
+    const result = pattern.exec(input);
+
+    if (result) {
+      fetch(result[0]).then((value) => console.log(value));
+    }
+  }, [input]);
+
   const [isPosting, setIsPosting] = useState(false);
 
   async function send() {
@@ -26,27 +42,34 @@ export function PostCreator({
   }
 
   return (
-    <>
-      <input
-        placeholder="Type something!"
-        className="grow bg-transparent placeholder-zinc-600 outline-none"
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
+    <div className="grow">
+      <div className="flex grow">
+        <input
+          placeholder="Type something!"
+          className="grow bg-transparent text-opacity-0 placeholder-zinc-600 outline-none"
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
 
-            if (input !== "" && !isPosting) {
-              void send();
+              if (input !== "" && !isPosting) {
+                void send();
+              }
             }
-          }
-        }}
-        disabled={isPosting}
-      />
-      {input !== "" && !isPosting && (
-        <button onClick={() => void send()}>Post</button>
-      )}
-    </>
+          }}
+          disabled={isPosting}
+        />
+
+        {input !== "" && !isPosting && (
+          <button onClick={() => void send()} className="font-bold">
+            Post
+          </button>
+        )}
+      </div>
+
+      {/* {!!content && <Link href={content.}>{content}</Link>} */}
+    </div>
   );
 }
