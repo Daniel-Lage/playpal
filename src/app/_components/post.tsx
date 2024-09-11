@@ -39,27 +39,28 @@ export function Post({
           <div className="px-2 font-bold">{post.author?.name}</div>
         </Link>
 
-        {userId === post.userId && focused ? (
-          <Link
-            href={
-              post.thread.length > 0
-                ? `/profile/${post.author.providerAccountId}/post/${post.thread.pop()}`
-                : "/"
-            }
-            onClick={() => deletePost(post.id)}
-          >
-            <Image height={24} width={24} src="/trash.png" alt="trash icon" />
-          </Link>
-        ) : (
-          <button onClick={() => deletePost(post.id)}>
-            <Image height={24} width={24} src="/trash.png" alt="trash icon" />
-          </button>
-        )}
+        {userId === post.userId &&
+          (focused ? (
+            <Link
+              href={
+                post.thread.length > 0
+                  ? `/profile/${post.author.providerAccountId}/post/${post.thread.pop()}`
+                  : "/"
+              }
+              onClick={() => deletePost(post.id)}
+            >
+              <Image height={24} width={24} src="/trash.png" alt="trash icon" />
+            </Link>
+          ) : (
+            <button onClick={() => deletePost(post.id)}>
+              <Image height={24} width={24} src="/trash.png" alt="trash icon" />
+            </button>
+          ))}
       </div>
       <Link href={`/profile/${post.author.providerAccountId}/post/${post.id}`}>
         {post.content}
       </Link>
-      {post?.metadata?.url && post.metadata.image && post.metadata.title && (
+      {post?.metadata?.url && post?.metadata?.image && post.metadata.title && (
         <Link
           href={post.metadata.url}
           className="flex items-center gap-2 rounded-lg bg-secondary2 p-2"

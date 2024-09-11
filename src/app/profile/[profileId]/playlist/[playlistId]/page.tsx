@@ -30,11 +30,11 @@ export async function generateMetadata({
     };
 
   return {
-    title: `${playlist.name} | playlist by ${playlist.owner.display_name}`,
+    title: `${playlist.name} | Playpal`,
     description: `Playlist - ${playlist.owner.display_name} - ${playlist.tracks.total} tracks`,
     openGraph: {
       description: `Playlist - ${playlist.owner.display_name} - ${playlist.tracks.total} tracks`,
-      title: `${playlist.name} | playlist by ${playlist.owner.display_name}`,
+      title: `${playlist.name} | Playpal`,
       type: "music.playlist",
       images: [playlist?.images[0]?.url ?? "/playpal.ico"],
       creators: [`${process.env.NEXTAUTH_URL}/profile/${profileId}`],
