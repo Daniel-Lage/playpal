@@ -173,7 +173,7 @@ export default function PlaylistView({
             <div className="rounded-sm bg-main3 p-1">{`https://playpal-sepia.vercel.app/profile/${profileId}/playlist/${playlistId}`}</div>
             <button
               onClick={() => {
-                navigator.clipboard.writeText(
+                void navigator.clipboard.writeText(
                   `https://playpal-sepia.vercel.app/profile/${profileId}/playlist/${playlistId}`,
                 );
                 setModalIsOpen(false);

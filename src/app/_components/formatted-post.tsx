@@ -1,6 +1,6 @@
-import { PostObject } from "~/models/post.model";
 import { Post } from "./post";
 import getMetaData from "metadata-scraper";
+import type { PostObject } from "~/models/post.model";
 
 export async function FormattedPost({
   post,

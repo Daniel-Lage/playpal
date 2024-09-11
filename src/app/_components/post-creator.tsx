@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import getMetaData, { type MetaData } from "metadata-scraper";
+import { useState } from "react";
 
 import { postPost } from "~/server/queries";
 
@@ -14,19 +12,6 @@ export function PostCreator({
   thread?: string[];
 }) {
   const [input, setInput] = useState("");
-
-  const [link, setLink] = useState<MetaData>();
-
-  useEffect(() => {
-    const pattern =
-      /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-
-    const result = pattern.exec(input);
-
-    if (result) {
-      fetch(result[0]).then((value) => console.log(value));
-    }
-  }, [input]);
 
   const [isPosting, setIsPosting] = useState(false);
 
