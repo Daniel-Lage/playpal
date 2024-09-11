@@ -8,7 +8,8 @@ import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
 import { Logo } from "~/app/_components/logo";
 import { authOptions } from "~/lib/auth";
-import { FormattedPost } from "~/app/_components/formatted-post";
+import { Post } from "~/app/_components/post";
+import { formatPost } from "~/lib/format-post";
 
 export const dynamic = "force-dynamic";
 
@@ -52,8 +53,13 @@ export default async function PostPage({
   if (!post)
     return <div className="self-center text-xl text-red-500">Error</div>;
 
-  const thread = await getThread(post.thread);
-  const replies = await getReplies(post.id);
+  const formattedPost = await formatPost(post);
+  const thread = await Promise.all(
+    (await getThread(post.thread)).map(formatPost),
+  );
+  const replies = await Promise.all(
+    (await getReplies(post.id)).map(formatPost),
+  );
 
   return (
     <>
@@ -70,12 +76,10 @@ export default async function PostPage({
             </div>
           );
 
-        return (
-          <FormattedPost key={post.id} post={post} userId={session?.user.id} />
-        );
+        return <Post key={post.id} post={post} userId={session?.user.id} />;
       })}
       <div>
-        <FormattedPost post={post} userId={session?.user.id} focused={true} />
+        <Post post={formattedPost} userId={session?.user.id} focused={true} />
         {session?.user?.image && session?.user?.name ? (
           <div className="flex flex-col gap-2 bg-main p-2 md:rounded-b-xl">
             <div className="flex items-center justify-between">
@@ -107,7 +111,7 @@ export default async function PostPage({
       </div>
 
       {replies.map((reply) => (
-        <FormattedPost key={reply.id} post={reply} userId={session?.user.id} />
+        <Post key={reply.id} post={reply} userId={session?.user.id} />
       ))}
     </>
   );

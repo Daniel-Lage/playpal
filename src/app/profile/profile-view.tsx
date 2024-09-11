@@ -21,7 +21,7 @@ import {
 } from "~/models/playlist.model";
 import type { PostObject } from "~/models/post.model";
 import { SpotifyLink } from "../_components/spotify-link";
-import { FormattedPost } from "../_components/formatted-post";
+import { Post } from "../_components/post";
 
 export function ProfileView({
   userId,
@@ -269,9 +269,7 @@ export function ProfileView({
       </div>
 
       {showPosts !== false ? (
-        posts.map((post) => (
-          <FormattedPost key={post.id} post={post} userId={userId} />
-        ))
+        posts.map((post) => <Post key={post.id} post={post} userId={userId} />)
       ) : (
         <PlaylistFeed
           treatedPlaylists={treatedPlaylists}
@@ -318,83 +316,84 @@ function PlaylistFeed({
 
 function PlaylistSimple({ playlist }: { playlist: Playlist }) {
   return (
-    <Link
-      href={`/profile/${playlist.owner.id}/playlist/${playlist.id}`}
-      className="flex flex-col items-end justify-between rounded-xl bg-secondary p-2"
-      title={playlist.name}
-    >
-      <Image
-        width={500}
-        height={500}
-        className="rounded-lg"
-        src={playlist.images[0]?.url ?? ""}
-        alt={playlist.name}
-      />
+    <div className="flex flex-col items-end justify-between rounded-xl bg-secondary p-2">
+      <Link
+        href={`/profile/${playlist.owner.id}/playlist/${playlist.id}`}
+        className="grow"
+        title={playlist.name}
+      >
+        <Image
+          width={500}
+          height={500}
+          className="rounded-lg"
+          src={playlist.images[0]?.url ?? ""}
+          alt={playlist.name}
+        />
 
-      <div className="px-2 pt-2 text-center font-bold">{playlist.name}</div>
-
+        <div className="px-2 pt-2 text-center font-bold">{playlist.name}</div>
+      </Link>
       <SpotifyLink size={20} external_url={playlist.external_urls.spotify} />
-    </Link>
+    </div>
   );
 }
 
 function PlaylistCompact({ playlist }: { playlist: Playlist }) {
   return (
-    <Link
-      href={`/profile/${playlist.owner.id}/playlist/${playlist.id}`}
-      className="flex items-center gap-2 overflow-hidden bg-secondary p-1 font-bold md:rounded-lg"
-      title={playlist.name}
-    >
-      <div className="grow overflow-hidden">
-        <div className="flex grow overflow-hidden">
-          <div className="w-full truncate text-left md:w-1/2">
-            {playlist.name}
+    <div className="flex items-center gap-2 overflow-hidden bg-secondary p-1 font-bold md:rounded-lg">
+      <Link
+        href={`/profile/${playlist.owner.id}/playlist/${playlist.id}`}
+        className="grow"
+        title={playlist.name}
+      >
+        <div className="grow overflow-hidden">
+          <div className="flex grow overflow-hidden">
+            <div className="w-full truncate text-left md:w-1/2">
+              {playlist.name}
+            </div>
+            <div className="w-0 truncate text-left md:w-1/2">
+              {playlist.owner.display_name}
+            </div>
           </div>
-          <div className="w-0 truncate text-left md:w-1/2">
-            {playlist.owner.display_name}
-          </div>
-          <SpotifyLink
-            size={20}
-            external_url={playlist.external_urls.spotify}
-          />
         </div>
-      </div>
-    </Link>
+      </Link>
+
+      <SpotifyLink size={20} external_url={playlist.external_urls.spotify} />
+    </div>
   );
 }
 
 function PlaylistDetailed({ playlist }: { playlist: Playlist }) {
   return (
-    <Link
-      href={`/profile/${playlist.owner.id}/playlist/${playlist.id}`}
-      className="flex items-start gap-2 bg-secondary p-2 font-bold md:rounded-lg"
-      title={playlist.name}
-    >
-      <Image
-        width={64}
-        height={64}
-        className="rounded-md"
-        src={playlist.images[0]?.url ?? ""}
-        alt={playlist.name}
-      />
+    <div className="flex items-start gap-2 bg-secondary p-2 font-bold md:rounded-lg">
+      <Link
+        href={`/profile/${playlist.owner.id}/playlist/${playlist.id}`}
+        className="flex grow gap-2"
+        title={playlist.name}
+      >
+        <Image
+          width={64}
+          height={64}
+          className="rounded-md"
+          src={playlist.images[0]?.url ?? ""}
+          alt={playlist.name}
+        />
 
-      <div className="grow overflow-hidden">
-        <div className="flex grow overflow-hidden">
-          <div className="w-full truncate text-left text-xl md:w-1/2 md:text-2xl">
-            {playlist.name}
+        <div className="grow overflow-hidden">
+          <div className="flex grow overflow-hidden">
+            <div className="w-full truncate text-left text-xl md:w-1/2 md:text-2xl">
+              {playlist.name}
+            </div>
+            <div className="w-0 truncate text-left md:w-1/2">
+              {playlist.tracks.total} tracks
+            </div>
           </div>
-          <div className="w-0 truncate text-left md:w-1/2">
-            {playlist.tracks.total} tracks
+          <div className="truncate text-left text-sm">
+            {playlist.owner.display_name}
           </div>
-          <SpotifyLink
-            size={32}
-            external_url={playlist.external_urls.spotify}
-          />
         </div>
-        <div className="truncate text-left text-sm">
-          {playlist.owner.display_name}
-        </div>
-      </div>
-    </Link>
+      </Link>
+
+      <SpotifyLink size={32} external_url={playlist.external_urls.spotify} />
+    </div>
   );
 }

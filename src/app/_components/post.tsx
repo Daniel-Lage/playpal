@@ -1,23 +1,20 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import type { MetaData } from "metadata-scraper";
 
 import { deletePost } from "~/server/queries";
 
-import type { PostObject } from "~/models/post.model";
+import type { PostWithMetadata } from "~/models/post.model";
+import Link from "next/link";
 
 export function Post({
   post,
   userId,
   focused,
-  link,
 }: {
-  post: PostObject;
+  post: PostWithMetadata;
   userId?: string | null;
   focused?: boolean;
-  link: MetaData | null;
 }) {
   return (
     <div
@@ -62,20 +59,20 @@ export function Post({
       <Link href={`/profile/${post.author.providerAccountId}/post/${post.id}`}>
         {post.content}
       </Link>
-      {link?.url && link.image && link.title && (
+      {post?.metadata?.url && post.metadata.image && post.metadata.title && (
         <Link
-          href={link.url}
+          href={post.metadata.url}
           className="flex items-center gap-2 rounded-lg bg-secondary2 p-2"
         >
           <Image
             width={40}
             height={40}
             className="rounded-md"
-            src={link.image}
-            alt={link.title}
+            src={post.metadata.image}
+            alt={post.metadata.title}
           />
-          <div>{link.title}</div>
-          <div>{link.description}</div>
+          <div>{post.metadata.title}</div>
+          <div>{post.metadata.description}</div>
         </Link>
       )}
     </div>

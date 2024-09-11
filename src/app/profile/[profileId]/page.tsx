@@ -5,6 +5,7 @@ import { getUser, getUsersPosts } from "~/server/queries";
 import { authOptions } from "~/lib/auth";
 
 import { ProfileView } from "../profile-view";
+import { formatPost } from "~/lib/format-post";
 
 export async function generateMetadata({
   params: { profileId },
@@ -59,7 +60,9 @@ export default async function OthersProfilePage({
     if (!user)
       return <div className="self-center text-xl text-red-500">Error</div>;
 
-    const posts = await getUsersPosts(user.id);
+    const posts = await Promise.all(
+      (await getUsersPosts(user.id)).map(formatPost),
+    );
 
     return <ProfileView userId={null} user={user} posts={posts} />;
   }
@@ -77,7 +80,9 @@ export default async function OthersProfilePage({
   if (!user)
     return <div className="self-center text-xl text-red-500">Error</div>;
 
-  const posts = await getUsersPosts(user.id);
+  const posts = await Promise.all(
+    (await getUsersPosts(user.id)).map(formatPost),
+  );
 
   return <ProfileView userId={session.user.id} user={user} posts={posts} />;
 }
