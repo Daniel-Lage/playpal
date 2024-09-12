@@ -35,7 +35,5 @@ export async function formatPost(post: PostObject): Promise<PostWithMetadata> {
 
   const metadata = Object.fromEntries(tags);
 
-  console.log(metadata);
-
   return { ...post, urls, metadata: metadata as IMetadata };
 }

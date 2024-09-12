@@ -19,8 +19,9 @@ export async function generateMetadata({
   params: { profileId: string; postId: string };
 }): Promise<Metadata> {
   const user = await getUser(profileId);
+  const post = await getPost(postId);
 
-  if (!user)
+  if (!user || !post)
     return {
       title: "Playpal | post",
       openGraph: {
@@ -36,6 +37,7 @@ export async function generateMetadata({
     openGraph: {
       images: [user?.image ?? "/favicon.ico"],
       title: `Playpal | Post by ${user.name}`,
+      description: post.content,
       creators: [`${process.env.NEXTAUTH_URL}/profile/${profileId}`],
       url: `${process.env.NEXTAUTH_URL}/profile/${profileId}/post/${postId}`,
     },
