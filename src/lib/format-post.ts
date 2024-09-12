@@ -23,32 +23,19 @@ export async function formatPost(post: PostObject): Promise<PostWithMetadata> {
   const text = await res.text();
   const html = parse(text);
 
-  const metadata: any = {};
+  const tags = html
+    .querySelectorAll("meta")
+    .map(({ rawAttributes: { name, property, content } }) => {
+      const attribute = name ?? property;
+      if (content && attribute)
+        return [attribute.replace(":", "_") as PropertyKey, content] as const;
+      else return ["null", null] as const;
+    })
+    .filter((value) => value[1] !== null);
 
-  html.querySelectorAll("meta").forEach(({ rawAttributes }) => {
-    console.log(rawAttributes);
-    if (rawAttributes.content) {
-      const attribute = rawAttributes.name ?? rawAttributes.property;
+  const metadata = Object.fromEntries(tags);
 
-      if (attribute) {
-        const keys = attribute.split(":");
-        let target = metadata;
-        keys.forEach((key, index) => {
-          if (index === keys.length - 1) {
-            target[key] = rawAttributes.content;
-          } else {
-            if (!target[key]) {
-              target[key] = {};
-            } else if (typeof target[key] !== "object") {
-              key = keys.slice(index).join("_");
-              target[key] = {};
-            }
-            target = target[key];
-          }
-        });
-      }
-    }
-  });
+  console.log(metadata);
 
   return { ...post, urls, metadata: metadata as IMetadata };
 }

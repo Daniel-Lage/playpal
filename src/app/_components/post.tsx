@@ -63,26 +63,26 @@ export function Post({
           ))}
       </div>
       <FormattedContent post={post} />
-      {post?.metadata?.og?.url && (
+      {post?.metadata?.og_url && (
         <Link
-          href={post.metadata.og.url}
+          href={post.metadata.og_url}
           className="flex items-start gap-2 rounded-lg bg-secondary2 p-2"
         >
-          {post?.metadata?.og?.image && (
+          {post?.metadata?.og_image && (
             <Image
               width={100}
               height={100}
               className="rounded-md"
-              src={post?.metadata?.og?.image}
-              alt={post.metadata.og.title ?? "image"}
+              src={post?.metadata?.og_image}
+              alt={post.metadata.og_title ?? "image"}
             />
           )}
           <div className="grow overflow-hidden">
             <div className="w-full truncate text-left text-xl font-bold md:text-2xl">
-              {post.metadata.og.title}
+              {post.metadata.og_title}
             </div>
             <div className="truncate text-left text-sm">
-              {post.metadata.og.description}
+              {post.metadata.og_description}
             </div>
           </div>
         </Link>
