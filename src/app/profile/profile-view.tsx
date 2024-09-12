@@ -371,8 +371,8 @@ function PlaylistDetailed({ playlist }: { playlist: Playlist }) {
         title={playlist.name}
       >
         <Image
-          width={64}
-          height={64}
+          width={100}
+          height={100}
           className="rounded-md"
           src={playlist.images[0]?.url ?? ""}
           alt={playlist.name}

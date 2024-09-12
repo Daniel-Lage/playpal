@@ -38,7 +38,12 @@ export function Post({
           />
           <div className="px-2 font-bold">{post.author?.name}</div>
         </Link>
-
+        <Link
+          className="flex grow text-transparent"
+          href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
+        >
+          <div>ir a post</div>
+        </Link>
         {userId === post.userId &&
           (focused ? (
             <Link
@@ -57,25 +62,83 @@ export function Post({
             </button>
           ))}
       </div>
-      <Link href={`/profile/${post.author.providerAccountId}/post/${post.id}`}>
-        {post.content}
-      </Link>
-      {post?.metadata?.url && post?.metadata?.image && post.metadata.title && (
+      <FormattedContent post={post} />
+      {post?.metadata?.og?.url && (
         <Link
-          href={post.metadata.url}
-          className="flex items-center gap-2 rounded-lg bg-secondary2 p-2"
+          href={post.metadata.og.url}
+          className="flex items-start gap-2 rounded-lg bg-secondary2 p-2"
         >
-          <Image
-            width={40}
-            height={40}
-            className="rounded-md"
-            src={post.metadata.image}
-            alt={post.metadata.title}
-          />
-          <div>{post.metadata.title}</div>
-          <div>{post.metadata.description}</div>
+          {post?.metadata?.og?.image && (
+            <Image
+              width={100}
+              height={100}
+              className="rounded-md"
+              src={post?.metadata?.og?.image}
+              alt={post.metadata.og.title ?? "image"}
+            />
+          )}
+          <div className="grow overflow-hidden">
+            <div className="w-full truncate text-left text-xl font-bold md:text-2xl">
+              {post.metadata.og.title}
+            </div>
+            <div className="truncate text-left text-sm">
+              {post.metadata.og.description}
+            </div>
+          </div>
         </Link>
       )}
     </div>
+  );
+}
+
+function FormattedContent({ post }: { post: PostWithMetadata }) {
+  if (!post.urls)
+    return (
+      <Link href={`/profile/${post.author.providerAccountId}/post/${post.id}`}>
+        {post.content}
+      </Link>
+    );
+
+  const content = [];
+
+  let contentIndex = 0;
+  for (let index = 0; index < post.urls.length; index++) {
+    const url = post.urls[index];
+    if (url) {
+      if (contentIndex != url.index)
+        content.push(post.content.slice(contentIndex, url.index));
+      content.push(url);
+      contentIndex = url.index + url.url.length;
+      if (index === post.urls.length - 1)
+        if (contentIndex !== post.content.length)
+          content.push(post.content.slice(contentIndex));
+    }
+  }
+
+  return (
+    <span>
+      {content.map((value) => {
+        if (typeof value === "string")
+          return (
+            <Link
+              key={value}
+              href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
+            >
+              {value}
+            </Link>
+          );
+        else
+          return (
+            <Link
+              target="_blank"
+              href={value.url}
+              key={value.url}
+              className="text-blue-700"
+            >
+              {value.url}
+            </Link>
+          );
+      })}
+    </span>
   );
 }

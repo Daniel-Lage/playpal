@@ -16,6 +16,7 @@ const config = {
         protocol: "https",
         hostname: "**.spotifycdn.com",
       },
+      { protocol: "https", hostname: "**.ytimg.com" },
     ],
   },
 };

@@ -8,40 +8,47 @@ import type {
 import parse from "node-html-parser";
 
 export async function formatPost(post: PostObject): Promise<PostWithMetadata> {
-  const pattern =
-    /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+  const pattern = new RegExp(
+    "(^|[ \t\r\n])((ftp|http|https|gopher|mailto|news|nntp|telnet|wais|file|prospero|aim|webcal):(([A-Za-z0-9$_.+!*(),;/?:@&~=-])|%[A-Fa-f0-9]{2}){2,}(#([a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;/?:@&~=%-]*))?([A-Za-z0-9$_+!*();/?:~-]))",
+    "g",
+  );
 
-  const result = pattern.exec(post.content);
+  const result = post.content.match(pattern);
 
   if (!result) return post;
+
+  const urls = result.map((url) => ({ url, index: post.content.indexOf(url) }));
 
   const res = await fetch(result[0]);
   const text = await res.text();
   const html = parse(text);
 
-  const metadata: IMetadata = {};
+  const metadata: any = {};
 
   html.querySelectorAll("meta").forEach(({ rawAttributes }) => {
+    console.log(rawAttributes);
     if (rawAttributes.content) {
       const attribute = rawAttributes.name ?? rawAttributes.property;
 
       if (attribute) {
-        const key = attribute.split(":");
-        if (key[1]) {
-          if (key[0] === "og") {
-            if (key[1]) {
-              if (key[1] === "title") metadata.title = rawAttributes.content;
-              else if (key[1] === "description")
-                metadata.description = rawAttributes.content;
-              else if (key[1] === "url") metadata.url = rawAttributes.content;
-              else if (key[1] === "image")
-                metadata.image = rawAttributes.content;
+        const keys = attribute.split(":");
+        let target = metadata;
+        keys.forEach((key, index) => {
+          if (index === keys.length - 1) {
+            target[key] = rawAttributes.content;
+          } else {
+            if (!target[key]) {
+              target[key] = {};
+            } else if (typeof target[key] !== "object") {
+              key = keys.slice(index).join("_");
+              target[key] = {};
             }
+            target = target[key];
           }
-        }
+        });
       }
     }
   });
 
-  return { ...post, metadata: metadata };
+  return { ...post, urls, metadata: metadata as IMetadata };
 }
