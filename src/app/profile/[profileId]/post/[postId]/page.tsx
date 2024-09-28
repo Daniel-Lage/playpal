@@ -3,13 +3,12 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { getPost, getReplies, getThread, getUser } from "~/server/queries";
+import { getPost, getUser } from "~/server/queries";
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
 import { Logo } from "~/app/_components/logo";
 import { authOptions } from "~/lib/auth";
 import { Post } from "~/app/_components/post";
-import { formatPost } from "~/lib/format-post";
 
 export const dynamic = "force-dynamic";
 
@@ -55,33 +54,35 @@ export default async function PostPage({
   if (!post)
     return <div className="self-center text-xl text-red-500">Error</div>;
 
-  const formattedPost = await formatPost(post);
-  const thread = await Promise.all(
-    (await getThread(post.thread)).map(formatPost),
-  );
-  const replies = await Promise.all(
-    (await getReplies(post.id)).map(formatPost),
-  );
-
   return (
     <>
-      {post.thread.map((postId, index) => {
-        const post = thread.find((post) => post.id === postId);
+      <div className="flex flex-col rounded-xl bg-secondary">
+        {post?.thread?.[0]?.repliee ? (
+          <>
+            <Post post={post?.thread?.[0]?.repliee} userId={session?.user.id} />
 
-        if (!post)
-          return (
-            <div
-              key={index}
-              className="flex flex-col gap-2 bg-secondary2 p-6 md:rounded-xl"
-            >
-              Post Was Deleted
+            <div className="flex justify-stretch">
+              <div className="m-1 w-1 rounded-xl bg-black"></div>
+              <div className="flex w-full flex-col items-stretch">
+                {post.thread?.map(
+                  ({ repliee }, index) =>
+                    repliee &&
+                    index !== 0 && (
+                      <Post
+                        key={repliee.id}
+                        post={repliee}
+                        userId={session?.user.id}
+                      />
+                    ),
+                )}
+                <Post post={post} userId={session?.user.id} focused={true} />
+              </div>
             </div>
-          );
+          </>
+        ) : (
+          <Post post={post} userId={session?.user.id} focused={true} />
+        )}
 
-        return <Post key={post.id} post={post} userId={session?.user.id} />;
-      })}
-      <div>
-        <Post post={formattedPost} userId={session?.user.id} focused={true} />
         {session?.user?.image && session?.user?.name ? (
           <div className="flex flex-col gap-2 bg-main p-2 md:rounded-b-xl">
             <div className="flex items-center justify-between">
@@ -103,7 +104,7 @@ export default async function PostPage({
             <div className="flex">
               <PostCreator
                 userId={session?.user.id}
-                thread={[...post.thread, post.id]}
+                parent={{ id: post.id, thread: post.thread }}
               />
             </div>
           </div>
@@ -112,8 +113,25 @@ export default async function PostPage({
         )}
       </div>
 
-      {replies.map((reply) => (
-        <Post key={reply.id} post={reply} userId={session?.user.id} />
+      {post.replies?.map((replythread) => (
+        <div
+          key={replythread[0]?.replierId}
+          className="flex justify-stretch rounded-xl bg-secondary"
+        >
+          <div className="m-1 my-2 w-1 rounded-xl bg-black"></div>
+          <div className="flex w-full flex-col items-stretch">
+            {replythread.map(
+              ({ replier }) =>
+                replier && (
+                  <Post
+                    key={replier.id}
+                    post={replier}
+                    userId={session?.user.id}
+                  />
+                ),
+            )}
+          </div>
+        </div>
       ))}
     </>
   );

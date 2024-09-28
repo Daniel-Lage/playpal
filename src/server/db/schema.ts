@@ -6,11 +6,13 @@ import {
   integer,
   pgTableCreator,
   varchar,
+  jsonb,
 } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
 
 // import type { AdapterAccountType } from "next-auth/adapters" <- not here
 import type { AdapterAccountType } from ".pnpm/@auth+core@0.34.2/node_modules/@auth/core/adapters";
-import { relations, sql } from "drizzle-orm";
+import type { IMetadata, Substring } from "~/models/post.model";
 
 export const createTable = pgTableCreator((name) => `playpal_${name}`);
 
@@ -93,7 +95,7 @@ export const authenticatorsTable = createTable(
 );
 
 export const postsTable = createTable("post", {
-  id: varchar("id")
+  id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   userId: text("userId")
@@ -106,20 +108,80 @@ export const postsTable = createTable("post", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date(),
   ),
-  thread: varchar("thread")
-    .array()
+  type: varchar("type").notNull(),
+  urls: jsonb("urls").$type<Substring[]>(),
+  urlMetadata: jsonb("urlMetadata").$type<IMetadata>(),
+});
+
+export const repliesTable = createTable("reply", {
+  replierId: text("replierId")
     .notNull()
-    .default(sql`ARRAY[]::text[]`),
+    .references(() => postsTable.id, { onDelete: "cascade" }),
+  replieeId: text("replieeId").references(() => postsTable.id, {
+    onDelete: "set null",
+  }),
+  separation: integer("separation").notNull(),
+});
+
+export const likesTable = createTable("like", {
+  postId: text("postId")
+    .notNull()
+    .references(() => postsTable.id, { onDelete: "cascade" }),
+  userId: text("userId")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
 });
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
   author: many(postsTable, { relationName: "author" }),
+  likes: many(likesTable, {
+    relationName: "userLiked",
+  }),
 }));
 
-export const postsTableRelations = relations(postsTable, ({ one }) => ({
+export const postsTableRelations = relations(postsTable, ({ one, many }) => ({
   author: one(usersTable, {
     fields: [postsTable.userId],
     references: [usersTable.id],
     relationName: "author",
+  }),
+  thread: many(repliesTable, {
+    relationName: "replier",
+  }),
+  replies: many(repliesTable, {
+    relationName: "repliee",
+  }),
+  likes: many(likesTable, {
+    relationName: "postLiked",
+  }),
+}));
+
+export const repliesTableRelations = relations(repliesTable, ({ one }) => ({
+  replier: one(postsTable, {
+    // gets all posts a specific post is replying to
+    fields: [repliesTable.replierId],
+    references: [postsTable.id],
+    relationName: "replier",
+  }),
+  repliee: one(postsTable, {
+    fields: [repliesTable.replieeId], // gets all posts replying to a specific post
+    references: [postsTable.id],
+    relationName: "repliee",
+  }),
+}));
+
+export const likesTableRelations = relations(likesTable, ({ one }) => ({
+  postLiked: one(postsTable, {
+    fields: [likesTable.postId],
+    references: [postsTable.id],
+    relationName: "postLiked",
+  }),
+  userLiked: one(usersTable, {
+    fields: [likesTable.postId],
+    references: [usersTable.id],
+    relationName: "userLiked",
   }),
 }));

@@ -1,17 +1,31 @@
 "use server";
 
-import { arrayContains, asc, desc, eq, inArray } from "drizzle-orm";
-import { postsTable, accountsTable, usersTable } from "./db/schema";
+import { and, desc, eq } from "drizzle-orm";
+import {
+  postsTable,
+  accountsTable,
+  usersTable,
+  repliesTable,
+  likesTable,
+} from "./db/schema";
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
 
-import type { PostObject } from "~/models/post.model";
+import type {
+  ClientPostObject,
+  IMetadata,
+  parentPostObject,
+  PostObject,
+  Substring,
+} from "~/models/post.model";
 import type { Account, User } from "next-auth";
+import type { ReplyObject } from "~/models/reply.model";
 
 export async function getPosts() {
   const posts = await db.query.postsTable.findMany({
-    with: { author: true },
+    with: { author: true, likes: true },
     orderBy: [desc(postsTable.createdAt)],
+    where: eq(postsTable.type, "post"),
     limit: 100,
   });
 
@@ -28,7 +42,17 @@ export async function getUser(profileId: string): Promise<User | undefined> {
 
 export async function getUsersPosts(authorId: string) {
   const posts = await db.query.postsTable.findMany({
-    with: { author: true },
+    with: { author: true, likes: true },
+    orderBy: [desc(postsTable.createdAt)],
+    where: and(eq(postsTable.userId, authorId), eq(postsTable.type, "post")),
+    limit: 100,
+  });
+
+  return posts;
+}
+export async function getUsersPostsAndReplies(authorId: string) {
+  const posts = await db.query.postsTable.findMany({
+    with: { author: true, likes: true },
     orderBy: [desc(postsTable.createdAt)],
     where: eq(postsTable.userId, authorId),
     limit: 100,
@@ -40,13 +64,43 @@ export async function getUsersPosts(authorId: string) {
 export async function postPost(
   content: string,
   userId: string,
-  thread?: string[],
+  parent?: parentPostObject,
+  urls?: Substring[],
+  metadata?: IMetadata,
 ) {
   // used in client
+  if (parent) {
+    const posts = await db
+      .insert(postsTable)
+      .values({ content, userId, type: "reply", urls, urlMetadata: metadata })
+      .returning();
 
-  if (thread && thread.length > 0) {
-    await db.insert(postsTable).values({ content, userId, thread }).returning();
-  } else await db.insert(postsTable).values({ content, userId }).returning();
+    const postId = posts[0]?.id;
+
+    if (postId) {
+      await db
+        .insert(repliesTable)
+        .values({ replierId: postId, replieeId: parent.id, separation: 0 });
+
+      if (parent.thread) {
+        const newThread = [...parent.thread];
+        newThread.reverse();
+        for (let index = 0; index <= newThread.length; index++) {
+          const replieeId = newThread[index]?.replieeId;
+          if (replieeId)
+            await db.insert(repliesTable).values({
+              replierId: postId,
+              replieeId,
+              separation: index + 1,
+            });
+        }
+      }
+    }
+  } else
+    await db
+      .insert(postsTable)
+      .values({ content, userId, type: "post", urls, urlMetadata: metadata })
+      .returning();
 
   revalidatePath("/");
 }
@@ -81,33 +135,74 @@ export async function deletePost(postId: string) {
   revalidatePath("/");
 }
 
-export async function getPost(postId: string): Promise<PostObject | undefined> {
+export async function getPost(
+  postId: string,
+): Promise<ClientPostObject | undefined> {
   const post = (await db.query.postsTable.findFirst({
     where: eq(postsTable.id, postId),
-    with: { author: true },
+    with: {
+      author: true,
+      likes: true,
+      thread: {
+        orderBy: [desc(repliesTable.separation)],
+        with: { repliee: { with: { author: true, likes: true } } },
+      },
+      replies: {
+        with: {
+          replier: {
+            with: {
+              author: true,
+              likes: true,
+              replies: {
+                // only gets direct replies
+                where: eq(repliesTable.separation, 0),
+              },
+            },
+          },
+        },
+      },
+    },
   })) as PostObject;
 
-  return post;
+  if (post?.replies) {
+    const replies = post.replies
+      .filter((reply) => reply.separation === 0)
+      .map((reply) => [reply]);
+
+    for (const replyThread of replies) {
+      getReplyThread(replyThread, post.replies);
+    }
+
+    return { ...post, replies } as ClientPostObject;
+  }
+
+  return { ...post, replies: undefined } as ClientPostObject;
 }
 
-export async function getReplies(postId: string) {
-  const posts = await db.query.postsTable.findMany({
-    with: { author: true },
-    orderBy: [desc(postsTable.createdAt)],
-    where: arrayContains(postsTable.thread, [postId]),
-    limit: 100,
-  });
+function getReplyThread(replyThread: ReplyObject[], replies: ReplyObject[]) {
+  const leaf = replyThread.at(-1);
 
-  return posts;
+  const newLeaf = replies.find(
+    (reply) => reply.replierId === leaf?.replier?.replies?.[0]?.replierId,
+  );
+
+  if (newLeaf) replyThread.push(newLeaf);
+
+  if (newLeaf?.replier?.replies) {
+    getReplyThread(replyThread, replies);
+  }
 }
 
-export async function getThread(thread: string[]) {
-  const posts = await db.query.postsTable.findMany({
-    with: { author: true },
-    orderBy: [asc(postsTable.thread)],
-    where: inArray(postsTable.id, thread),
-    limit: 100,
-  });
+export async function likePost(postId: string, userId: string) {
+  await db.insert(likesTable).values({ postId, userId });
 
-  return posts;
+  revalidatePath("/");
+}
+
+export async function unlikePost(postId: string, userId: string) {
+  await db
+    .delete(likesTable)
+    .where(and(eq(likesTable.postId, postId), eq(likesTable.userId, userId)));
+
+  revalidatePath("/");
 }

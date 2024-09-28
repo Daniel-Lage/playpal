@@ -7,7 +7,6 @@ import { getUsersPosts } from "~/server/queries";
 import { ProfileView } from "./profile-view";
 
 import type { Metadata } from "next";
-import { formatPost } from "~/lib/format-post";
 
 export const metadata: Metadata = {
   title: "PlayPal | Profile",
@@ -24,9 +23,7 @@ export default async function ProfilePage() {
 
   if (!session) return <SignInButton />;
 
-  const posts = await Promise.all(
-    (await getUsersPosts(session.user.id)).map(formatPost),
-  );
+  const posts = await getUsersPosts(session.user.id);
 
   return (
     <ProfileView userId={session.user.id} user={session.user} posts={posts} />

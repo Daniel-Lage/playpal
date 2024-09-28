@@ -25,3 +25,7 @@ select {
 option {
   @apply text-base;
 }
+
+* {
+  user-select: none;
+}

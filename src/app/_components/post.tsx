@@ -2,9 +2,13 @@
 
 import Image from "next/image";
 
-import { deletePost } from "~/server/queries";
+import { deletePost, likePost, unlikePost } from "~/server/queries";
 
-import type { PostWithMetadata } from "~/models/post.model";
+import type {
+  ClientPostObject,
+  PostObject,
+  Substring,
+} from "~/models/post.model";
 import Link from "next/link";
 
 export function Post({
@@ -12,7 +16,7 @@ export function Post({
   userId,
   focused,
 }: {
-  post: PostWithMetadata;
+  post: ClientPostObject | PostObject;
   userId?: string | null;
   focused?: boolean;
 }) {
@@ -44,101 +48,149 @@ export function Post({
         >
           <div>ir a post</div>
         </Link>
-        {userId === post.userId &&
-          (focused ? (
-            <Link
-              href={
-                post.thread.length > 0
-                  ? `/profile/${post.author.providerAccountId}/post/${post.thread.pop()}`
-                  : "/"
-              }
-              onClick={() => deletePost(post.id)}
-            >
-              <Image height={24} width={24} src="/trash.png" alt="trash icon" />
-            </Link>
-          ) : (
-            <button onClick={() => deletePost(post.id)}>
-              <Image height={24} width={24} src="/trash.png" alt="trash icon" />
-            </button>
-          ))}
+        <DeleteButton {...{ post, userId, focused }} />
       </div>
-      <FormattedContent post={post} />
-      {post?.metadata?.og_url && (
+      {post.urls ? (
+        <FormattedContent
+          input={post.content}
+          urls={post.urls}
+          ownUrl={`/profile/${post.author.providerAccountId}/post/${post.id}`}
+        />
+      ) : (
         <Link
-          href={post.metadata.og_url}
+          href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
+        >
+          {post.content}
+        </Link>
+      )}
+
+      {post?.urlMetadata?.og_url && (
+        <Link
+          href={post.urlMetadata.og_url}
           className="flex items-start gap-2 rounded-lg bg-secondary2 p-2"
         >
-          {post?.metadata?.og_image && (
+          {post?.urlMetadata?.og_image && (
             <Image
               width={100}
               height={100}
               className="rounded-md"
-              src={post?.metadata?.og_image}
-              alt={post.metadata.og_title ?? "image"}
+              src={post?.urlMetadata?.og_image}
+              alt={post.urlMetadata.og_title ?? "image"}
             />
           )}
           <div className="grow overflow-hidden">
             <div className="w-full truncate text-left text-xl font-bold md:text-2xl">
-              {post.metadata.og_title}
+              {post.urlMetadata.og_title}
             </div>
             <div className="truncate text-left text-sm">
-              {post.metadata.og_description}
+              {post.urlMetadata.og_description}
             </div>
           </div>
         </Link>
       )}
+      <div className="flex items-center gap-2 font-bold">
+        {post.likes?.length}
+        <LikeButton {...{ post, userId }} />
+      </div>
     </div>
   );
 }
 
-function FormattedContent({ post }: { post: PostWithMetadata }) {
-  if (!post.urls)
-    return (
-      <Link href={`/profile/${post.author.providerAccountId}/post/${post.id}`}>
-        {post.content}
-      </Link>
-    );
-
-  const content = [];
+function FormattedContent({
+  input,
+  urls,
+  ownUrl,
+}: {
+  input: string;
+  ownUrl: string;
+  urls: Substring[];
+}) {
+  const content: string[] = [];
+  const urlIndexes = new Set<number>();
 
   let contentIndex = 0;
-  for (let index = 0; index < post.urls.length; index++) {
-    const url = post.urls[index];
+  for (let index = 0; index < urls.length; index++) {
+    const url = urls[index];
     if (url) {
-      if (contentIndex != url.index)
-        content.push(post.content.slice(contentIndex, url.index));
-      content.push(url);
-      contentIndex = url.index + url.url.length;
-      if (index === post.urls.length - 1)
-        if (contentIndex !== post.content.length)
-          content.push(post.content.slice(contentIndex));
+      if (contentIndex != url.start) {
+        content.push(input.slice(contentIndex, url.start));
+      }
+
+      content.push(input.slice(url.start, url.start + url.length));
+      urlIndexes.add(content.length - 1);
+      contentIndex = url.start + url.length;
+
+      if (index === urls.length - 1) {
+        if (contentIndex !== input.length) {
+          content.push(input.slice(contentIndex));
+        }
+      }
     }
   }
 
-  return (
-    <span>
-      {content.map((value) => {
-        if (typeof value === "string")
-          return (
-            <Link
-              key={value}
-              href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
-            >
-              {value}
-            </Link>
-          );
-        else
-          return (
-            <Link
-              target="_blank"
-              href={value.url}
-              key={value.url}
-              className="text-blue-700"
-            >
-              {value.url}
-            </Link>
-          );
-      })}
-    </span>
-  );
+  return content.map((value, index) => {
+    if (urlIndexes.has(index))
+      return (
+        <Link
+          target="_blank"
+          href={value}
+          key={index}
+          className="text-blue-700"
+        >
+          {value}
+        </Link>
+      );
+    else
+      return (
+        <Link key={index} href={ownUrl}>
+          {value}
+        </Link>
+      );
+  });
+}
+
+function DeleteButton({
+  post,
+  userId,
+  focused,
+}: {
+  post: ClientPostObject | PostObject;
+  userId?: string | null;
+  focused?: boolean;
+}) {
+  if (userId === post.userId) {
+    if (focused)
+      return (
+        <Link href={"/"} onClick={() => deletePost(post.id)}>
+          <Image height={24} width={24} src="/trash.png" alt="trash icon" />
+        </Link>
+      );
+    return (
+      <button onClick={() => deletePost(post.id)}>
+        <Image height={24} width={24} src="/trash.png" alt="trash icon" />
+      </button>
+    );
+  }
+}
+
+function LikeButton({
+  post,
+  userId,
+}: {
+  post: ClientPostObject | PostObject;
+  userId?: string | null;
+}) {
+  if (userId) {
+    if (post.likes?.some((like) => like.userId === userId))
+      return (
+        <button onClick={() => unlikePost(post.id, userId)}>
+          <Image height={24} width={24} src="/liked.png" alt="liked icon" />
+        </button>
+      );
+    return (
+      <button onClick={() => likePost(post.id, userId)}>
+        <Image height={24} width={24} src="/unliked.png" alt="unliked icon" />
+      </button>
+    );
+  }
 }

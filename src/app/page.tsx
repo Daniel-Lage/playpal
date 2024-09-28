@@ -7,14 +7,13 @@ import { PostCreator } from "~/app/_components/post-creator";
 import { Logo } from "~/app/_components/logo";
 import { getPosts } from "~/server/queries";
 import { authOptions } from "~/lib/auth";
-import { formatPost } from "~/lib/format-post";
 import { Post } from "./_components/post";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
-  const posts = await Promise.all((await getPosts()).map(formatPost));
+  const posts = await getPosts();
 
   return (
     <>
