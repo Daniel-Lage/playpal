@@ -88,9 +88,19 @@ export function Post({
           </div>
         </Link>
       )}
-      <div className="flex items-center gap-2 font-bold">
-        {post.likes?.length}
-        <LikeButton {...{ post, userId }} />
+      <div className="flex items-center font-bold">
+        <div className="flex w-1/2 gap-2">
+          <LikeButton {...{ post, userId }} />
+          {post.likes?.length}
+        </div>
+        <div className="flex w-1/2 gap-2">
+          <Link
+            href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
+          >
+            <Image height={24} width={24} src="/reply.png" alt="reply icon" />
+          </Link>
+          {post.replies?.length ?? 0}
+        </div>
       </div>
     </div>
   );
@@ -193,4 +203,10 @@ function LikeButton({
       </button>
     );
   }
+  return (
+    // eventually open modal to login
+    <button>
+      <Image height={24} width={24} src="/unliked.png" alt="unliked icon" />
+    </button>
+  );
 }

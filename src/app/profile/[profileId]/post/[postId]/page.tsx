@@ -1,4 +1,4 @@
-import { getServerSession } from "next-auth";
+import { getServerSession, type Session } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -9,6 +9,7 @@ import { PostCreator } from "~/app/_components/post-creator";
 import { Logo } from "~/app/_components/logo";
 import { authOptions } from "~/lib/auth";
 import { Post } from "~/app/_components/post";
+import type { ClientPostObject } from "~/models/post.model";
 
 export const dynamic = "force-dynamic";
 
@@ -56,13 +57,12 @@ export default async function PostPage({
 
   return (
     <>
-      <div className="flex flex-col rounded-xl bg-secondary">
+      <div className="flex flex-col gap-1 bg-secondary2 md:rounded-xl">
         {post?.thread?.[0]?.repliee ? (
           <>
             <Post post={post?.thread?.[0]?.repliee} userId={session?.user.id} />
 
-            <div className="flex justify-stretch">
-              <div className="m-1 w-1 rounded-xl bg-black"></div>
+            <div className="flex justify-stretch pl-2">
               <div className="flex w-full flex-col items-stretch">
                 {post.thread?.map(
                   ({ repliee }, index) =>
@@ -75,54 +75,39 @@ export default async function PostPage({
                       />
                     ),
                 )}
-                <Post post={post} userId={session?.user.id} focused={true} />
+
+                <div>
+                  <Post post={post} userId={session?.user.id} focused={true} />
+                  <PostCreatorWrapper post={post} session={session} />
+                </div>
               </div>
             </div>
           </>
         ) : (
-          <Post post={post} userId={session?.user.id} focused={true} />
-        )}
-
-        {session?.user?.image && session?.user?.name ? (
-          <div className="flex flex-col gap-2 bg-main p-2 md:rounded-b-xl">
-            <div className="flex items-center justify-between">
-              <Link
-                className="flex items-center"
-                href={`/profile/${session.user.id}`}
-              >
-                <Image
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                  src={session.user.image}
-                  alt={session.user.name}
-                />
-                <div className="px-2 font-bold">{session.user.name}</div>
-              </Link>
-              <Logo />
-            </div>
-            <div className="flex">
-              <PostCreator
-                userId={session?.user.id}
-                parent={{ id: post.id, thread: post.thread }}
-              />
-            </div>
+          <div>
+            <Post post={post} userId={session?.user.id} focused={true} />
+            <PostCreatorWrapper post={post} session={session} />
           </div>
-        ) : (
-          <SignInButton />
         )}
       </div>
 
       {post.replies?.map((replythread) => (
         <div
           key={replythread[0]?.replierId}
-          className="flex justify-stretch rounded-xl bg-secondary"
+          className="flex flex-col justify-stretch gap-1 bg-secondary2 md:rounded-xl"
         >
-          <div className="m-1 my-2 w-1 rounded-xl bg-black"></div>
-          <div className="flex w-full flex-col items-stretch">
+          {replythread?.[0]?.replier && (
+            <Post
+              key={replythread[0].replier.id}
+              post={replythread[0].replier}
+              userId={session?.user.id}
+            />
+          )}
+          <div className="flex w-full flex-col items-stretch gap-1 pl-2">
             {replythread.map(
-              ({ replier }) =>
-                replier && (
+              ({ replier }, index) =>
+                replier &&
+                index !== 0 && (
                   <Post
                     key={replier.id}
                     post={replier}
@@ -135,4 +120,41 @@ export default async function PostPage({
       ))}
     </>
   );
+}
+
+function PostCreatorWrapper({
+  session,
+  post,
+}: {
+  session: Session | null;
+  post: ClientPostObject;
+}) {
+  if (session?.user?.image && session?.user?.name)
+    return (
+      <div className="flex flex-col gap-2 bg-main p-2 md:rounded-b-xl">
+        <div className="flex items-center justify-between">
+          <Link
+            className="flex items-center"
+            href={`/profile/${session.user.id}`}
+          >
+            <Image
+              width={40}
+              height={40}
+              className="rounded-full"
+              src={session.user.image}
+              alt={session.user.name}
+            />
+            <div className="px-2 font-bold">{session.user.name}</div>
+          </Link>
+          <Logo />
+        </div>
+        <div className="flex">
+          <PostCreator
+            userId={session?.user.id}
+            parent={{ id: post.id, thread: post.thread }}
+          />
+        </div>
+      </div>
+    );
+  return <SignInButton />;
 }

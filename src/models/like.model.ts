@@ -1,9 +1,10 @@
 import type { likesTable } from "~/server/db/schema";
 import type { PostObject } from "./post.model";
+import type { UserObject } from "./user.model";
 
 interface likeRelations {
-  likedPost?: PostObject;
-  userLiked?: PostObject;
+  likee?: PostObject;
+  liker?: UserObject;
 }
 
 export type LikeObject = typeof likesTable.$inferSelect & likeRelations;

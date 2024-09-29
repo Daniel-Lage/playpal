@@ -67,7 +67,10 @@ export async function getMyPlaylists(userId: string) {
   return playlists.items;
 }
 
-export async function getPlaylists(userId: string | null, profileId: string) {
+export async function getPlaylists(
+  userId: string | null | undefined,
+  profileId: string,
+) {
   const tokens = await getTokens(userId ?? process.env.FALLBACK_USERID);
 
   if (!tokens?.access_token) {

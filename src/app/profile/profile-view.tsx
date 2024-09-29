@@ -7,10 +7,8 @@ import Link from "next/link";
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
 import { Logo } from "~/app/_components/logo";
-import { deleteUser } from "~/server/queries";
+import { deleteUser, followUser, unfollowUser } from "~/server/queries";
 import { getMyPlaylists, getPlaylists } from "~/api/calls";
-
-import type { User } from "next-auth";
 
 import {
   PlaylistFeedStyleOptions,
@@ -19,57 +17,110 @@ import {
   PlaylistFeedStyle,
   type Playlist,
 } from "~/models/playlist.model";
-import type { PostObject } from "~/models/post.model";
 import { SpotifyLink } from "../_components/spotify-link";
 import { Post } from "../_components/post";
+import {
+  ProfileTab,
+  ProfileTabOptions,
+  type UserObject,
+} from "~/models/user.model";
+import { PostType } from "~/models/post.model";
 
 export function ProfileView({
   userId,
   user,
-  posts,
 }: {
-  userId: string | null;
-  user: User;
-  posts: PostObject[];
+  userId: string | null | undefined;
+  user: UserObject;
 }) {
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [profileTab, setProfileTab] = useState<ProfileTab | undefined>();
 
-  const [showPosts, setShowPosts] = useState<boolean | undefined>();
+  useEffect(() => {
+    if (profileTab !== undefined && userId) {
+      localStorage.setItem(`${userId}:profile_tab`, profileTab);
+    }
+  }, [profileTab, userId]);
 
+  useEffect(() => {
+    setProfileTab(
+      (localStorage.getItem(`${userId}:profile_tab`) as ProfileTab) ??
+        ProfileTab.Posts,
+    );
+  }, [user, userId]);
+
+  if (!user?.image || !user?.name) return <SignInButton />;
+
+  console.log(user.following);
+  console.log(user.followers);
+
+  return (
+    <div>
+      <div className="flex flex-col gap-2 overflow-hidden bg-main md:rounded-t-xl">
+        <div className="flex items-center gap-2 p-2">
+          <Image
+            width={40}
+            height={40}
+            className="rounded-full"
+            src={user.image}
+            alt={user.name}
+          />
+          <div className="grow px-2 font-bold">{user.name}</div>
+
+          <FollowButton userId={userId} user={user} />
+
+          <SpotifyLink
+            size={32}
+            external_url={`https://open.spotify.com/user/${user.providerAccountId}`}
+          />
+          <Logo />
+        </div>
+
+        <div className="flex gap-2 self-center font-bold">
+          <div>{user.followers.length} Followers</div>
+          <div>{user.following.length} Following</div>
+        </div>
+        <div className="flex flex-col bg-main2">
+          <div className="flex font-bold">
+            {ProfileTabOptions.map((ProfileTabOption) => (
+              <button
+                key={ProfileTabOption}
+                className={`flex w-1/2 justify-center ${profileTab === ProfileTabOption ? "bg-main" : "bg-main2"} p-1 text-xs md:text-base`}
+                onClick={() => setProfileTab(ProfileTabOption)}
+              >
+                {ProfileTabOption}
+              </button>
+            ))}
+          </div>
+          {userId === user.id && profileTab === ProfileTab.Posts && (
+            <div className="flex p-2">
+              <PostCreator userId={userId} />
+            </div>
+          )}
+        </div>
+      </div>
+      <ProfileFeed userId={userId} user={user} profileTab={profileTab} />
+    </div>
+  );
+}
+
+function ProfileFeed({
+  userId,
+  user,
+  profileTab,
+}: {
+  userId: string | null | undefined;
+  user: UserObject;
+  profileTab: ProfileTab | undefined;
+}) {
   const [sortingColumn, setSortingColumn] = useState<
     PlaylistsSortingColumn | undefined
   >();
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [filter, setFilter] = useState("");
 
   const [reversed, setReversed] = useState<boolean | undefined>();
 
   const [feedStyle, setFeedStyle] = useState<PlaylistFeedStyle | undefined>();
-
-  useEffect(() => {
-    if (showPosts !== undefined && userId) {
-      localStorage.setItem(`${userId}:showPosts`, showPosts.toString());
-    }
-  }, [showPosts, userId]);
-
-  useEffect(() => {
-    if (sortingColumn !== undefined && userId) {
-      localStorage.setItem(`${userId}:playlists_sorting_column`, sortingColumn);
-    }
-  }, [sortingColumn, userId]);
-
-  useEffect(() => {
-    if (reversed !== undefined && userId) {
-      localStorage.setItem(`${userId}:reversed`, reversed.toString());
-    }
-  }, [reversed, userId]);
-
-  useEffect(() => {
-    if (feedStyle !== undefined && userId) {
-      localStorage.setItem(`${userId}:playlists_feed_style`, feedStyle);
-    }
-  }, [feedStyle, userId]);
-
-  const [filter, setFilter] = useState("");
-
   const treatedPlaylists = useMemo(() => {
     const temp = [...playlists]
       .filter(
@@ -110,13 +161,32 @@ export function ProfileView({
   }, [playlists, filter, sortingColumn, reversed]);
 
   useEffect(() => {
-    setShowPosts(localStorage.getItem(`${userId}:showPosts`) !== "false");
+    if (sortingColumn !== undefined && userId) {
+      localStorage.setItem(`${userId}:playlists_sorting_column`, sortingColumn);
+    }
+  }, [sortingColumn, userId]);
+
+  useEffect(() => {
+    if (reversed !== undefined && userId) {
+      localStorage.setItem(`${userId}:playlists_reversed`, reversed.toString());
+    }
+  }, [reversed, userId]);
+
+  useEffect(() => {
+    if (feedStyle !== undefined && userId) {
+      localStorage.setItem(`${userId}:playlists_feed_style`, feedStyle);
+    }
+  }, [feedStyle, userId]);
+
+  useEffect(() => {
     setSortingColumn(
       (localStorage.getItem(
         `${userId}:playlists_sorting_column`,
       ) as PlaylistsSortingColumn) ?? PlaylistsSortingColumn.CreatedAt,
     );
-    setReversed(localStorage.getItem(`${userId}:reversed`) === "true");
+    setReversed(
+      localStorage.getItem(`${userId}:playlists_reversed`) === "true",
+    );
     setFeedStyle(
       (localStorage.getItem(
         `${userId}:playlists_feed_style`,
@@ -134,150 +204,112 @@ export function ProfileView({
     }
   }, [user, userId]);
 
-  if (!user?.image || !user?.name) return <SignInButton />;
-
-  return (
-    <>
-      <div className="flex flex-col gap-2 overflow-hidden bg-main md:rounded-xl">
-        <div className="flex items-center gap-2 p-2">
-          <Image
-            width={40}
-            height={40}
-            className="rounded-full"
-            src={user.image}
-            alt={user.name}
-          />
-          <div className="grow px-2 font-bold">{user.name}</div>
-
-          <SpotifyLink
-            size={32}
-            external_url={`https://open.spotify.com/user/${user.providerAccountId}`}
-          />
-
-          {userId === user.id && (
-            <>
-              <Link href="/" onClick={() => deleteUser(userId)}>
-                <Image
-                  height={32}
-                  width={32}
-                  src="/trash.png"
-                  alt="trash icon"
-                />
-              </Link>
-              <Link href="/api/auth/signout">
-                <Image height={32} width={32} src="/exit.png" alt="exit icon" />
-              </Link>
-            </>
-          )}
-          <Logo />
+  if (profileTab === ProfileTab.Posts) {
+    const posts = user.posts.filter((post) => post.type === PostType.Post);
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col items-start gap-2 bg-main p-2 md:flex-row md:items-center md:rounded-b-2xl">
+          <div className="font-bold">{posts.length} Posts</div>
         </div>
-
-        <div className="flex flex-col bg-main2">
-          <div className="flex font-bold">
-            {showPosts !== false ? (
-              <>
-                <div className="flex w-1/2 justify-center bg-main3 p-1">
-                  Posts
-                </div>
-                <button
-                  className="flex w-1/2 justify-center bg-main p-1"
-                  onClick={() => setShowPosts(false)}
-                >
-                  Playlists
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  className="flex w-1/2 justify-center bg-main p-1"
-                  onClick={() => setShowPosts(true)}
-                >
-                  Posts
-                </button>
-                <div className="flex w-1/2 justify-center bg-main3 p-1">
-                  Playlists
-                </div>
-              </>
-            )}
-          </div>
-          {showPosts !== false ? (
-            userId === user.id && (
-              <div className="flex p-2">
-                <PostCreator userId={userId} />
-              </div>
-            )
-          ) : (
-            <div className="flex flex-col gap-2 p-2 md:flex-row">
-              <div className="flex items-start gap-2">
-                <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 p-2 text-center text-sm">
-                  <div className="font-bold">Sorting column</div>
-                  <select
-                    onChange={(e) => {
-                      setSortingColumn(
-                        e.target.value as PlaylistsSortingColumn,
-                      );
-                    }}
-                    defaultValue={
-                      sortingColumn ?? PlaylistsSortingColumn.CreatedAt
-                    }
-                  >
-                    {PlaylistsSortingColumnOptions.map((sortingColumn) => (
-                      <option key={sortingColumn}>{sortingColumn}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setReversed((prev) => !prev);
-                  }}
-                >
-                  <Image
-                    height={32}
-                    width={32}
-                    src="/direction.png"
-                    alt="direction icon"
-                    className={reversed ? "rotate-180" : ""}
-                  />
-                </button>
-              </div>
-
-              <div className="flex items-center justify-center gap-2 self-start rounded-xl bg-main3 p-2 text-center text-sm">
-                <div className="font-bold">Feed Style</div>
-                <select
-                  onChange={(e) => {
-                    setFeedStyle(e.target.value as PlaylistFeedStyle);
-                  }}
-                  defaultValue={sortingColumn ?? PlaylistFeedStyle.Compact}
-                >
-                  {PlaylistFeedStyleOptions.map((PlaylistFeedStyle) => (
-                    <option key={PlaylistFeedStyle}>{PlaylistFeedStyle}</option>
-                  ))}
-                </select>
-              </div>
-
-              <input
-                placeholder="Search something!"
-                className="grow bg-transparent placeholder-zinc-600 outline-none"
-                type="text"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-              />
-            </div>
-          )}
-        </div>
+        {posts.map((post) => (
+          <Post key={post.id} post={post} userId={userId} />
+        ))}
       </div>
+    );
+  }
 
-      {showPosts !== false ? (
-        posts.map((post) => <Post key={post.id} post={post} userId={userId} />)
-      ) : (
+  if (profileTab === ProfileTab.PostsAndReplies)
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col items-start gap-2 bg-main p-2 md:flex-row md:items-center md:rounded-b-2xl">
+          <div className="font-bold">{user.posts.length} Posts</div>
+        </div>
+        {user.posts.map((post) => (
+          <Post key={post.id} post={post} userId={userId} />
+        ))}
+      </div>
+    );
+
+  if (profileTab === ProfileTab.Likes)
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col items-start gap-2 bg-main p-2 md:flex-row md:items-center md:rounded-b-2xl">
+          <div className="font-bold">{user.likes.length} Likes</div>
+        </div>
+        {user.likes.map(
+          (like) =>
+            like?.likee && (
+              <Post key={like.likee.id} post={like.likee} userId={userId} />
+            ),
+        )}
+      </div>
+    );
+
+  if (profileTab === ProfileTab.Playlists)
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col items-start gap-2 bg-main p-2 md:flex-row md:items-center md:rounded-b-2xl">
+          <div className="flex items-start gap-2">
+            <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 p-2 text-center text-sm">
+              <div className="font-bold">Sorting column</div>
+              <select
+                onChange={(e) => {
+                  setSortingColumn(e.target.value as PlaylistsSortingColumn);
+                }}
+                defaultValue={sortingColumn ?? PlaylistsSortingColumn.CreatedAt}
+              >
+                {PlaylistsSortingColumnOptions.map((sortingColumn) => (
+                  <option key={sortingColumn}>{sortingColumn}</option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              onClick={() => {
+                setReversed((prev) => !prev);
+              }}
+            >
+              <Image
+                height={32}
+                width={32}
+                src="/direction.png"
+                alt="direction icon"
+                className={reversed ? "rotate-180" : ""}
+              />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 p-2 text-center text-sm">
+            <div className="font-bold">Feed Style</div>
+            <select
+              onChange={(e) => {
+                setFeedStyle(e.target.value as PlaylistFeedStyle);
+              }}
+              defaultValue={sortingColumn ?? PlaylistFeedStyle.Compact}
+            >
+              {PlaylistFeedStyleOptions.map((PlaylistFeedStyle) => (
+                <option key={PlaylistFeedStyle}>{PlaylistFeedStyle}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="font-bold">{treatedPlaylists.length} Playlists</div>
+
+          <input
+            placeholder="Search something!"
+            className="grow bg-transparent placeholder-zinc-600 outline-none"
+            type="text"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
+        </div>
+
         <PlaylistFeed
           treatedPlaylists={treatedPlaylists}
           style={feedStyle ?? PlaylistFeedStyle.Simple}
         />
-      )}
-    </>
-  );
+      </div>
+    );
 }
 
 function PlaylistFeed({
@@ -395,5 +427,49 @@ function PlaylistDetailed({ playlist }: { playlist: Playlist }) {
 
       <SpotifyLink size={32} external_url={playlist.external_urls.spotify} />
     </div>
+  );
+}
+
+function FollowButton({
+  userId,
+  user,
+}: {
+  userId: string | null | undefined;
+  user: UserObject;
+}) {
+  if (userId === user.id)
+    return (
+      <>
+        <Link href="/" onClick={() => deleteUser(userId)}>
+          <Image height={32} width={32} src="/trash.png" alt="trash icon" />
+        </Link>
+        <Link href="/api/auth/signout">
+          <Image height={32} width={32} src="/exit.png" alt="exit icon" />
+        </Link>
+      </>
+    );
+
+  if (!userId) return;
+
+  if (user.followers.some((follow) => follow.followerId === userId))
+    return (
+      <button
+        onClick={() => {
+          void unfollowUser(userId, user.id);
+        }}
+        className="text-sm font-bold"
+      >
+        Unfollow
+      </button>
+    );
+  return (
+    <button
+      onClick={() => {
+        void followUser(userId, user.id);
+      }}
+      className="text-sm font-bold"
+    >
+      Follow
+    </button>
   );
 }

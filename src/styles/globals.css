@@ -28,4 +28,5 @@ option {
 
 * {
   user-select: none;
+  overflow-x: hidden;
 }

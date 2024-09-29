@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import type { Metadata } from "next";
 
-import { getUser, getUsersPosts } from "~/server/queries";
+import { getUser } from "~/server/queries";
 import { authOptions } from "~/lib/auth";
 
 import { ProfileView } from "../profile-view";
@@ -53,31 +53,10 @@ export default async function OthersProfilePage({
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
-    const user = await getUser(profileId);
-
-    if (!user)
-      return <div className="self-center text-xl text-red-500">Error</div>;
-
-    const posts = await getUsersPosts(user.id);
-
-    return <ProfileView userId={null} user={user} posts={posts} />;
-  }
-
-  if (session?.user?.providerAccountId === profileId) {
-    const posts = await getUsersPosts(session.user.id);
-
-    return (
-      <ProfileView userId={session.user.id} user={session.user} posts={posts} />
-    );
-  }
-
   const user = await getUser(profileId);
 
   if (!user)
     return <div className="self-center text-xl text-red-500">Error</div>;
 
-  const posts = await getUsersPosts(user.id);
-
-  return <ProfileView userId={session.user.id} user={user} posts={posts} />;
+  return <ProfileView userId={session?.user?.id} user={user} />;
 }

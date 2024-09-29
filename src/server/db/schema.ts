@@ -12,7 +12,7 @@ import { relations, sql } from "drizzle-orm";
 
 // import type { AdapterAccountType } from "next-auth/adapters" <- not here
 import type { AdapterAccountType } from ".pnpm/@auth+core@0.34.2/node_modules/@auth/core/adapters";
-import type { IMetadata, Substring } from "~/models/post.model";
+import type { PostType, IMetadata, Substring } from "~/models/post.model";
 
 export const createTable = pgTableCreator((name) => `playpal_${name}`);
 
@@ -108,7 +108,7 @@ export const postsTable = createTable("post", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).$onUpdate(
     () => new Date(),
   ),
-  type: varchar("type").notNull(),
+  type: varchar("type").$type<PostType>().notNull(),
   urls: jsonb("urls").$type<Substring[]>(),
   urlMetadata: jsonb("urlMetadata").$type<IMetadata>(),
 });
@@ -135,10 +135,28 @@ export const likesTable = createTable("like", {
     .notNull(),
 });
 
+export const followsTable = createTable("follow", {
+  followerId: text("followerId")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  followeeId: text("followeeId")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
-  author: many(postsTable, { relationName: "author" }),
+  posts: many(postsTable, { relationName: "author" }),
   likes: many(likesTable, {
-    relationName: "userLiked",
+    relationName: "liker",
+  }),
+  following: many(followsTable, {
+    relationName: "follower",
+  }),
+  followers: many(followsTable, {
+    relationName: "followee",
   }),
 }));
 
@@ -155,7 +173,7 @@ export const postsTableRelations = relations(postsTable, ({ one, many }) => ({
     relationName: "repliee",
   }),
   likes: many(likesTable, {
-    relationName: "postLiked",
+    relationName: "likee",
   }),
 }));
 
@@ -174,14 +192,27 @@ export const repliesTableRelations = relations(repliesTable, ({ one }) => ({
 }));
 
 export const likesTableRelations = relations(likesTable, ({ one }) => ({
-  postLiked: one(postsTable, {
+  likee: one(postsTable, {
     fields: [likesTable.postId],
     references: [postsTable.id],
-    relationName: "postLiked",
+    relationName: "likee",
   }),
-  userLiked: one(usersTable, {
-    fields: [likesTable.postId],
+  liker: one(usersTable, {
+    fields: [likesTable.userId],
     references: [usersTable.id],
-    relationName: "userLiked",
+    relationName: "liker",
+  }),
+}));
+
+export const followsTableRelations = relations(followsTable, ({ one }) => ({
+  follower: one(usersTable, {
+    fields: [followsTable.followerId],
+    references: [usersTable.id],
+    relationName: "follower",
+  }),
+  followee: one(usersTable, {
+    fields: [followsTable.followeeId],
+    references: [usersTable.id],
+    relationName: "followee",
   }),
 }));

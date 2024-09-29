@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "~/lib/auth";
 import { SignInButton } from "~/app/_components/signin-button";
-import { getUsersPosts } from "~/server/queries";
+import { getUser } from "~/server/queries";
 
 import { ProfileView } from "./profile-view";
 
@@ -23,9 +23,10 @@ export default async function ProfilePage() {
 
   if (!session) return <SignInButton />;
 
-  const posts = await getUsersPosts(session.user.id);
+  const user = await getUser(session.user.providerAccountId);
 
-  return (
-    <ProfileView userId={session.user.id} user={session.user} posts={posts} />
-  );
+  if (!user)
+    return <div className="self-center text-xl text-red-500">Error</div>;
+
+  return <ProfileView userId={session.user.id} user={user} />;
 }

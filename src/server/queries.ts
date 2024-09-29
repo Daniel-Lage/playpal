@@ -7,58 +7,55 @@ import {
   usersTable,
   repliesTable,
   likesTable,
+  followsTable,
 } from "./db/schema";
 import { revalidatePath } from "next/cache";
 import { db } from "./db";
 
-import type {
-  ClientPostObject,
-  IMetadata,
-  parentPostObject,
-  PostObject,
-  Substring,
+import {
+  PostType,
+  type ClientPostObject,
+  type IMetadata,
+  type parentPostObject,
+  type PostObject,
+  type Substring,
 } from "~/models/post.model";
-import type { Account, User } from "next-auth";
+import type { Account } from "next-auth";
 import type { ReplyObject } from "~/models/reply.model";
+import type { UserObject } from "~/models/user.model";
 
 export async function getPosts() {
   const posts = await db.query.postsTable.findMany({
-    with: { author: true, likes: true },
+    with: {
+      author: true,
+      likes: true,
+      replies: {
+        // only gets direct replies
+        where: eq(repliesTable.separation, 0),
+      },
+    },
     orderBy: [desc(postsTable.createdAt)],
-    where: eq(postsTable.type, "post"),
+    where: eq(postsTable.type, PostType.Post),
     limit: 100,
   });
 
   return posts;
 }
 
-export async function getUser(profileId: string): Promise<User | undefined> {
+export async function getUser(
+  profileId: string,
+): Promise<UserObject | undefined> {
   const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.providerAccountId, profileId),
+    with: {
+      posts: { with: { author: true, likes: true } },
+      likes: { with: { likee: { with: { author: true, likes: true } } } },
+      followers: true,
+      following: true,
+    },
   });
 
-  return user;
-}
-
-export async function getUsersPosts(authorId: string) {
-  const posts = await db.query.postsTable.findMany({
-    with: { author: true, likes: true },
-    orderBy: [desc(postsTable.createdAt)],
-    where: and(eq(postsTable.userId, authorId), eq(postsTable.type, "post")),
-    limit: 100,
-  });
-
-  return posts;
-}
-export async function getUsersPostsAndReplies(authorId: string) {
-  const posts = await db.query.postsTable.findMany({
-    with: { author: true, likes: true },
-    orderBy: [desc(postsTable.createdAt)],
-    where: eq(postsTable.userId, authorId),
-    limit: 100,
-  });
-
-  return posts;
+  return user as UserObject;
 }
 
 export async function postPost(
@@ -72,7 +69,13 @@ export async function postPost(
   if (parent) {
     const posts = await db
       .insert(postsTable)
-      .values({ content, userId, type: "reply", urls, urlMetadata: metadata })
+      .values({
+        content,
+        userId,
+        type: PostType.Reply,
+        urls,
+        urlMetadata: metadata,
+      })
       .returning();
 
     const postId = posts[0]?.id;
@@ -99,7 +102,13 @@ export async function postPost(
   } else
     await db
       .insert(postsTable)
-      .values({ content, userId, type: "post", urls, urlMetadata: metadata })
+      .values({
+        content,
+        userId,
+        type: PostType.Post,
+        urls,
+        urlMetadata: metadata,
+      })
       .returning();
 
   revalidatePath("/");
@@ -203,6 +212,25 @@ export async function unlikePost(postId: string, userId: string) {
   await db
     .delete(likesTable)
     .where(and(eq(likesTable.postId, postId), eq(likesTable.userId, userId)));
+
+  revalidatePath("/");
+}
+
+export async function followUser(followerId: string, followeeId: string) {
+  await db.insert(followsTable).values({ followerId, followeeId });
+
+  revalidatePath("/");
+}
+
+export async function unfollowUser(followerId: string, followeeId: string) {
+  await db
+    .delete(followsTable)
+    .where(
+      and(
+        eq(followsTable.followerId, followerId),
+        eq(followsTable.followeeId, followeeId),
+      ),
+    );
 
   revalidatePath("/");
 }

@@ -8,6 +8,11 @@ export interface Substring {
   length: number;
 }
 
+export enum PostType {
+  Post = "post",
+  Reply = "reply",
+}
+
 export interface IMetadata {
   og_title?: string;
   og_description?: string;
@@ -17,7 +22,7 @@ export interface IMetadata {
 
 interface postRelations {
   author: User;
-  likes?: LikeObject[];
+  likes: LikeObject[];
   replies?: ReplyObject[];
   thread?: ReplyObject[];
 }
