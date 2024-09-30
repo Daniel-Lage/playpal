@@ -28,6 +28,7 @@ export default async function PostLikesPage({
             <Link
               className="flex items-center bg-secondary p-2 md:rounded-xl"
               href={`/profile/${like.liker.providerAccountId}`}
+              key={like.liker.id}
             >
               <Image
                 width={32}

@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import Image from "next/image";
 import { authOptions } from "~/lib/auth";
-import { getUserFollowers, getUserFollowing } from "~/server/queries";
+import { getUserFollowers } from "~/server/queries";
 import { FollowButton } from "../../profile-view";
 import { SpotifyLink } from "~/app/_components/spotify-link";
 import { Logo } from "~/app/_components/logo";
@@ -56,6 +56,7 @@ export default async function OthersProfileFollowersPage({
         (follow) =>
           follow.follower && (
             <Link
+              key={follow.follower.id}
               className="flex items-center bg-secondary p-2 md:rounded-xl"
               href={`/profile/${follow.follower.providerAccountId}`}
             >

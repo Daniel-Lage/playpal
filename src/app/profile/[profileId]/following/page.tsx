@@ -56,6 +56,7 @@ export default async function OthersProfileFollowingPage({
         (follow) =>
           follow.followee && (
             <Link
+              key={follow.followee.id}
               className="flex items-center bg-secondary p-2 md:rounded-xl"
               href={`/profile/${follow.followee.providerAccountId}`}
             >
