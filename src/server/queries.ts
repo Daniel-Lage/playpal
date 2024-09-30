@@ -234,3 +234,55 @@ export async function unfollowUser(followerId: string, followeeId: string) {
 
   revalidatePath("/");
 }
+
+export async function getPostLikes(postId: string) {
+  const post = (await db.query.postsTable.findFirst({
+    where: eq(postsTable.id, postId),
+    with: {
+      author: true,
+      likes: { with: { liker: true } },
+      thread: {
+        orderBy: [desc(repliesTable.separation)],
+        with: { repliee: { with: { author: true, likes: true } } },
+      },
+      replies: {
+        // only gets direct replies
+        where: eq(repliesTable.separation, 0),
+      },
+    },
+  })) as PostObject;
+
+  return post;
+}
+
+export async function getUserFollowing(
+  profileId: string,
+): Promise<UserObject | undefined> {
+  const user = await db.query.usersTable.findFirst({
+    where: eq(usersTable.providerAccountId, profileId),
+    with: {
+      posts: { with: { author: true, likes: true } },
+      likes: { with: { likee: { with: { author: true, likes: true } } } },
+      followers: true,
+      following: { with: { followee: true } },
+    },
+  });
+
+  return user as UserObject;
+}
+
+export async function getUserFollowers(
+  profileId: string,
+): Promise<UserObject | undefined> {
+  const user = await db.query.usersTable.findFirst({
+    where: eq(usersTable.providerAccountId, profileId),
+    with: {
+      posts: { with: { author: true, likes: true } },
+      likes: { with: { likee: { with: { author: true, likes: true } } } },
+      followers: { with: { follower: true } },
+      following: true,
+    },
+  });
+
+  return user as UserObject;
+}

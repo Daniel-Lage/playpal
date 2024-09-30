@@ -50,9 +50,6 @@ export function ProfileView({
 
   if (!user?.image || !user?.name) return <SignInButton />;
 
-  console.log(user.following);
-  console.log(user.followers);
-
   return (
     <div>
       <div className="flex flex-col gap-2 overflow-hidden bg-main md:rounded-t-xl">
@@ -76,8 +73,12 @@ export function ProfileView({
         </div>
 
         <div className="flex gap-2 self-center font-bold">
-          <div>{user.followers.length} Followers</div>
-          <div>{user.following.length} Following</div>
+          <Link href={`/profile/${user.providerAccountId}/followers`}>
+            {user.followers.length} Followers
+          </Link>
+          <Link href={`/profile/${user.providerAccountId}/following`}>
+            {user.following.length} Following
+          </Link>
         </div>
         <div className="flex flex-col bg-main2">
           <div className="flex font-bold">
@@ -430,7 +431,7 @@ function PlaylistDetailed({ playlist }: { playlist: Playlist }) {
   );
 }
 
-function FollowButton({
+export function FollowButton({
   userId,
   user,
 }: {

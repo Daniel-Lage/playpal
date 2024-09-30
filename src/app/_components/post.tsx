@@ -91,16 +91,19 @@ export function Post({
       <div className="flex items-center font-bold">
         <div className="flex w-1/2 gap-2">
           <LikeButton {...{ post, userId }} />
-          {post.likes?.length}
-        </div>
-        <div className="flex w-1/2 gap-2">
           <Link
-            href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
+            href={`/profile/${post.author.providerAccountId}/post/${post.id}/likes`}
           >
-            <Image height={24} width={24} src="/reply.png" alt="reply icon" />
+            {post.likes?.length}
           </Link>
-          {post.replies?.length ?? 0}
         </div>
+        <Link
+          className="flex w-1/2 gap-2"
+          href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
+        >
+          <Image height={24} width={24} src="/reply.png" alt="reply icon" />
+          {post.replies?.length ?? 0}
+        </Link>
       </div>
     </div>
   );
