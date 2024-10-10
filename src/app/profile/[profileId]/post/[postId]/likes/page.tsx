@@ -1,6 +1,4 @@
 import { getServerSession } from "next-auth";
-import Image from "next/image";
-import Link from "next/link";
 import { Post } from "~/app/_components/post";
 import { User } from "~/app/_components/user";
 import { authOptions } from "~/lib/auth";
@@ -23,7 +21,9 @@ export default async function PostLikesPage({
         <Post post={post} userId={session?.user.id} focused={true} />
         <div className="text-center font-bold">Liked By</div>
       </div>
-      {post.likes.map((like) => like?.liker && <User user={like.liker} />)}
+      {post.likes.map(
+        (like) => like?.liker && <User key={like.userId} user={like.liker} />,
+      )}
     </>
   );
 }

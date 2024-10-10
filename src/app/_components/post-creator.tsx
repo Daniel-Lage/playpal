@@ -1,7 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import type {
   IMetadata,
   parentPostObject,

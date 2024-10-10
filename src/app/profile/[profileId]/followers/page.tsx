@@ -75,7 +75,10 @@ export default async function OthersProfileFollowersPage({
           <div className="font-bold">{user.followers.length} Followers</div>
         </div>
         {user.followers.map(
-          (follow) => follow.follower && <User user={follow.follower} />,
+          (follow) =>
+            follow.follower && (
+              <User key={follow.followerId} user={follow.follower} />
+            ),
         )}
       </div>
     </div>

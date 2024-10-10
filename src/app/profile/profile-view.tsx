@@ -6,7 +6,6 @@ import Link from "next/link";
 
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
-import { Logo } from "~/app/_components/logo";
 import { deleteUser, followUser, unfollowUser } from "~/server/queries";
 import { getMyPlaylists, getPlaylists } from "~/api/calls";
 

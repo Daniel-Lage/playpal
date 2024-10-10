@@ -5,9 +5,9 @@ import Image from "next/image";
 import { deletePost, likePost, unlikePost } from "~/server/queries";
 
 import {
-  ClientPostObject,
-  PostObject,
-  Substring,
+  type ClientPostObject,
+  type PostObject,
+  type Substring,
   threadPosition,
 } from "~/models/post.model";
 import Link from "next/link";
