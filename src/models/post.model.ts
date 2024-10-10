@@ -23,7 +23,7 @@ export interface IMetadata {
 interface postRelations {
   author: User;
   likes: LikeObject[];
-  replies?: ReplyObject[];
+  replies: ReplyObject[];
   thread?: ReplyObject[];
 }
 
@@ -42,4 +42,10 @@ export type ClientPostObject = typeof postsTable.$inferSelect &
 export interface parentPostObject {
   id: string;
   thread?: ReplyObject[];
+}
+
+export enum threadPosition {
+  First = "First",
+  Middle = "Middle",
+  Last = "Last",
 }

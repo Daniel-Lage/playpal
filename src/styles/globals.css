@@ -7,7 +7,7 @@ html {
 }
 
 body {
-  @apply bg-black;
+  @apply bg-gray-800;
 }
 
 select {
@@ -29,4 +29,23 @@ option {
 * {
   user-select: none;
   overflow-x: hidden;
+}
+
+.insertion-point {
+  height: 1rem;
+  width: 1px;
+  background-color: black;
+  animation: blink-animation 2s steps(2, start) infinite;
+  -webkit-animation: blink-animation 2s steps(2, start) infinite;
+}
+
+@keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
+}
+@-webkit-keyframes blink-animation {
+  to {
+    visibility: hidden;
+  }
 }

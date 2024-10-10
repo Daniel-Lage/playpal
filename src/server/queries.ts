@@ -48,8 +48,30 @@ export async function getUser(
   const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.providerAccountId, profileId),
     with: {
-      posts: { with: { author: true, likes: true } },
-      likes: { with: { likee: { with: { author: true, likes: true } } } },
+      posts: {
+        with: {
+          author: true,
+          likes: true,
+          replies: {
+            // only gets direct replies
+            where: eq(repliesTable.separation, 0),
+          },
+        },
+      },
+      likes: {
+        with: {
+          likee: {
+            with: {
+              author: true,
+              likes: true,
+              replies: {
+                // only gets direct replies
+                where: eq(repliesTable.separation, 0),
+              },
+            },
+          },
+        },
+      },
       followers: true,
       following: true,
     },
@@ -154,7 +176,18 @@ export async function getPost(
       likes: true,
       thread: {
         orderBy: [desc(repliesTable.separation)],
-        with: { repliee: { with: { author: true, likes: true } } },
+        with: {
+          repliee: {
+            with: {
+              author: true,
+              likes: true,
+              replies: {
+                // only gets direct replies
+                where: eq(repliesTable.separation, 0),
+              },
+            },
+          },
+        },
       },
       replies: {
         with: {
@@ -241,10 +274,6 @@ export async function getPostLikes(postId: string) {
     with: {
       author: true,
       likes: { with: { liker: true } },
-      thread: {
-        orderBy: [desc(repliesTable.separation)],
-        with: { repliee: { with: { author: true, likes: true } } },
-      },
       replies: {
         // only gets direct replies
         where: eq(repliesTable.separation, 0),
@@ -261,9 +290,6 @@ export async function getUserFollowing(
   const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.providerAccountId, profileId),
     with: {
-      posts: { with: { author: true, likes: true } },
-      likes: { with: { likee: { with: { author: true, likes: true } } } },
-      followers: true,
       following: { with: { followee: true } },
     },
   });
@@ -277,10 +303,7 @@ export async function getUserFollowers(
   const user = await db.query.usersTable.findFirst({
     where: eq(usersTable.providerAccountId, profileId),
     with: {
-      posts: { with: { author: true, likes: true } },
-      likes: { with: { likee: { with: { author: true, likes: true } } } },
       followers: { with: { follower: true } },
-      following: true,
     },
   });
 

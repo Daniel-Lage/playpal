@@ -9,7 +9,7 @@ import { PostCreator } from "~/app/_components/post-creator";
 import { Logo } from "~/app/_components/logo";
 import { authOptions } from "~/lib/auth";
 import { Post } from "~/app/_components/post";
-import type { ClientPostObject } from "~/models/post.model";
+import { threadPosition, type ClientPostObject } from "~/models/post.model";
 
 export const dynamic = "force-dynamic";
 
@@ -57,12 +57,16 @@ export default async function PostPage({
 
   return (
     <>
-      <div className="flex flex-col gap-1 bg-secondary2 md:rounded-xl">
+      <div className="flex flex-col bg-secondary md:rounded-xl">
         {post?.thread?.[0]?.repliee ? (
           <>
-            <Post post={post?.thread?.[0]?.repliee} userId={session?.user.id} />
+            <Post
+              post={post?.thread?.[0]?.repliee}
+              userId={session?.user.id}
+              position={threadPosition.First}
+            />
 
-            <div className="flex justify-stretch pl-2">
+            <div className="flex justify-stretch">
               <div className="flex w-full flex-col items-stretch">
                 {post.thread?.map(
                   ({ repliee }, index) =>
@@ -72,12 +76,18 @@ export default async function PostPage({
                         key={repliee.id}
                         post={repliee}
                         userId={session?.user.id}
+                        position={threadPosition.Middle}
                       />
                     ),
                 )}
 
                 <div>
-                  <Post post={post} userId={session?.user.id} focused={true} />
+                  <Post
+                    post={post}
+                    userId={session?.user.id}
+                    focused={true}
+                    position={threadPosition.Last}
+                  />
                   <PostCreatorWrapper post={post} session={session} />
                 </div>
               </div>
@@ -93,25 +103,24 @@ export default async function PostPage({
 
       {post.replies?.map((replythread) => (
         <div
-          key={replythread[0]?.replierId}
-          className="flex flex-col justify-stretch gap-1 bg-secondary2 md:rounded-xl"
+          key={`${replythread[0]?.replierId}:thread`}
+          className="flex flex-col justify-stretch bg-secondary md:rounded-xl"
         >
-          {replythread?.[0]?.replier && (
-            <Post
-              key={replythread[0].replier.id}
-              post={replythread[0].replier}
-              userId={session?.user.id}
-            />
-          )}
-          <div className="flex w-full flex-col items-stretch gap-1 pl-2">
+          <div className="flex w-full flex-col items-stretch">
             {replythread.map(
               ({ replier }, index) =>
-                replier &&
-                index !== 0 && (
+                replier && (
                   <Post
                     key={replier.id}
                     post={replier}
                     userId={session?.user.id}
+                    position={
+                      index === 0
+                        ? threadPosition.First
+                        : index === replythread.length - 1
+                          ? threadPosition.Last
+                          : threadPosition.Middle
+                    }
                   />
                 ),
             )}

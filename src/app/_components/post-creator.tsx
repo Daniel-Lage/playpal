@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import type {
   IMetadata,
   parentPostObject,
@@ -89,37 +89,17 @@ export function PostCreator({
   }
 
   return (
-    <div className="flex grow flex-col gap-2">
-      <div className="flex grow">
-        <div className="flex grow">
-          <div className="border-1 absolute grow border-red-500">
-            {urls ? <FormattedContent input={input} urls={urls} /> : input}
-          </div>
-
-          <input
-            placeholder="Type something!"
-            className="z-10 grow select-text bg-transparent text-transparent placeholder-zinc-600 outline-none"
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-
-                if (input !== "" && canPost) {
-                  void send();
-                }
-              }
-            }}
-            disabled={!canPost}
+    <div className="flex grow flex-col">
+      <div className="flex grow gap-2">
+        <div className="flex grow overflow-hidden text-clip">
+          <TextInput
+            input={input}
+            urls={urls}
+            send={send}
+            canPost={canPost}
+            setInput={setInput}
           />
         </div>
-
-        {input !== "" && canPost && (
-          <button onClick={() => void send()} className="font-bold">
-            Post
-          </button>
-        )}
       </div>
       <MetadataPreview
         url={urlForMetadata}
@@ -135,47 +115,47 @@ function FormattedContent({
   urls,
 }: {
   input: string;
-  urls: Substring[];
+  urls?: Substring[];
 }) {
-  const content: string[] = [];
-  const urlIndexes = new Set<number>();
+  if (!urls) return <span className="whitespace-pre">{input}</span>;
+
+  const content: JSX.Element[] = [];
 
   let contentIndex = 0;
   for (let index = 0; index < urls.length; index++) {
     const url = urls[index];
     if (url) {
       if (contentIndex != url.start) {
-        content.push(input.slice(contentIndex, url.start));
+        const value = input.slice(contentIndex, url.start);
+        content.push(
+          <span className="whitespace-pre" key={index}>
+            {value}
+          </span>,
+        );
       }
 
-      const slice = input.slice(url.start, url.start + url.length);
-      content.push(slice);
-      urlIndexes.add(content.length - 1);
+      const value = input.slice(url.start, url.start + url.length);
+      content.push(
+        <span key={index} className="whitespace-pre text-blue-700">
+          {value}
+        </span>,
+      );
       contentIndex = url.start + url.length;
 
       if (index === urls.length - 1) {
         if (contentIndex !== input.length) {
-          const slice = input.slice(contentIndex);
-          content.push(slice);
+          const value = input.slice(contentIndex);
+          content.push(
+            <span className="whitespace-pre" key={index}>
+              {value}
+            </span>,
+          );
         }
       }
     }
   }
 
-  return content.map((value, index) => {
-    if (urlIndexes.has(index))
-      return (
-        <Link
-          target="_blank"
-          href={value}
-          key={index}
-          className="text-blue-700"
-        >
-          {value}
-        </Link>
-      );
-    else return <span key={index}>{value}</span>;
-  });
+  return content;
 }
 
 function MetadataPreview({
@@ -221,4 +201,47 @@ function MetadataPreview({
       );
     return;
   }
+}
+
+function TextInput({
+  input,
+  urls,
+  canPost,
+  send,
+  setInput,
+}: {
+  input: string;
+  urls?: Substring[];
+  canPost: boolean;
+  send: () => Promise<void>;
+  setInput: Dispatch<SetStateAction<string>>;
+}) {
+  return (
+    <>
+      <div className="relative flex h-10 w-full grow">
+        <input
+          placeholder="Type something!"
+          className="absolute z-10 w-full select-text bg-transparent text-transparent placeholder-zinc-600 caret-black outline-none"
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+
+              if (input !== "" && canPost) {
+                void send();
+              }
+            }
+          }}
+        />
+        <FormattedContent input={input} urls={urls} />
+      </div>
+      {canPost && input !== "" && (
+        <button onClick={() => void send()} className="pl-2 font-bold">
+          Post
+        </button>
+      )}
+    </>
+  );
 }

@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import Image from "next/image";
 import Link from "next/link";
 import { Post } from "~/app/_components/post";
+import { User } from "~/app/_components/user";
 import { authOptions } from "~/lib/auth";
 import { getPostLikes } from "~/server/queries";
 
@@ -22,25 +23,7 @@ export default async function PostLikesPage({
         <Post post={post} userId={session?.user.id} focused={true} />
         <div className="text-center font-bold">Liked By</div>
       </div>
-      {post.likes.map(
-        (like) =>
-          like?.liker && (
-            <Link
-              className="flex items-center bg-secondary p-2 md:rounded-xl"
-              href={`/profile/${like.liker.providerAccountId}`}
-              key={like.liker.id}
-            >
-              <Image
-                width={32}
-                height={32}
-                className="rounded-full"
-                src={like.liker?.image ?? ""}
-                alt={like.liker?.name ?? ""}
-              />
-              <div className="px-2 font-bold">{like.liker?.name}</div>
-            </Link>
-          ),
-      )}
+      {post.likes.map((like) => like?.liker && <User user={like.liker} />)}
     </>
   );
 }

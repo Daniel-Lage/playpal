@@ -69,7 +69,6 @@ export function ProfileView({
             size={32}
             external_url={`https://open.spotify.com/user/${user.providerAccountId}`}
           />
-          <Logo />
         </div>
 
         <div className="flex gap-2 self-center font-bold">
@@ -92,11 +91,6 @@ export function ProfileView({
               </button>
             ))}
           </div>
-          {userId === user.id && profileTab === ProfileTab.Posts && (
-            <div className="flex p-2">
-              <PostCreator userId={userId} />
-            </div>
-          )}
         </div>
       </div>
       <ProfileFeed userId={userId} user={user} profileTab={profileTab} />
@@ -212,6 +206,26 @@ function ProfileFeed({
         <div className="flex flex-col items-start gap-2 bg-main p-2 md:flex-row md:items-center md:rounded-b-2xl">
           <div className="font-bold">{posts.length} Posts</div>
         </div>
+
+        {userId === user.id && profileTab === ProfileTab.Posts && (
+          <div className="flex flex-col gap-2 bg-main p-2 md:rounded-xl">
+            <div className="flex items-center justify-between">
+              <Link className="flex items-center" href={"/profile"}>
+                <Image
+                  width={40}
+                  height={40}
+                  className="rounded-full"
+                  src={user.image ?? ""}
+                  alt={user.name ?? ""}
+                />
+                <div className="px-2 font-bold">{user.name}</div>
+              </Link>
+            </div>
+            <div className="flex">
+              <PostCreator userId={user.id} />
+            </div>
+          </div>
+        )}
         {posts.map((post) => (
           <Post key={post.id} post={post} userId={userId} />
         ))}
@@ -339,7 +353,7 @@ function PlaylistFeed({
     );
 
   return (
-    <div className="grid grid-cols-2 gap-2 p-2 pt-0 md:grid-cols-4 md:gap-4">
+    <div className="grid grid-cols-2 gap-2 px-2 pt-0 md:grid-cols-4 md:gap-4">
       {treatedPlaylists.map((playlist) => (
         <PlaylistSimple key={playlist.id} playlist={playlist} />
       ))}
@@ -416,12 +430,10 @@ function PlaylistDetailed({ playlist }: { playlist: Playlist }) {
             <div className="w-full truncate text-left text-xl md:w-1/2 md:text-2xl">
               {playlist.name}
             </div>
-            <div className="w-0 truncate text-left md:w-1/2">
-              {playlist.tracks.total} tracks
-            </div>
           </div>
           <div className="truncate text-left text-sm">
-            {playlist.owner.display_name}
+            Playlist - {playlist.owner.display_name} - {playlist.tracks.total}{" "}
+            tracks
           </div>
         </div>
       </Link>

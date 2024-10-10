@@ -17,3 +17,7 @@ Nextjs and React
 Deployed on Vercel
 
 Drizzle ORM with PostgreSQL (Vercel Storage)
+
+Authentication with NextAuth
+
+Spotify Api
