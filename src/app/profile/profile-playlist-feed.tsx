@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import useLocalStorage from "~/hooks/use-local-storage";
 import {
-  Playlist,
+  type Playlist,
   PlaylistFeedStyle,
   PlaylistFeedStyleOptions,
   PlaylistsSortingColumn,
@@ -11,7 +11,7 @@ import {
 } from "~/models/playlist.model";
 import { SpotifyLink } from "../_components/spotify-link";
 import { getPlaylists } from "~/api/get-playlists";
-import { UserObject } from "~/models/user.model";
+import type { UserObject } from "~/models/user.model";
 import { getUsersPlaylists } from "~/api/get-users-playlists";
 
 export default function ProfilePlaylistFeed({

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PostType } from "~/models/post.model";
-import { ProfileTab, UserObject } from "~/models/user.model";
+import { ProfileTab, type UserObject } from "~/models/user.model";
 import { PostCreator } from "../_components/post-creator";
 import { Post } from "../_components/post";
 import ProfilePlaylistFeed from "./profile-playlist-feed";
