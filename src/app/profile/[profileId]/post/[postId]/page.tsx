@@ -62,7 +62,7 @@ export default async function PostPage({
           <>
             <Post
               post={post?.thread?.[0]?.repliee}
-              userId={session?.user.id}
+              sessionUserId={session?.user.id}
               position={threadPosition.First}
             />
 
@@ -75,7 +75,7 @@ export default async function PostPage({
                       <Post
                         key={repliee.id}
                         post={repliee}
-                        userId={session?.user.id}
+                        sessionUserId={session?.user.id}
                         position={threadPosition.Middle}
                       />
                     ),
@@ -84,7 +84,7 @@ export default async function PostPage({
                 <div>
                   <Post
                     post={post}
-                    userId={session?.user.id}
+                    sessionUserId={session?.user.id}
                     focused={true}
                     position={threadPosition.Last}
                   />
@@ -95,7 +95,7 @@ export default async function PostPage({
           </>
         ) : (
           <div>
-            <Post post={post} userId={session?.user.id} focused={true} />
+            <Post post={post} sessionUserId={session?.user.id} focused={true} />
             <PostCreatorWrapper post={post} session={session} />
           </div>
         )}
@@ -113,7 +113,7 @@ export default async function PostPage({
                   <Post
                     key={replier.id}
                     post={replier}
-                    userId={session?.user.id}
+                    sessionUserId={session?.user.id}
                     position={
                       index === 0
                         ? threadPosition.First
@@ -159,7 +159,7 @@ function PostCreatorWrapper({
         </div>
         <div className="flex">
           <PostCreator
-            userId={session?.user.id}
+            sessionUserId={session?.user.id}
             parent={{ id: post.id, thread: post.thread }}
           />
         </div>

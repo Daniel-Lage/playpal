@@ -33,14 +33,14 @@ export default async function HomePage() {
             <Logo />
           </div>
           <div className="flex">
-            <PostCreator userId={session.user.id} />
+            <PostCreator sessionUserId={session.user.id} />
           </div>
         </div>
       ) : (
         <SignInButton />
       )}
       {posts.map((post) => (
-        <Post key={post.id} post={post} userId={session?.user.id} />
+        <Post key={post.id} post={post} sessionUserId={session?.user.id} />
       ))}
     </>
   );

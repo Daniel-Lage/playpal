@@ -19,10 +19,10 @@ import { getMetadata } from "~/lib/get-metadata";
 import Image from "next/image";
 
 export function PostCreator({
-  userId,
+  sessionUserId,
   parent,
 }: {
-  userId: string;
+  sessionUserId: string;
   parent?: parentPostObject;
 }) {
   const [input, setInput] = useState("");
@@ -86,7 +86,7 @@ export function PostCreator({
   async function send() {
     setCanPost(false);
 
-    postPost(input, userId, parent, urls, metadata)
+    postPost(input, sessionUserId, parent, urls, metadata)
       .then(() => {
         setCanPost(true);
         setInput("");
@@ -96,17 +96,13 @@ export function PostCreator({
 
   return (
     <div className="flex grow flex-col">
-      <div className="flex grow gap-2">
-        <div className="flex grow overflow-hidden text-clip">
-          <TextInput
-            input={input}
-            urls={urls}
-            send={send}
-            canPost={canPost}
-            setInput={setInput}
-          />
-        </div>
-      </div>
+      <TextInput
+        input={input}
+        urls={urls}
+        send={send}
+        canPost={canPost}
+        setInput={setInput}
+      />
       <MetadataPreview
         url={urlForMetadata}
         metadata={metadata}
@@ -223,31 +219,33 @@ function TextInput({
   setInput: Dispatch<SetStateAction<string>>;
 }) {
   return (
-    <>
-      <div className="relative flex h-10 w-full grow">
-        <input
-          placeholder="Type something!"
-          className="absolute z-10 w-full select-text bg-transparent text-transparent placeholder-zinc-600 caret-black outline-none"
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
+    <div className="flex grow gap-2">
+      <div className="flex grow overflow-hidden text-clip">
+        <div className="relative flex h-10 w-full grow">
+          <input
+            placeholder="Type something!"
+            className="absolute z-10 w-full select-text bg-transparent text-transparent placeholder-zinc-600 caret-black outline-none"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
 
-              if (input !== "" && canPost) {
-                void send();
+                if (input !== "" && canPost) {
+                  void send();
+                }
               }
-            }
-          }}
-        />
-        <FormattedContent input={input} urls={urls} />
+            }}
+          />
+          <FormattedContent input={input} urls={urls} />
+        </div>
+        {canPost && input !== "" && (
+          <button onClick={() => void send()} className="pl-2 font-bold">
+            Post
+          </button>
+        )}
       </div>
-      {canPost && input !== "" && (
-        <button onClick={() => void send()} className="pl-2 font-bold">
-          Post
-        </button>
-      )}
-    </>
+    </div>
   );
 }

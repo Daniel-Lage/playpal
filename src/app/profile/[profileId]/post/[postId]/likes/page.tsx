@@ -18,7 +18,7 @@ export default async function PostLikesPage({
   return (
     <>
       <div className="flex flex-col gap-1 bg-main md:rounded-xl">
-        <Post post={post} userId={session?.user.id} focused={true} />
+        <Post post={post} sessionUserId={session?.user.id} focused={true} />
         <div className="text-center font-bold">Liked By</div>
       </div>
       {post.likes.map(

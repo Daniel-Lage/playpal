@@ -28,5 +28,5 @@ export default async function ProfilePage() {
   if (!user)
     return <div className="self-center text-xl text-red-500">Error</div>;
 
-  return <ProfileView userId={session.user.id} user={user} />;
+  return <ProfileView sessionUserId={session.user.id} user={user} />;
 }

@@ -1,12 +1,9 @@
 import { getServerSession } from "next-auth";
-import Image from "next/image";
 import { authOptions } from "~/lib/auth";
 import { getUserFollowing } from "~/server/queries";
-import { FollowButton } from "../../profile-view";
-import { SpotifyLink } from "~/app/_components/spotify-link";
-import { Logo } from "~/app/_components/logo";
 import Link from "next/link";
 import { User } from "~/app/_components/user";
+import SimpleUserView from "~/app/_components/simple-user-view";
 
 export default async function OthersProfileFollowingPage({
   params: { profileId },
@@ -23,29 +20,7 @@ export default async function OthersProfileFollowingPage({
   return (
     <div>
       <div className="flex flex-col gap-2 overflow-hidden bg-main md:rounded-t-xl">
-        <div className="flex items-center gap-2 p-2">
-          <Link
-            className="flex grow items-center"
-            href={`/profile/${user.providerAccountId}`}
-          >
-            <Image
-              width={40}
-              height={40}
-              className="rounded-full"
-              src={user.image}
-              alt={user.name}
-            />
-            <div className="grow px-2 font-bold">{user.name}</div>
-          </Link>
-
-          <FollowButton userId={session?.user.id} user={user} />
-
-          <SpotifyLink
-            size={32}
-            external_url={`https://open.spotify.com/user/${user.providerAccountId}`}
-          />
-          <Logo />
-        </div>
+        <SimpleUserView user={user} sessionUserId={session?.user.id} />
 
         <div className="flex flex-col bg-main2">
           <div className="flex font-bold">

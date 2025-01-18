@@ -2,10 +2,9 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "~/lib/auth";
 
-import PlaylistView from "./playlist-view";
-
 import type { Metadata } from "next";
-import { getPlaylist } from "~/api/calls";
+import { getPlaylist } from "~/api/get-playlist";
+import PlaylistView from "./playlist-view";
 
 export async function generateMetadata({
   params: { playlistId, profileId },
@@ -53,7 +52,7 @@ export default async function PlaylistPage({
   if (!session)
     return (
       <PlaylistView
-        userId={null}
+        sessionUserId={null}
         playlistId={playlistId}
         profileId={profileId}
       />
@@ -61,7 +60,7 @@ export default async function PlaylistPage({
 
   return (
     <PlaylistView
-      userId={session.user.id}
+      sessionUserId={session.user.id}
       playlistId={playlistId}
       profileId={profileId}
     />

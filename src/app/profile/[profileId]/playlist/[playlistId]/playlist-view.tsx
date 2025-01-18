@@ -1,11 +1,11 @@
 "use client";
 
-import { getDevices, getMySpotifyUser, getPlaylist } from "~/api/calls";
+import { getSpotifyUser } from "~/api/get-spotify-user";
+import { getDevices } from "~/api/get-devices";
+import { getPlaylist } from "~/api/get-playlist";
 import { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
 
-import { Logo } from "~/app/_components/logo";
-import { getTokens } from "~/api/calls";
+import { getTokens } from "~/api/get-tokens";
 
 import {
   TracksSortingColumnOptions,
@@ -16,45 +16,47 @@ import {
 import type { SimplifiedArtist } from "~/models/artist.model";
 import type { Playlist } from "~/models/playlist.model";
 import type { Device } from "~/models/device.model";
-import { SpotifyLink } from "~/app/_components/spotify-link";
+import { PlaylistContent } from "./playlist-content";
+import { PlaylistSearch } from "./playlist-search";
+import { PlaylistTracks } from "./playlist-tracks";
+import useLocalStorage from "~/hooks/use-local-storage";
 
 export default function PlaylistView({
-  userId,
-  profileId,
+  sessionUserId,
+  // profileId, // to know if the playlist is yours?
   playlistId,
 }: {
-  userId: string | null;
+  sessionUserId: string | null;
   profileId: string;
   playlistId: string;
 }) {
   const [loading, setLoading] = useState(true);
-
-  const [playlist, setPlaylist] = useState<Playlist | undefined>();
-  const [deviceId, setDeviceId] = useState<string | undefined>();
   const [devices, setDevices] = useState<Device[]>([]);
   const [playing, setPlaying] = useState(false);
-
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-
-  const [premium, setPremium] = useState(false);
-  const [sortingColumn, setSortingColumn] = useState<
-    TracksSortingColumn | undefined
-  >();
-  const [reversed, setReversed] = useState<boolean | undefined>();
-
-  useEffect(() => {
-    if (sortingColumn !== undefined) {
-      localStorage.setItem(`${userId}:tracks_sorting_column`, sortingColumn);
-    }
-  }, [sortingColumn, userId]);
-
-  useEffect(() => {
-    if (reversed !== undefined) {
-      localStorage.setItem(`${userId}:tracks_reversed`, reversed.toString());
-    }
-  }, [reversed, userId]);
-
   const [filter, setFilter] = useState("");
+
+  const [playlist, setPlaylist] = useState<Playlist | undefined>();
+  const [premium, setPremium] = useState(false);
+  const [queue, setQueue] = useState<PlaylistTrack[]>([]);
+
+  const [reversed, setReversed] = useLocalStorage<boolean>(
+    `${sessionUserId}:tracks_reversed`,
+    false,
+    (text) => text === "true",
+    (value) => (value ? "true" : "false"),
+  );
+
+  const [sortingColumn, setSortingColumn] =
+    useLocalStorage<TracksSortingColumn>(
+      `${sessionUserId}:tracks_sorting_column`,
+      TracksSortingColumn.AddedAt,
+      (text) => {
+        if (TracksSortingColumnOptions.some((tsco) => tsco === text))
+          return text as TracksSortingColumn;
+        return null;
+      },
+      (tsc) => tsc, // already is text so no conversion is needed
+    );
 
   const treatedTracks = useMemo(() => {
     if (!playlist) return [];
@@ -123,277 +125,116 @@ export default function PlaylistView({
     return temp;
   }, [playlist, filter, sortingColumn, reversed]);
 
-  const shuffledTracks = useMemo(() => {
-    if (!playlist) return [];
-
-    return takeRandomly(
-      playlist.tracks.items.filter((track) => !track.is_local),
-      99,
-    );
-  }, [playlist]);
-
   useEffect(() => {
-    setSortingColumn(
-      (localStorage.getItem(`${userId}:tracks_sorting_column`) ??
-        "Added at") as TracksSortingColumn,
-    );
-    setReversed(localStorage.getItem(`${userId}:tracks_reversed`) === "true");
-
-    getPlaylist(userId, playlistId)
+    getPlaylist(sessionUserId, playlistId)
       .then((playlist) => {
         setLoading(false);
         setPlaylist(playlist);
+        if (playlist)
+          setQueue(
+            getRandomSample(
+              playlist.tracks.items.filter((track) => !track.is_local),
+              99,
+            ),
+          );
       })
       .catch(console.error);
 
-    if (userId) {
-      getDevices(userId)
+    if (sessionUserId) {
+      getDevices(sessionUserId)
         .then((devices) => {
           setDevices(devices);
-          if (devices[0]?.id) setDeviceId(devices[0]?.id);
         })
         .catch(console.error);
 
-      getMySpotifyUser(userId)
+      getSpotifyUser(sessionUserId)
         .then((spotifyUser) => setPremium(spotifyUser.product === "premium"))
         .catch(console.error);
     }
-  }, [playlistId, userId]);
+  }, [playlistId, sessionUserId]);
+
+  const cantPlay =
+    !sessionUserId || devices.length === 0 || playing || !premium;
+
+  function setQueueStart(
+    queue: PlaylistTrack[],
+    start: PlaylistTrack,
+  ): PlaylistTrack[] {
+    const queueWithFirstTrack = [...queue];
+
+    const trackIndex = queueWithFirstTrack.findIndex(
+      (other) => other.track.uri === start.track.uri,
+    );
+
+    void queueWithFirstTrack.splice(trackIndex, 1)[0];
+
+    queueWithFirstTrack.unshift(start);
+
+    return queueWithFirstTrack;
+  }
+
+  function handlePlay(start?: PlaylistTrack) {
+    if (cantPlay) return;
+    setPlaying(true);
+
+    let playingQueue = [...queue];
+
+    if (start) {
+      playingQueue = setQueueStart(playingQueue, start);
+    }
+
+    if (devices.length === 0 && devices[0]?.id) {
+      play(sessionUserId, playingQueue, devices[0]?.id)
+        .then(() => setPlaying(false))
+        .catch(console.error);
+    } else if (devices.length > 0) {
+      // at some point this will open a modal and ask you to choose the device
+      // setPlaying(true);
+      // deviceId gets defined somehow
+      // play(sessionUserId, shuffledTracks, deviceId)
+      //   .then(() => setPlaying(false))
+      //   .catch(console.error);
+    }
+  }
 
   if (loading) return;
 
   if (!playlist)
+    // playlist was not found
     return <div className="self-center text-xl text-red-500">Error</div>;
 
   return (
     <>
-      {modalIsOpen && (
-        <div className="fixed left-0 top-0 flex h-screen w-screen items-center justify-center backdrop-brightness-75">
-          <div className="flex flex-col items-center gap-1 rounded-md bg-main p-2">
-            <div className="rounded-sm bg-main3 p-1">{`https://playpal-sepia.vercel.app/profile/${profileId}/playlist/${playlistId}`}</div>
-            <button
-              onClick={() => {
-                void navigator.clipboard.writeText(
-                  `https://playpal-sepia.vercel.app/profile/${profileId}/playlist/${playlistId}`,
-                );
-                setModalIsOpen(false);
-              }}
-              className="font-bold"
-            >
-              Copy
-            </button>
-          </div>
-        </div>
-      )}
       <div className="flex flex-col overflow-hidden md:rounded-2xl">
-        <div className="flex flex-col items-center gap-2 bg-main p-2 md:flex-row md:items-start">
-          <div className="flex items-start gap-2">
-            <Image
-              width={200}
-              height={200}
-              className="rounded-xl"
-              src={playlist.images[0]?.url ?? ""}
-              alt={playlist.name}
-            />
+        <PlaylistContent playlist={playlist} />
 
-            <Logo />
-          </div>
-
-          <div className="flex w-full px-2 md:mt-12">
-            <div className="flex grow flex-col items-start truncate">
-              <div className="flex items-start justify-between text-wrap text-2xl font-bold">
-                {playlist.name}
-              </div>
-              <div className="text-wrap text-sm font-light">
-                {playlist.description}
-              </div>
-              <div className="text-wrap text-sm font-bold">
-                {playlist.owner.display_name} - {playlist.tracks.total} songs
-              </div>
-            </div>
-
-            <div className="flex flex-col items-end gap-2">
-              <SpotifyLink
-                size={32}
-                external_url={playlist.external_urls.spotify}
-              />
-              <button
-                onClick={() => {
-                  setModalIsOpen(true);
-                }}
-              >
-                <Image
-                  height={32}
-                  width={32}
-                  src="/share.png"
-                  alt="share icon"
-                />
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center justify-between gap-2 bg-main2 p-2 md:grid md:grid-cols-3">
-          {userId && (
-            <div className="flex gap-2">
-              {devices.length > 0 && deviceId ? (
-                <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center">
-                  <div className="font-bold md:p-1">Spotify device</div>
-                  <select
-                    onChange={(e) => {
-                      setDeviceId(e.target.value);
-                    }}
-                  >
-                    {devices.map((device) => (
-                      <option key={device.id} value={device.id}>
-                        {device.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ) : (
-                <div className="p-2 text-sm font-bold">
-                  No active spotify device
-                </div>
-              )}
-              <button
-                onClick={() => {
-                  getDevices(userId)
-                    .then((devices) => {
-                      setDevices(devices);
-                      if (devices[0]?.id) setDeviceId(devices[0]?.id);
-                    })
-                    .catch(console.error);
-                }}
-              >
-                <Image
-                  height={32}
-                  width={32}
-                  src="/reload.png"
-                  alt="reload icon"
-                />
-              </button>
-            </div>
-          )}
-
-          <div className="flex gap-2">
-            <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center">
-              <div className="font-bold md:p-1">Sort by</div>
-              <select
-                onChange={(e) => {
-                  setSortingColumn(e.target.value as TracksSortingColumn);
-                }}
-                defaultValue={sortingColumn ?? TracksSortingColumn.AddedAt}
-              >
-                {TracksSortingColumnOptions.map((sortingColumn) => (
-                  <option key={sortingColumn}>{sortingColumn}</option>
-                ))}
-              </select>
-            </div>
-
-            <button
-              onClick={() => {
-                setReversed((prev) => !prev);
-              }}
-            >
-              <Image
-                height={32}
-                width={32}
-                src="/direction.png"
-                alt="direction icon"
-                className={reversed ? "rotate-180" : ""}
-              />
-            </button>
-          </div>
-
-          <div className="flex w-full gap-2">
-            <input
-              placeholder="Search something!"
-              className="w-32 grow bg-transparent placeholder-zinc-600 outline-none md:w-48"
-              type="text"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            />
-            {userId && deviceId && !playing && premium && (
-              <button
-                className="font-extrabold text-red-500"
-                onClick={async () => {
-                  setPlaying(true);
-                  play(userId, shuffledTracks, deviceId)
-                    .then(() => setPlaying(false))
-                    .catch(console.error);
-                }}
-              >
-                <Image height={32} width={32} src="/play.png" alt="play icon" />
-              </button>
-            )}
-          </div>
-        </div>
+        <PlaylistSearch
+          sortingColumn={sortingColumn}
+          reversed={reversed}
+          filter={filter}
+          cantPlay={cantPlay}
+          sortColumn={(e) => {
+            setSortingColumn(e.target.value as TracksSortingColumn);
+          }}
+          reverse={() => {
+            setReversed((prev) => !prev);
+          }}
+          filterTracks={(e) => setFilter(e.target.value)}
+          play={handlePlay}
+        />
       </div>
 
-      {treatedTracks.map((track) => (
-        <button
-          key={track.track.uri}
-          className="flex items-center gap-1 bg-secondary p-1 font-bold md:rounded-lg"
-          disabled={!deviceId || playing || !premium || track.is_local}
-          onClick={() => {
-            if (!userId || !deviceId) return;
-
-            setPlaying(true);
-
-            const shuffledTracksWithFirstTrack = [...shuffledTracks];
-
-            const trackIndex = shuffledTracksWithFirstTrack.findIndex(
-              (other) => other.track.uri === track.track.uri,
-            );
-
-            void shuffledTracksWithFirstTrack.splice(trackIndex, 1)[0];
-
-            shuffledTracksWithFirstTrack.unshift(track);
-
-            play(userId, shuffledTracksWithFirstTrack, deviceId)
-              .then(() => setPlaying(false))
-              .catch(console.error);
-          }}
-        >
-          {track.track.album.images[0]?.url ? (
-            <Image
-              width={40}
-              height={40}
-              className="rounded-md"
-              src={track.track.album.images[0]?.url ?? ""}
-              alt={track.track.album.name}
-            />
-          ) : (
-            <div className="h-10 w-10 rounded-md bg-black" />
-          )}
-          <div className="grow overflow-hidden">
-            <div className="flex grow overflow-hidden">
-              <div className="w-full truncate text-left text-sm md:w-1/2">
-                {track.track.name}
-              </div>
-              <div className="w-0 truncate text-left text-sm md:w-1/2">
-                {track.track.album.name}
-              </div>
-            </div>
-            <div className="truncate text-left text-xs">
-              {track.track.artists.map((artist) => artist.name).join(", ")}
-            </div>
-          </div>
-          {!!track.track.external_urls?.spotify && (
-            <SpotifyLink
-              size={32}
-              external_url={track.track.external_urls.spotify}
-            />
-          )}
-        </button>
-      ))}
+      <PlaylistTracks
+        treatedTracks={treatedTracks}
+        cantPlay={cantPlay}
+        playTrack={handlePlay}
+      />
     </>
   );
 }
 
-function takeRandomly<T>(array: Array<T>, limit?: number): Array<T> {
-  const size = !limit || limit > array.length ? array.length : limit;
+function getRandomSample<T>(array: Array<T>, limit = Infinity): Array<T> {
+  const size = Math.min(array.length, limit); // either the whole array or limit if specified and valid
 
   const newArray: Array<T> = [];
   const prevArray = [...array];
@@ -408,11 +249,11 @@ function takeRandomly<T>(array: Array<T>, limit?: number): Array<T> {
 }
 
 export async function play(
-  userId: string,
+  sessionUserId: string,
   tracks: PlaylistTrack[],
   deviceId: string,
 ) {
-  const tokens = await getTokens(userId);
+  const tokens = await getTokens(sessionUserId);
 
   if (!tokens?.access_token) {
     console.log("Tokens: ", tokens);
@@ -484,8 +325,8 @@ export async function play(
             Authorization: `Bearer  ${tokens.access_token}`,
           },
         },
-      ).catch(() => {
-        console.error(track.track.disc_number, "EXCEEDED", track.track.name);
+      ).catch((e) => {
+        console.error(e);
       });
     }
   }

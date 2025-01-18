@@ -14,12 +14,12 @@ import Link from "next/link";
 
 export function Post({
   post,
-  userId,
+  sessionUserId,
   focused,
   position,
 }: {
   post: ClientPostObject | PostObject;
-  userId?: string | null;
+  sessionUserId?: string | null;
   focused?: boolean;
   position?: threadPosition;
 }) {
@@ -59,7 +59,7 @@ export function Post({
             className="flex h-full grow"
             href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
           ></Link>
-          <DeleteButton {...{ post, userId, focused }} />
+          <DeleteButton {...{ post, sessionUserId, focused }} />
         </div>
 
         <FormattedContent
@@ -95,7 +95,7 @@ export function Post({
 
         <div className="flex items-center font-bold">
           <div className="flex w-1/2 gap-2">
-            <LikeButton {...{ post, userId }} />
+            <LikeButton {...{ post, sessionUserId }} />
             <Link
               href={`/profile/${post.author.providerAccountId}/post/${post.id}/likes`}
             >
@@ -171,14 +171,14 @@ function FormattedContent({
 
 function DeleteButton({
   post,
-  userId,
+  sessionUserId,
   focused,
 }: {
   post: ClientPostObject | PostObject;
-  userId?: string | null;
+  sessionUserId?: string | null;
   focused?: boolean;
 }) {
-  if (userId === post.userId) {
+  if (sessionUserId === post.userId) {
     if (focused)
       return (
         <Link href={"/"} onClick={() => deletePost(post.id)}>
@@ -195,20 +195,20 @@ function DeleteButton({
 
 function LikeButton({
   post,
-  userId,
+  sessionUserId,
 }: {
   post: ClientPostObject | PostObject;
-  userId?: string | null;
+  sessionUserId?: string | null;
 }) {
-  if (userId) {
-    if (post.likes?.some((like) => like.userId === userId))
+  if (sessionUserId) {
+    if (post.likes?.some((like) => like.userId === sessionUserId))
       return (
-        <button onClick={() => unlikePost(post.id, userId)}>
+        <button onClick={() => unlikePost(post.id, sessionUserId)}>
           <Image height={24} width={24} src="/liked.png" alt="liked icon" />
         </button>
       );
     return (
-      <button onClick={() => likePost(post.id, userId)}>
+      <button onClick={() => likePost(post.id, sessionUserId)}>
         <Image height={24} width={24} src="/unliked.png" alt="unliked icon" />
       </button>
     );
