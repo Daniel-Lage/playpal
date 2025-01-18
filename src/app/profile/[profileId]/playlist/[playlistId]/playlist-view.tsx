@@ -1,9 +1,9 @@
 "use client";
 
-import { getSpotifyUser } from "~/api/get-spotify-user";
-import { getDevices } from "~/api/get-devices";
+import { getMySpotifyUser } from "~/api/get-my-spotify-user";
+import { getMyDevices } from "~/api/get-my-devices";
 import { getPlaylist } from "~/api/get-playlist";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { getTokens } from "~/api/get-tokens";
 
@@ -14,8 +14,7 @@ import {
 } from "~/models/track.model";
 
 import type { SimplifiedArtist } from "~/models/artist.model";
-import type { Playlist } from "~/models/playlist.model";
-import type { Device } from "~/models/device.model";
+import { PlayerStatus, type Playlist } from "~/models/playlist.model";
 import { PlaylistContent } from "./playlist-content";
 import { PlaylistSearch } from "./playlist-search";
 import { PlaylistTracks } from "./playlist-tracks";
@@ -31,21 +30,18 @@ export default function PlaylistView({
   playlistId: string;
 }) {
   const [loading, setLoading] = useState(true);
-  const [devices, setDevices] = useState<Device[]>([]);
-  const [playing, setPlaying] = useState(false);
-  const [filter, setFilter] = useState("");
+  const [status, setStatus] = useState<PlayerStatus>(PlayerStatus.Disabled);
 
   const [playlist, setPlaylist] = useState<Playlist | undefined>();
-  const [premium, setPremium] = useState(false);
   const [queue, setQueue] = useState<PlaylistTrack[]>([]);
 
+  const [filter, setFilter] = useState("");
   const [reversed, setReversed] = useLocalStorage<boolean>(
     `${sessionUserId}:tracks_reversed`,
     false,
     (text) => text === "true",
     (value) => (value ? "true" : "false"),
   );
-
   const [sortingColumn, setSortingColumn] =
     useLocalStorage<TracksSortingColumn>(
       `${sessionUserId}:tracks_sorting_column`,
@@ -61,62 +57,11 @@ export default function PlaylistView({
   const treatedTracks = useMemo(() => {
     if (!playlist) return [];
 
-    const temp = [...playlist.tracks.items]
-      .filter(
-        (track) =>
-          track.track.name.toLowerCase().includes(filter.toLowerCase()) ||
-          track.track.album.name.toLowerCase().includes(filter.toLowerCase()) ||
-          track.track.artists.some((artist) =>
-            artist.name.toLowerCase().includes(filter.toLowerCase()),
-          ),
-      )
-      .sort((trackA, trackB) => {
-        let keyA = "";
-        let keyB = "";
-
-        if (sortingColumn === TracksSortingColumn.Name) {
-          keyA = trackA.track.name.toLowerCase();
-          keyB = trackB.track.name.toLowerCase();
-        }
-
-        if (sortingColumn === TracksSortingColumn.Album) {
-          keyA = trackA.track.album.name.toLowerCase();
-          keyB = trackB.track.album.name.toLowerCase();
-        }
-
-        if (sortingColumn === TracksSortingColumn.Artists) {
-          function getHighestArtist(
-            artistA: SimplifiedArtist,
-            artistB: SimplifiedArtist,
-          ) {
-            const keyA = artistA.name.toLowerCase();
-            const keyB = artistB.name.toLowerCase();
-            if (keyA < keyB) return -1;
-            if (keyA > keyB) return 1;
-            return 0;
-          }
-
-          const artistA =
-            trackA.track.artists.length === 1
-              ? trackA.track.artists[0]
-              : trackA.track.artists.sort(getHighestArtist)[0];
-
-          const artistB =
-            trackB.track.artists.length === 1
-              ? trackB.track.artists[0]
-              : trackB.track.artists.sort(getHighestArtist)[0];
-
-          if (!artistA) return 0;
-          if (!artistB) return 0;
-
-          keyA = artistA.name.toLowerCase();
-          keyB = artistB.name.toLowerCase();
-        }
-
-        if (keyA < keyB) return -1;
-        if (keyA > keyB) return 1;
-        return 0;
-      });
+    const temp = getTreatedTracks(
+      [...playlist.tracks.items],
+      sortingColumn,
+      filter,
+    );
 
     if (reversed) {
       return temp.reverse();
@@ -141,61 +86,41 @@ export default function PlaylistView({
       .catch(console.error);
 
     if (sessionUserId) {
-      getDevices(sessionUserId)
-        .then((devices) => {
-          setDevices(devices);
+      getMySpotifyUser(sessionUserId)
+        .then((spotifyUser) => {
+          if (spotifyUser.product === "premium") {
+            setStatus(PlayerStatus.Ready);
+          }
         })
-        .catch(console.error);
-
-      getSpotifyUser(sessionUserId)
-        .then((spotifyUser) => setPremium(spotifyUser.product === "premium"))
         .catch(console.error);
     }
   }, [playlistId, sessionUserId]);
 
-  const cantPlay =
-    !sessionUserId || devices.length === 0 || playing || !premium;
+  const handlePlay = useCallback(
+    async (start?: PlaylistTrack) => {
+      if (status !== PlayerStatus.Ready || !sessionUserId)
+        // redundant but required
+        return;
+      setStatus(PlayerStatus.Busy);
 
-  function setQueueStart(
-    queue: PlaylistTrack[],
-    start: PlaylistTrack,
-  ): PlaylistTrack[] {
-    const queueWithFirstTrack = [...queue];
+      const devices = await getMyDevices(sessionUserId);
 
-    const trackIndex = queueWithFirstTrack.findIndex(
-      (other) => other.track.uri === start.track.uri,
-    );
+      let playingQueue = [...queue];
 
-    void queueWithFirstTrack.splice(trackIndex, 1)[0];
+      if (start) {
+        playingQueue = setQueueStart(playingQueue, start);
+      }
 
-    queueWithFirstTrack.unshift(start);
+      if (devices[0]?.id)
+        await play(sessionUserId, playingQueue, devices[0]?.id).catch(
+          console.error,
+        );
+      else console.log("ta sem dispositivo mano"); // open little warning error message
 
-    return queueWithFirstTrack;
-  }
-
-  function handlePlay(start?: PlaylistTrack) {
-    if (cantPlay) return;
-    setPlaying(true);
-
-    let playingQueue = [...queue];
-
-    if (start) {
-      playingQueue = setQueueStart(playingQueue, start);
-    }
-
-    if (devices.length === 0 && devices[0]?.id) {
-      play(sessionUserId, playingQueue, devices[0]?.id)
-        .then(() => setPlaying(false))
-        .catch(console.error);
-    } else if (devices.length > 0) {
-      // at some point this will open a modal and ask you to choose the device
-      // setPlaying(true);
-      // deviceId gets defined somehow
-      // play(sessionUserId, shuffledTracks, deviceId)
-      //   .then(() => setPlaying(false))
-      //   .catch(console.error);
-    }
-  }
+      setStatus(PlayerStatus.Ready);
+    },
+    [status, queue, sessionUserId],
+  );
 
   if (loading) return;
 
@@ -212,7 +137,7 @@ export default function PlaylistView({
           sortingColumn={sortingColumn}
           reversed={reversed}
           filter={filter}
-          cantPlay={cantPlay}
+          playerReady={status === PlayerStatus.Ready}
           sortColumn={(e) => {
             setSortingColumn(e.target.value as TracksSortingColumn);
           }}
@@ -226,7 +151,7 @@ export default function PlaylistView({
 
       <PlaylistTracks
         treatedTracks={treatedTracks}
-        cantPlay={cantPlay}
+        playerReady={status === PlayerStatus.Ready}
         playTrack={handlePlay}
       />
     </>
@@ -330,4 +255,84 @@ export async function play(
       });
     }
   }
+}
+
+function getTreatedTracks(
+  tracks: PlaylistTrack[],
+  sortingColumn: TracksSortingColumn,
+  filter: string,
+) {
+  return tracks
+    .filter(
+      (track) =>
+        track.track.name.toLowerCase().includes(filter.toLowerCase()) ||
+        track.track.album.name.toLowerCase().includes(filter.toLowerCase()) ||
+        track.track.artists.some((artist) =>
+          artist.name.toLowerCase().includes(filter.toLowerCase()),
+        ),
+    )
+    .sort((trackA, trackB) => {
+      let keyA = "";
+      let keyB = "";
+
+      if (sortingColumn === TracksSortingColumn.Name) {
+        keyA = trackA.track.name.toLowerCase();
+        keyB = trackB.track.name.toLowerCase();
+      }
+
+      if (sortingColumn === TracksSortingColumn.Album) {
+        keyA = trackA.track.album.name.toLowerCase();
+        keyB = trackB.track.album.name.toLowerCase();
+      }
+
+      if (sortingColumn === TracksSortingColumn.Artists) {
+        function getHighestArtist(
+          artistA: SimplifiedArtist,
+          artistB: SimplifiedArtist,
+        ) {
+          const keyA = artistA.name.toLowerCase();
+          const keyB = artistB.name.toLowerCase();
+          if (keyA < keyB) return -1;
+          if (keyA > keyB) return 1;
+          return 0;
+        }
+
+        const artistA =
+          trackA.track.artists.length === 1
+            ? trackA.track.artists[0]
+            : trackA.track.artists.sort(getHighestArtist)[0];
+
+        const artistB =
+          trackB.track.artists.length === 1
+            ? trackB.track.artists[0]
+            : trackB.track.artists.sort(getHighestArtist)[0];
+
+        if (!artistA) return 0;
+        if (!artistB) return 0;
+
+        keyA = artistA.name.toLowerCase();
+        keyB = artistB.name.toLowerCase();
+      }
+
+      if (keyA < keyB) return -1;
+      if (keyA > keyB) return 1;
+      return 0;
+    });
+}
+
+function setQueueStart(
+  queue: PlaylistTrack[],
+  start: PlaylistTrack,
+): PlaylistTrack[] {
+  const queueWithFirstTrack = [...queue];
+
+  const trackIndex = queueWithFirstTrack.findIndex(
+    (other) => other.track.uri === start.track.uri,
+  );
+
+  void queueWithFirstTrack.splice(trackIndex, 1)[0];
+
+  queueWithFirstTrack.unshift(start);
+
+  return queueWithFirstTrack;
 }

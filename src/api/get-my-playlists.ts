@@ -4,7 +4,7 @@ import type { Paging } from "~/models/paging.model";
 import type { Playlist } from "~/models/playlist.model";
 import { getTokens } from "./get-tokens";
 
-export async function getPlaylists(userId: string) {
+export async function getMyPlaylists(userId: string) {
   const tokens = await getTokens(userId);
 
   if (!tokens?.access_token) {

@@ -31,8 +31,14 @@ export const PlaylistsSortingColumnOptions = Object.values(
 );
 
 export enum PlaylistFeedStyle {
-  Simple = "Simple",
-  Detailed = "Detailed",
+  Grid = "Grid",
+  Row = "Row",
   Compact = "Compact",
 }
 export const PlaylistFeedStyleOptions = Object.values(PlaylistFeedStyle);
+
+export enum PlayerStatus {
+  Disabled = "Disabled",
+  Ready = "Ready",
+  Busy = "Busy",
+}

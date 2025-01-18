@@ -1,9 +1,9 @@
 "use server";
+import type { Devices } from "~/models/device.model";
 import type { SpotifyError } from "~/models/error.model";
-import type { SpotifyUser } from "~/models/user.model";
 import { getTokens } from "./get-tokens";
 
-export async function getSpotifyUser(userId: string) {
+export async function getMyDevices(userId: string) {
   const tokens = await getTokens(userId);
 
   if (!tokens?.access_token) {
@@ -12,11 +12,15 @@ export async function getSpotifyUser(userId: string) {
     throw new Error("Internal Server Error");
   }
 
-  const response = await fetch("https://api.spotify.com/v1/me", {
+  const response = await fetch("https://api.spotify.com/v1/me/player/devices", {
     headers: {
-      Authorization: `Bearer ${tokens.access_token}`,
+      Authorization: `Bearer  ${tokens.access_token}`,
     },
   });
+
+  if (response.statusText === "No Content") {
+    return [];
+  }
 
   if (response.status != 200) {
     const json = (await response.json()) as SpotifyError;
@@ -26,7 +30,7 @@ export async function getSpotifyUser(userId: string) {
     );
   }
 
-  const user = (await response.json()) as SpotifyUser;
+  const devices = (await response.json()) as Devices;
 
-  return user;
+  return devices.devices;
 }

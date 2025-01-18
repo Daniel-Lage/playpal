@@ -50,7 +50,7 @@ export function Post({
       <div className="flex grow flex-col gap-2 p-2 pl-0">
         <div className="flex items-center justify-between">
           <Link
-            className="flex items-center"
+            className="flex items-center hover:underline"
             href={`/profile/${post.author.providerAccountId}`}
           >
             <div className="font-bold">{post.author?.name}</div>
@@ -146,7 +146,7 @@ function FormattedContent({
           target="_blank"
           href={value}
           key={index}
-          className="whitespace-pre text-blue-700"
+          className="whitespace-pre text-blue-700 hover:underline"
         >
           {value}
         </Link>,

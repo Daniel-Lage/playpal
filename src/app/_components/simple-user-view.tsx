@@ -1,9 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { FollowButton } from "./follow-button";
 import { SpotifyLink } from "./spotify-link";
-import { Logo } from "./logo";
 import type { UserObject } from "~/models/user.model";
+import { deleteUser, followUser, unfollowUser } from "~/server/queries";
 
 export default function SimpleUserView({
   user,
@@ -28,7 +27,7 @@ export default function SimpleUserView({
             src={user.image}
             alt={user.name}
           />
-          <div className="grow px-2 font-bold">{user.name}</div>
+          <div className="grow px-2 font-bold hover:underline">{user.name}</div>
         </Link>
 
         <FollowButton
@@ -43,29 +42,67 @@ export default function SimpleUserView({
           size={32}
           external_url={`https://open.spotify.com/user/${user.providerAccountId}`}
         />
-        <Logo />
       </div>
-      <div className="flex flex-col bg-main2">
-        <div className="flex font-bold">
-          <Link
-            href={`/profile/${user.providerAccountId}/followers`}
-            className={
-              "flex w-1/2 justify-center bg-main p-1 text-xs md:text-base"
-            }
-          >
-            Followers
-          </Link>
+      <div className="flex gap-2 pl-4 text-xs font-bold text-gray-700 md:text-base">
+        <Link
+          href={`/profile/${user.providerAccountId}/followers`}
+          className="hover:underline"
+        >
+          {user.followers.length} followers
+        </Link>
 
-          <Link
-            href={`/profile/${user.providerAccountId}/following`}
-            className={
-              "flex w-1/2 justify-center bg-main2 p-1 text-xs md:text-base"
-            }
-          >
-            Following
-          </Link>
-        </div>
+        <Link
+          href={`/profile/${user.providerAccountId}/following`}
+          className="hover:underline"
+        >
+          {user.following.length} following
+        </Link>
       </div>
     </div>
+  );
+}
+
+function FollowButton({
+  sessionUserId,
+  userId,
+  isFollowing,
+}: {
+  sessionUserId: string | undefined;
+  userId: string;
+  isFollowing: boolean;
+}) {
+  if (sessionUserId === userId)
+    return (
+      <>
+        <Link href="/" onClick={() => deleteUser(sessionUserId)}>
+          <Image height={32} width={32} src="/trash.png" alt="trash icon" />
+        </Link>
+        <Link href="/api/auth/signout">
+          <Image height={32} width={32} src="/exit.png" alt="exit icon" />
+        </Link>
+      </>
+    );
+
+  if (isFollowing && sessionUserId)
+    return (
+      <button
+        onClick={() => {
+          void unfollowUser(sessionUserId, userId);
+        }}
+        className="text-sm font-bold"
+      >
+        Unfollow
+      </button>
+    );
+  return (
+    <button
+      onClick={() => {
+        if (sessionUserId) void followUser(sessionUserId, userId);
+        else console.log("open a modal that asks you to log in");
+      }}
+      className="text-sm font-bold"
+    >
+      Follow
+    </button>
   );
 }

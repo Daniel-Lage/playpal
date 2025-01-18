@@ -10,7 +10,7 @@ import {
   PlaylistsSortingColumnOptions,
 } from "~/models/playlist.model";
 import { SpotifyLink } from "../_components/spotify-link";
-import { getPlaylists } from "~/api/get-playlists";
+import { getMyPlaylists } from "~/api/get-my-playlists";
 import type { UserObject } from "~/models/user.model";
 import { getUsersPlaylists } from "~/api/get-users-playlists";
 
@@ -33,7 +33,7 @@ export default function ProfilePlaylistFeed({
 
   const [feedStyle, setFeedStyle] = useLocalStorage<PlaylistFeedStyle>(
     `${sessionUserId}:playlists_feed_style`,
-    PlaylistFeedStyle.Simple,
+    PlaylistFeedStyle.Grid,
     (text) => {
       if (PlaylistFeedStyleOptions.some((pfso) => pfso === text))
         return text as PlaylistFeedStyle;
@@ -95,7 +95,7 @@ export default function ProfilePlaylistFeed({
 
   useEffect(() => {
     if (sessionUserId === user.id) {
-      getPlaylists(sessionUserId)
+      getMyPlaylists(sessionUserId)
         .then((value) => setPlaylists(value))
         .catch(console.error);
     } else {
@@ -165,7 +165,7 @@ export default function ProfilePlaylistFeed({
 
       <PlaylistFeed
         treatedPlaylists={treatedPlaylists}
-        style={feedStyle ?? PlaylistFeedStyle.Simple}
+        style={feedStyle ?? PlaylistFeedStyle.Grid}
       />
     </div>
   );
@@ -187,11 +187,11 @@ function PlaylistFeed({
       </div>
     );
 
-  if (style === PlaylistFeedStyle.Detailed)
+  if (style === PlaylistFeedStyle.Row)
     return (
       <div className="flex flex-col gap-2">
         {treatedPlaylists.map((playlist) => (
-          <PlaylistDetailed key={playlist.id} playlist={playlist} />
+          <PlaylistRow key={playlist.id} playlist={playlist} />
         ))}
       </div>
     );
@@ -199,13 +199,13 @@ function PlaylistFeed({
   return (
     <div className="grid grid-cols-2 gap-2 px-2 pt-0 md:grid-cols-4 md:gap-4">
       {treatedPlaylists.map((playlist) => (
-        <PlaylistSimple key={playlist.id} playlist={playlist} />
+        <PlaylistGrid key={playlist.id} playlist={playlist} />
       ))}
     </div>
   );
 }
 
-function PlaylistSimple({ playlist }: { playlist: Playlist }) {
+function PlaylistGrid({ playlist }: { playlist: Playlist }) {
   return (
     <div className="flex flex-col items-end justify-between rounded-xl bg-secondary p-2">
       <Link
@@ -216,7 +216,7 @@ function PlaylistSimple({ playlist }: { playlist: Playlist }) {
         <Image
           width={500}
           height={500}
-          className="rounded-lg"
+          className="aspect-square rounded-lg"
           src={playlist.images[0]?.url ?? ""}
           alt={playlist.name}
         />
@@ -253,7 +253,7 @@ function PlaylistCompact({ playlist }: { playlist: Playlist }) {
   );
 }
 
-function PlaylistDetailed({ playlist }: { playlist: Playlist }) {
+function PlaylistRow({ playlist }: { playlist: Playlist }) {
   return (
     <div className="flex items-start gap-2 bg-secondary p-2 font-bold md:rounded-lg">
       <Link
@@ -264,7 +264,7 @@ function PlaylistDetailed({ playlist }: { playlist: Playlist }) {
         <Image
           width={100}
           height={100}
-          className="rounded-md"
+          className="aspect-square rounded-md"
           src={playlist.images[0]?.url ?? ""}
           alt={playlist.name}
         />

@@ -10,6 +10,7 @@ export default {
         sans: ["var(--font-geist-sans)", ...fontFamily.sans],
       },
       colors: {
+        blue: { 50: "#acd4fd", 100: "#4287f5" },
         nav: "#acd4fd",
         main: "#d8b4fe",
         main2: "#e9d5ff",

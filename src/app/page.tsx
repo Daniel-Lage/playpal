@@ -4,7 +4,6 @@ import Link from "next/link";
 
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
-import { Logo } from "~/app/_components/logo";
 import { getPosts } from "~/server/queries";
 import { authOptions } from "~/lib/auth";
 import { Post } from "./_components/post";
@@ -30,7 +29,6 @@ export default async function HomePage() {
               />
               <div className="px-2 font-bold">{session.user.name}</div>
             </Link>
-            <Logo />
           </div>
           <div className="flex">
             <PostCreator sessionUserId={session.user.id} />

@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 import type { Metadata } from "next";
-import { Logo } from "./_components/logo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? ""),
@@ -22,9 +21,16 @@ export const metadata: Metadata = {
 
 function NavBar() {
   return (
-    <div className="fixed bottom-0 flex h-16 w-full gap-6 bg-nav font-bold md:h-full md:w-[19%] md:flex-col md:pl-10 md:pt-4">
+    <div className="fixed bottom-0 flex h-16 w-full gap-6 bg-blue-50 font-bold md:h-full md:w-[19%] md:flex-col md:pl-10 md:pt-4">
       <div className="w-0 md:w-auto">
-        <Logo />
+        <Image
+          className="rounded-md"
+          width={48}
+          height={48}
+          src="/favicon.ico"
+          alt="playpal logo"
+          priority
+        />
       </div>
       <div className="flex w-full items-center justify-center md:justify-start">
         <Link href="/profile" className="flex items-end gap-2" role="button">

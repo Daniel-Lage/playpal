@@ -6,7 +6,6 @@ import type { Metadata } from "next";
 import { getPost, getUser } from "~/server/queries";
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
-import { Logo } from "~/app/_components/logo";
 import { authOptions } from "~/lib/auth";
 import { Post } from "~/app/_components/post";
 import { threadPosition, type ClientPostObject } from "~/models/post.model";
@@ -155,7 +154,6 @@ function PostCreatorWrapper({
             />
             <div className="px-2 font-bold">{session.user.name}</div>
           </Link>
-          <Logo />
         </div>
         <div className="flex">
           <PostCreator
