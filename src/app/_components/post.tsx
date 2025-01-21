@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 
-import { deletePost, likePost, unlikePost } from "~/server/queries";
+import { unlikePost } from "~/server/unlike-post";
+import { likePost } from "~/server/like-post";
+import { deletePost } from "~/server/delete-post";
 
 import {
   type ClientPostObject,

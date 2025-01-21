@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/lib/auth";
-import { getUserFollowing } from "~/server/queries";
+import { getUserFollowing } from "~/server/get-user-following";
 import Link from "next/link";
 import { User } from "~/app/_components/user";
 import SimpleUserView from "~/app/_components/simple-user-view";

@@ -111,11 +111,12 @@ export default function PlaylistView({
         playingQueue = setQueueStart(playingQueue, start);
       }
 
-      if (devices[0]?.id)
+      if (devices[0]?.id) {
         await play(sessionUserId, playingQueue, devices[0]?.id).catch(
           console.error,
         );
-      else console.log("ta sem dispositivo mano"); // open little warning error message
+        console.log("sucesso");
+      } else console.log("ta sem dispositivo mano"); // open little warning error message
 
       setStatus(PlayerStatus.Ready);
     },

@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { Post } from "~/app/_components/post";
 import { User } from "~/app/_components/user";
 import { authOptions } from "~/lib/auth";
-import { getPostLikes } from "~/server/queries";
+import { getPostLikes } from "~/server/get-post-likes";
 
 export default async function PostLikesPage({
   params: { postId },

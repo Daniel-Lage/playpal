@@ -1,7 +1,7 @@
 "use server";
 import type { SpotifyError } from "~/models/error.model";
 import type { Tokens } from "~/models/tokens.model";
-import { getAccount } from "~/server/queries";
+import { getAccount } from "~/server/get-account";
 
 export async function getTokens(userId?: string) {
   if (!userId) return;

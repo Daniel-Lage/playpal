@@ -14,7 +14,7 @@ import type {
   Substring,
 } from "~/models/post.model";
 
-import { postPost } from "~/server/queries";
+import { postPost } from "~/server/post-post";
 import { getMetadata } from "~/lib/get-metadata";
 import Image from "next/image";
 

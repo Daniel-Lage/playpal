@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
-import { getPosts } from "~/server/queries";
+import { getPosts } from "~/server/get-posts";
 import { authOptions } from "~/lib/auth";
 import { Post } from "./_components/post";
 

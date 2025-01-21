@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import type { Metadata } from "next";
 
-import { getUser } from "~/server/queries";
+import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
 import { ProfileView } from "../profile-view";

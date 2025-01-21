@@ -3,7 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 
-import { getPost, getUser } from "~/server/queries";
+import { getPost } from "~/server/get-post";
+import { getUser } from "~/server/get-user";
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
 import { authOptions } from "~/lib/auth";

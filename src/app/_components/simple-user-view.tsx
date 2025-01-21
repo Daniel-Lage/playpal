@@ -2,7 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { SpotifyLink } from "./spotify-link";
 import type { UserObject } from "~/models/user.model";
-import { deleteUser, followUser, unfollowUser } from "~/server/queries";
+import { unfollowUser } from "~/server/unfollow-user";
+import { followUser } from "~/server/follow-user";
+import { deleteUser } from "~/server/delete-user";
 
 export default function SimpleUserView({
   user,

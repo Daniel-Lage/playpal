@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 
 import { authOptions } from "~/lib/auth";
 import { SignInButton } from "~/app/_components/signin-button";
-import { getUser } from "~/server/queries";
+import { getUser } from "~/server/get-user";
 
 import { ProfileView } from "./profile-view";
 
