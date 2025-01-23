@@ -19,21 +19,23 @@ export default function ProfilePlaylistFeed({
   sessionUser,
   user,
 }: {
-  sessionUser: User;
+  sessionUser: User | null;
   user: UserObject;
 }) {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [filter, setFilter] = useState("");
 
   const [reversed, setReversed] = useLocalStorage<boolean>(
-    `${sessionUser.id}:playlists_reversed`,
+    sessionUser ? `${sessionUser.id}:playlists_reversed` : "playlists_reversed",
     false,
     (text) => text === "true",
     (value) => (value ? "true" : "false"),
   );
 
   const [feedStyle, setFeedStyle] = useLocalStorage<PlaylistFeedStyle>(
-    `${sessionUser.id}:playlists_feed_style`,
+    sessionUser
+      ? `${sessionUser.id}:playlists_feed_style`
+      : "playlists_feed_style",
     PlaylistFeedStyle.Grid,
     (text) => {
       if (PlaylistFeedStyleOptions.some((pfso) => pfso === text))
@@ -45,7 +47,9 @@ export default function ProfilePlaylistFeed({
 
   const [sortingColumn, setSortingColumn] =
     useLocalStorage<PlaylistsSortingColumn>(
-      `${sessionUser.id}:playlists_sorting_column`,
+      sessionUser
+        ? `${sessionUser.id}:playlists_sorting_column`
+        : "playlists_sorting_column",
       PlaylistsSortingColumn.CreatedAt,
       (text) => {
         if (PlaylistsSortingColumnOptions.some((psco) => psco === text))
@@ -95,12 +99,12 @@ export default function ProfilePlaylistFeed({
   }, [playlists, filter, sortingColumn, reversed]);
 
   useEffect(() => {
-    if (sessionUser.id === user.id) {
+    if (sessionUser?.id === user.id) {
       getMyPlaylists(sessionUser.access_token)
         .then((value) => setPlaylists(value))
         .catch(console.error);
     } else {
-      getUsersPlaylists(sessionUser.access_token, user.providerAccountId)
+      getUsersPlaylists(null, user.providerAccountId)
         .then((value) => setPlaylists(value))
         .catch(console.error);
     }

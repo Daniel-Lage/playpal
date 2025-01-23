@@ -59,5 +59,7 @@ export default async function OthersProfilePage({
     // no profile
     return <div className="self-center text-xl text-red-500">Error</div>;
 
-  return <ProfileView sessionUserId={session?.user?.id} user={user} />;
+  if (!session) return <ProfileView sessionUser={null} user={user} />;
+
+  return <ProfileView sessionUser={session.user} user={user} />;
 }

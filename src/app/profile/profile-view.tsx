@@ -15,11 +15,11 @@ export function ProfileView({
   sessionUser,
   user,
 }: {
-  sessionUser: User;
+  sessionUser: User | null;
   user: UserObject;
 }) {
   const [profileTab, setProfileTab] = useLocalStorage<ProfileTab>(
-    `${sessionUser.id}:profile_tab`,
+    sessionUser ? `${sessionUser.id}:profile_tab` : "profile_tab",
     ProfileTab.Posts,
     (text) => {
       if (ProfileTabOptions.some((pto) => pto === text))
@@ -34,7 +34,7 @@ export function ProfileView({
   return (
     <div>
       <div className="flex flex-col gap-2 overflow-hidden bg-main md:rounded-t-xl">
-        <SimpleUserView sessionUserId={sessionUser.id} user={user} />
+        <SimpleUserView sessionUserId={sessionUser?.id} user={user} />
 
         <div className="flex flex-col bg-main2">
           <div className="flex font-bold">

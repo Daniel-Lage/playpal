@@ -12,7 +12,7 @@ export default function ProfileFeed({
   user,
   profileTab,
 }: {
-  sessionUser: User;
+  sessionUser: User | null;
   user: UserObject;
   profileTab: ProfileTab | undefined;
 }) {
@@ -24,7 +24,7 @@ export default function ProfileFeed({
           <div className="font-bold">{posts.length} Posts</div>
         </div>
 
-        {sessionUser.id === user.id && (
+        {sessionUser?.id === user.id && (
           <div className="flex flex-col gap-2 bg-main p-2 md:rounded-xl">
             <div className="flex items-center justify-between">
               <Link className="flex items-center" href={"/profile"}>
@@ -44,7 +44,7 @@ export default function ProfileFeed({
           </div>
         )}
         {posts.map((post) => (
-          <Post key={post.id} post={post} sessionUserId={sessionUser.id} />
+          <Post key={post.id} post={post} sessionUserId={sessionUser?.id} />
         ))}
       </div>
     );
@@ -57,7 +57,7 @@ export default function ProfileFeed({
           <div className="font-bold">{user.posts.length} Posts</div>
         </div>
         {user.posts.map((post) => (
-          <Post key={post.id} post={post} sessionUserId={sessionUser.id} />
+          <Post key={post.id} post={post} sessionUserId={sessionUser?.id} />
         ))}
       </div>
     );
@@ -74,7 +74,7 @@ export default function ProfileFeed({
               <Post
                 key={like.likee.id}
                 post={like.likee}
-                sessionUserId={sessionUser.id}
+                sessionUserId={sessionUser?.id}
               />
             ),
         )}
