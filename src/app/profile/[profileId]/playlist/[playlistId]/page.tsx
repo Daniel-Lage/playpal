@@ -12,7 +12,7 @@ export async function generateMetadata({
   params: { playlistId: string; profileId: string };
 }): Promise<Metadata> {
   const playlist = await getPlaylist(
-    process.env.FALLBACK_USERID ?? null,
+    null, // will use fallback
     playlistId,
   );
 
@@ -52,7 +52,7 @@ export default async function PlaylistPage({
   if (!session)
     return (
       <PlaylistView
-        sessionUserId={null}
+        sessionUser={null}
         playlistId={playlistId}
         profileId={profileId}
       />
@@ -60,7 +60,7 @@ export default async function PlaylistPage({
 
   return (
     <PlaylistView
-      sessionUserId={session.user.id}
+      sessionUser={session.user}
       playlistId={playlistId}
       profileId={profileId}
     />

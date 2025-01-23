@@ -5,8 +5,6 @@ import { getMyDevices } from "~/api/get-my-devices";
 import { getPlaylist } from "~/api/get-playlist";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { getTokens } from "~/api/get-tokens";
-
 import {
   TracksSortingColumnOptions,
   TracksSortingColumn,
@@ -19,13 +17,14 @@ import { PlaylistContent } from "./playlist-content";
 import { PlaylistSearch } from "./playlist-search";
 import { PlaylistTracks } from "./playlist-tracks";
 import useLocalStorage from "~/hooks/use-local-storage";
+import type { User } from "next-auth";
 
 export default function PlaylistView({
-  sessionUserId,
+  sessionUser,
   // profileId, // to know if the playlist is yours?
   playlistId,
 }: {
-  sessionUserId: string | null;
+  sessionUser: User | null;
   profileId: string;
   playlistId: string;
 }) {
@@ -36,15 +35,18 @@ export default function PlaylistView({
   const [queue, setQueue] = useState<PlaylistTrack[]>([]);
 
   const [filter, setFilter] = useState("");
+
   const [reversed, setReversed] = useLocalStorage<boolean>(
-    `${sessionUserId}:tracks_reversed`,
+    sessionUser ? `${sessionUser.id}:tracks_reversed` : "tracks_reversed",
     false,
     (text) => text === "true",
     (value) => (value ? "true" : "false"),
   );
   const [sortingColumn, setSortingColumn] =
     useLocalStorage<TracksSortingColumn>(
-      `${sessionUserId}:tracks_sorting_column`,
+      sessionUser
+        ? `${sessionUser.id}:tracks_sorting_column`
+        : "tracks_sorting_column",
       TracksSortingColumn.AddedAt,
       (text) => {
         if (TracksSortingColumnOptions.some((tsco) => tsco === text))
@@ -71,7 +73,7 @@ export default function PlaylistView({
   }, [playlist, filter, sortingColumn, reversed]);
 
   useEffect(() => {
-    getPlaylist(sessionUserId, playlistId)
+    getPlaylist(sessionUser?.access_token, playlistId)
       .then((playlist) => {
         setLoading(false);
         setPlaylist(playlist);
@@ -85,8 +87,8 @@ export default function PlaylistView({
       })
       .catch(console.error);
 
-    if (sessionUserId) {
-      getMySpotifyUser(sessionUserId)
+    if (sessionUser) {
+      getMySpotifyUser(sessionUser.access_token)
         .then((spotifyUser) => {
           if (spotifyUser.product === "premium") {
             setStatus(PlayerStatus.Ready);
@@ -94,16 +96,15 @@ export default function PlaylistView({
         })
         .catch(console.error);
     }
-  }, [playlistId, sessionUserId]);
+  }, [playlistId, sessionUser]);
 
   const handlePlay = useCallback(
     async (start?: PlaylistTrack) => {
-      if (status !== PlayerStatus.Ready || !sessionUserId)
-        // redundant but required
-        return;
+      if (status !== PlayerStatus.Ready || !sessionUser?.id) return;
+
       setStatus(PlayerStatus.Busy);
 
-      const devices = await getMyDevices(sessionUserId);
+      const devices = await getMyDevices(sessionUser.access_token);
 
       let playingQueue = [...queue];
 
@@ -112,15 +113,17 @@ export default function PlaylistView({
       }
 
       if (devices[0]?.id) {
-        await play(sessionUserId, playingQueue, devices[0]?.id).catch(
-          console.error,
-        );
+        await play(
+          sessionUser.access_token,
+          playingQueue,
+          devices[0]?.id,
+        ).catch(console.error);
         console.log("sucesso");
-      } else console.log("ta sem dispositivo mano"); // open little warning error message
+      } else console.error("ta sem dispositivo mano"); // open little warning error message
 
       setStatus(PlayerStatus.Ready);
     },
-    [status, queue, sessionUserId],
+    [status, queue, sessionUser],
   );
 
   if (loading) return;
@@ -175,17 +178,11 @@ function getRandomSample<T>(array: Array<T>, limit = Infinity): Array<T> {
 }
 
 export async function play(
-  sessionUserId: string,
+  accessToken: string | null,
   tracks: PlaylistTrack[],
   deviceId: string,
 ) {
-  const tokens = await getTokens(sessionUserId);
-
-  if (!tokens?.access_token) {
-    console.log("Tokens: ", tokens);
-
-    throw new Error("Internal Server Error");
-  }
+  if (accessToken === null) throw new Error("acessToken is null");
 
   const firstTrack = tracks.shift();
 
@@ -205,7 +202,7 @@ export async function play(
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer  ${tokens.access_token}`,
+        Authorization: `Bearer  ${accessToken}`,
       },
     },
   );
@@ -224,7 +221,7 @@ export async function play(
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer  ${tokens.access_token}`,
+        Authorization: `Bearer  ${accessToken}`,
       },
     },
   );
@@ -248,7 +245,7 @@ export async function play(
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer  ${tokens.access_token}`,
+            Authorization: `Bearer  ${accessToken}`,
           },
         },
       ).catch((e) => {

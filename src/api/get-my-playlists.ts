@@ -2,22 +2,15 @@
 import type { SpotifyError } from "~/models/error.model";
 import type { Paging } from "~/models/paging.model";
 import type { Playlist } from "~/models/playlist.model";
-import { getTokens } from "./get-tokens";
 
-export async function getMyPlaylists(userId: string) {
-  const tokens = await getTokens(userId);
-
-  if (!tokens?.access_token) {
-    console.log("Tokens: ", tokens);
-
-    throw new Error("Internal Server Error");
-  }
+export async function getMyPlaylists(accessToken: string | null) {
+  if (accessToken === null) throw new Error("acessToken is null");
 
   const response = await fetch(
     "https://api.spotify.com/v1/me/playlists?limit=50",
     {
       headers: {
-        Authorization: `Bearer ${tokens.access_token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     },
   );
@@ -41,7 +34,7 @@ export async function getMyPlaylists(userId: string) {
       requests.push(
         fetch(url, {
           headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }),
       );

@@ -6,22 +6,27 @@ import type { PlaylistTrack } from "~/models/track.model";
 import { getTokens } from "./get-tokens";
 
 export async function getPlaylist(
-  userId: string | null,
+  accessToken: string | null | undefined,
   playlistId: string,
 ): Promise<Playlist | undefined> {
-  const tokens = await getTokens(userId ?? process.env.FALLBACK_USERID);
+  if (!accessToken) {
+    if (process.env.FALLBACK_REFRESH_TOKEN === undefined)
+      throw new Error("FALLBACK_REFRESH_TOKEN is not defined in env");
 
-  if (!tokens?.access_token) {
-    console.log("Tokens: ", tokens);
+    const { access_token } = await getTokens(
+      process.env.FALLBACK_REFRESH_TOKEN,
+    );
 
-    throw new Error("Internal Server Error");
+    accessToken = access_token;
   }
+
+  if (accessToken === null) throw new Error("acessToken is null");
 
   const response = await fetch(
     `https://api.spotify.com/v1/playlists/${playlistId}`,
     {
       headers: {
-        Authorization: `Bearer  ${tokens.access_token}`,
+        Authorization: `Bearer  ${accessToken}`,
       },
     },
   );
@@ -49,7 +54,7 @@ export async function getPlaylist(
       requests.push(
         fetch(url, {
           headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }),
       );

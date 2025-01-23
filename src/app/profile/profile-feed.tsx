@@ -5,13 +5,14 @@ import { ProfileTab, type UserObject } from "~/models/user.model";
 import { PostCreator } from "../_components/post-creator";
 import { Post } from "../_components/post";
 import ProfilePlaylistFeed from "./profile-playlist-feed";
+import type { User } from "next-auth";
 
 export default function ProfileFeed({
-  sessionUserId,
+  sessionUser,
   user,
   profileTab,
 }: {
-  sessionUserId: string | undefined;
+  sessionUser: User;
   user: UserObject;
   profileTab: ProfileTab | undefined;
 }) {
@@ -23,7 +24,7 @@ export default function ProfileFeed({
           <div className="font-bold">{posts.length} Posts</div>
         </div>
 
-        {sessionUserId === user.id && (
+        {sessionUser.id === user.id && (
           <div className="flex flex-col gap-2 bg-main p-2 md:rounded-xl">
             <div className="flex items-center justify-between">
               <Link className="flex items-center" href={"/profile"}>
@@ -38,12 +39,12 @@ export default function ProfileFeed({
               </Link>
             </div>
             <div className="flex">
-              <PostCreator sessionUserId={user.id} />
+              <PostCreator sessionUserId={sessionUser.id} />
             </div>
           </div>
         )}
         {posts.map((post) => (
-          <Post key={post.id} post={post} sessionUserId={sessionUserId} />
+          <Post key={post.id} post={post} sessionUserId={sessionUser.id} />
         ))}
       </div>
     );
@@ -56,7 +57,7 @@ export default function ProfileFeed({
           <div className="font-bold">{user.posts.length} Posts</div>
         </div>
         {user.posts.map((post) => (
-          <Post key={post.id} post={post} sessionUserId={sessionUserId} />
+          <Post key={post.id} post={post} sessionUserId={sessionUser.id} />
         ))}
       </div>
     );
@@ -73,7 +74,7 @@ export default function ProfileFeed({
               <Post
                 key={like.likee.id}
                 post={like.likee}
-                sessionUserId={sessionUserId}
+                sessionUserId={sessionUser.id}
               />
             ),
         )}
@@ -81,5 +82,5 @@ export default function ProfileFeed({
     );
 
   if (profileTab === ProfileTab.Playlists)
-    return <ProfilePlaylistFeed sessionUserId={sessionUserId} user={user} />;
+    return <ProfilePlaylistFeed sessionUser={sessionUser} user={user} />;
 }

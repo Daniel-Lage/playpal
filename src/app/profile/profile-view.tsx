@@ -9,16 +9,17 @@ import {
 import useLocalStorage from "~/hooks/use-local-storage";
 import SimpleUserView from "../_components/simple-user-view";
 import ProfileFeed from "./profile-feed";
+import type { User } from "next-auth";
 
 export function ProfileView({
-  sessionUserId,
+  sessionUser,
   user,
 }: {
-  sessionUserId: string | undefined;
+  sessionUser: User;
   user: UserObject;
 }) {
   const [profileTab, setProfileTab] = useLocalStorage<ProfileTab>(
-    `${sessionUserId}:profile_tab`,
+    `${sessionUser.id}:profile_tab`,
     ProfileTab.Posts,
     (text) => {
       if (ProfileTabOptions.some((pto) => pto === text))
@@ -33,7 +34,7 @@ export function ProfileView({
   return (
     <div>
       <div className="flex flex-col gap-2 overflow-hidden bg-main md:rounded-t-xl">
-        <SimpleUserView sessionUserId={sessionUserId} user={user} />
+        <SimpleUserView sessionUserId={sessionUser.id} user={user} />
 
         <div className="flex flex-col bg-main2">
           <div className="flex font-bold">
@@ -51,7 +52,7 @@ export function ProfileView({
       </div>
 
       <ProfileFeed
-        sessionUserId={sessionUserId}
+        sessionUser={sessionUser}
         user={user}
         profileTab={profileTab}
       />

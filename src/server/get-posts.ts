@@ -1,6 +1,6 @@
 "use server";
 import { eq, desc } from "drizzle-orm";
-import { PostType } from "~/models/post.model";
+import { type PostObject, PostType } from "~/models/post.model";
 import { db } from "./db";
 import { repliesTable, postsTable } from "./db/schema";
 
@@ -19,5 +19,5 @@ export async function getPosts() {
     limit: 100,
   });
 
-  return posts;
+  return posts as PostObject[];
 }

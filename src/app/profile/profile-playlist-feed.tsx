@@ -13,26 +13,27 @@ import { SpotifyLink } from "../_components/spotify-link";
 import { getMyPlaylists } from "~/api/get-my-playlists";
 import type { UserObject } from "~/models/user.model";
 import { getUsersPlaylists } from "~/api/get-users-playlists";
+import type { User } from "next-auth";
 
 export default function ProfilePlaylistFeed({
-  sessionUserId,
+  sessionUser,
   user,
 }: {
-  sessionUserId: string | undefined;
+  sessionUser: User;
   user: UserObject;
 }) {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [filter, setFilter] = useState("");
 
   const [reversed, setReversed] = useLocalStorage<boolean>(
-    `${sessionUserId}:playlists_reversed`,
+    `${sessionUser.id}:playlists_reversed`,
     false,
     (text) => text === "true",
     (value) => (value ? "true" : "false"),
   );
 
   const [feedStyle, setFeedStyle] = useLocalStorage<PlaylistFeedStyle>(
-    `${sessionUserId}:playlists_feed_style`,
+    `${sessionUser.id}:playlists_feed_style`,
     PlaylistFeedStyle.Grid,
     (text) => {
       if (PlaylistFeedStyleOptions.some((pfso) => pfso === text))
@@ -44,7 +45,7 @@ export default function ProfilePlaylistFeed({
 
   const [sortingColumn, setSortingColumn] =
     useLocalStorage<PlaylistsSortingColumn>(
-      `${sessionUserId}:playlists_sorting_column`,
+      `${sessionUser.id}:playlists_sorting_column`,
       PlaylistsSortingColumn.CreatedAt,
       (text) => {
         if (PlaylistsSortingColumnOptions.some((psco) => psco === text))
@@ -94,16 +95,16 @@ export default function ProfilePlaylistFeed({
   }, [playlists, filter, sortingColumn, reversed]);
 
   useEffect(() => {
-    if (sessionUserId === user.id) {
-      getMyPlaylists(sessionUserId)
+    if (sessionUser.id === user.id) {
+      getMyPlaylists(sessionUser.access_token)
         .then((value) => setPlaylists(value))
         .catch(console.error);
     } else {
-      getUsersPlaylists(sessionUserId, user.providerAccountId)
+      getUsersPlaylists(sessionUser.access_token, user.providerAccountId)
         .then((value) => setPlaylists(value))
         .catch(console.error);
     }
-  }, [user, sessionUserId]);
+  }, [user, sessionUser]);
 
   return (
     <div className="flex flex-col gap-2">

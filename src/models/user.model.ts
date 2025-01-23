@@ -26,6 +26,7 @@ declare module "next-auth" {
   }
   interface User {
     providerAccountId: string;
+    access_token: string | null;
   }
 }
 
