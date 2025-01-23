@@ -1,7 +1,7 @@
 "use server";
 import type { ReplyObject } from "~/models/reply.model";
 
-export function getReplyThread(
+export async function getReplyThread(
   replyThread: ReplyObject[],
   replies: ReplyObject[],
 ) {
