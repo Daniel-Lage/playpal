@@ -14,6 +14,6 @@ export async function getReplyThread(
   if (newLeaf) replyThread.push(newLeaf);
 
   if (newLeaf?.replier?.replies) {
-    getReplyThread(replyThread, replies);
+    await getReplyThread(replyThread, replies);
   }
 }

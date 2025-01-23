@@ -51,7 +51,7 @@ export async function getPost(
       .map((reply) => [reply]);
 
     for (const replyThread of replies) {
-      getReplyThread(replyThread, post.replies);
+      await getReplyThread(replyThread, post.replies);
     }
 
     return { ...post, replies } as ClientPostObject;
