@@ -10,7 +10,7 @@ export function PlaylistSearch({
   sortingColumn,
   reversed,
   filter,
-  playerReady,
+  disabled,
   sortColumn,
   reverse,
   filterTracks,
@@ -19,7 +19,7 @@ export function PlaylistSearch({
   sortingColumn: TracksSortingColumn | undefined;
   reversed: boolean | undefined;
   filter: string;
-  playerReady: boolean;
+  disabled: boolean;
   sortColumn: (e: ChangeEvent<HTMLSelectElement>) => void;
   reverse: () => void;
   filterTracks: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -59,7 +59,7 @@ export function PlaylistSearch({
         onChange={filterTracks}
       />
 
-      <button disabled={!playerReady} onClick={() => play()}>
+      <button disabled={disabled} onClick={() => play()}>
         <Image height={32} width={32} src="/play.png" alt="play icon" />
       </button>
     </div>

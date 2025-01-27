@@ -38,12 +38,3 @@ interface userRelations {
 }
 
 export type UserObject = typeof usersTable.$inferSelect & userRelations;
-
-export enum ProfileTab {
-  Posts = "Posts",
-  PostsAndReplies = "Posts and Replies",
-  Likes = "Likes",
-  Playlists = "Playlists",
-}
-
-export const ProfileTabOptions = Object.values(ProfileTab);

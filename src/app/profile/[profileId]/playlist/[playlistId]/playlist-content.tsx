@@ -8,7 +8,7 @@ export function PlaylistContent({ playlist }: { playlist: Playlist }) {
       <Image
         width={200}
         height={200}
-        className="rounded-xl"
+        className="aspect-square rounded-xl"
         src={playlist.images[0]?.url ?? ""}
         alt={playlist.name}
       />

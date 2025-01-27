@@ -1,9 +1,6 @@
 "use client";
 
-import { getMySpotifyUser } from "~/api/get-my-spotify-user";
-import { getMyDevices } from "~/api/get-my-devices";
-import { getPlaylist } from "~/api/get-playlist";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import {
   TracksSortingColumnOptions,
@@ -12,40 +9,37 @@ import {
 } from "~/models/track.model";
 
 import type { SimplifiedArtist } from "~/models/artist.model";
-import { PlayerStatus, type Playlist } from "~/models/playlist.model";
+import { type Playlist } from "~/models/playlist.model";
 import { PlaylistContent } from "./playlist-content";
 import { PlaylistSearch } from "./playlist-search";
 import { PlaylistTracks } from "./playlist-tracks";
-import useLocalStorage from "~/hooks/use-local-storage";
-import type { User } from "next-auth";
+import { useLocalStorage } from "~/hooks/use-local-storage";
 
-export default function PlaylistView({
-  sessionUser,
+export function PlaylistView({
+  playlist,
   // profileId, // to know if the playlist is yours?
-  playlistId,
+  sessionUserId,
+  play,
 }: {
-  sessionUser: User | null;
-  profileId: string;
-  playlistId: string;
+  // profileId: string;
+  playlist: Playlist;
+  sessionUserId?: string;
+  play?: (start?: PlaylistTrack) => Promise<void>;
 }) {
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<PlayerStatus>(PlayerStatus.Disabled);
-
-  const [playlist, setPlaylist] = useState<Playlist | undefined>();
-  const [queue, setQueue] = useState<PlaylistTrack[]>([]);
+  const [disabled, setDisabled] = useState(!play);
 
   const [filter, setFilter] = useState("");
 
   const [reversed, setReversed] = useLocalStorage<boolean>(
-    sessionUser ? `${sessionUser.id}:tracks_reversed` : "tracks_reversed",
+    sessionUserId ? `${sessionUserId}:tracks_reversed` : "tracks_reversed",
     false,
     (text) => text === "true",
     (value) => (value ? "true" : "false"),
   );
   const [sortingColumn, setSortingColumn] =
     useLocalStorage<TracksSortingColumn>(
-      sessionUser
-        ? `${sessionUser.id}:tracks_sorting_column`
+      sessionUserId
+        ? `${sessionUserId}:tracks_sorting_column`
         : "tracks_sorting_column",
       TracksSortingColumn.AddedAt,
       (text) => {
@@ -72,65 +66,18 @@ export default function PlaylistView({
     return temp;
   }, [playlist, filter, sortingColumn, reversed]);
 
-  useEffect(() => {
-    getPlaylist(sessionUser?.access_token, playlistId)
-      .then((playlist) => {
-        setLoading(false);
-        setPlaylist(playlist);
-        if (playlist)
-          setQueue(
-            getRandomSample(
-              playlist.tracks.items.filter((track) => !track.is_local),
-              99,
-            ),
-          );
-      })
-      .catch(console.error);
-
-    if (sessionUser) {
-      getMySpotifyUser(sessionUser.access_token)
-        .then((spotifyUser) => {
-          if (spotifyUser.product === "premium") {
-            setStatus(PlayerStatus.Ready);
-          }
-        })
-        .catch(console.error);
-    }
-  }, [playlistId, sessionUser]);
-
   const handlePlay = useCallback(
     async (start?: PlaylistTrack) => {
-      if (status !== PlayerStatus.Ready || !sessionUser?.id) return;
+      if (!play) return;
 
-      setStatus(PlayerStatus.Busy);
+      setDisabled(true);
 
-      const devices = await getMyDevices(sessionUser.access_token);
+      await play(start);
 
-      let playingQueue = [...queue];
-
-      if (start) {
-        playingQueue = setQueueStart(playingQueue, start);
-      }
-
-      if (devices[0]?.id) {
-        await play(
-          sessionUser.access_token,
-          playingQueue,
-          devices[0]?.id,
-        ).catch(console.error);
-        console.log("sucesso");
-      } else console.error("ta sem dispositivo mano"); // open little warning error message
-
-      setStatus(PlayerStatus.Ready);
+      setDisabled(false);
     },
-    [status, queue, sessionUser],
+    [play],
   );
-
-  if (loading) return;
-
-  if (!playlist)
-    // playlist was not found
-    return <div className="self-center text-xl text-red-500">Error</div>;
 
   return (
     <>
@@ -141,7 +88,7 @@ export default function PlaylistView({
           sortingColumn={sortingColumn}
           reversed={reversed}
           filter={filter}
-          playerReady={status === PlayerStatus.Ready}
+          disabled={disabled}
           sortColumn={(e) => {
             setSortingColumn(e.target.value as TracksSortingColumn);
           }}
@@ -155,104 +102,11 @@ export default function PlaylistView({
 
       <PlaylistTracks
         treatedTracks={treatedTracks}
-        playerReady={status === PlayerStatus.Ready}
+        disabled={disabled}
         playTrack={handlePlay}
       />
     </>
   );
-}
-
-function getRandomSample<T>(array: Array<T>, limit = Infinity): Array<T> {
-  const size = Math.min(array.length, limit); // either the whole array or limit if specified and valid
-
-  const newArray: Array<T> = [];
-  const prevArray = [...array];
-
-  for (let index = 0; index < size; index++) {
-    const index = Math.floor(Math.random() * prevArray.length);
-    const item = prevArray.splice(index, 1)[0];
-    if (item) newArray.push(item);
-  }
-
-  return newArray;
-}
-
-export async function play(
-  accessToken: string | null,
-  tracks: PlaylistTrack[],
-  deviceId: string,
-) {
-  if (accessToken === null) throw new Error("acessToken is null");
-
-  const firstTrack = tracks.shift();
-
-  if (!firstTrack) {
-    console.log("Tracks: ", tracks);
-    console.log("Shuffled Tracks: ", tracks);
-
-    throw new Error("Empty Track Array");
-  }
-
-  const addedToQueue = await fetch(
-    "https://api.spotify.com/v1/me/player/queue?" +
-      new URLSearchParams({
-        uri: firstTrack.track.uri,
-        device_id: deviceId,
-      }).toString(),
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer  ${accessToken}`,
-      },
-    },
-  );
-
-  if (addedToQueue.status != 200) {
-    console.log("Response: ", addedToQueue);
-
-    throw new Error(addedToQueue.statusText);
-  }
-
-  const skipped = await fetch(
-    "https://api.spotify.com/v1/me/player/next?" +
-      new URLSearchParams({
-        device_id: deviceId,
-      }).toString(),
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer  ${accessToken}`,
-      },
-    },
-  );
-
-  if (skipped.status != 200) {
-    console.log("Response: ", skipped);
-
-    throw new Error(skipped.statusText);
-  }
-
-  for (let index = 0; index < tracks.length; index++) {
-    const track = tracks[index];
-    if (track) {
-      track.track.disc_number = index;
-      fetch(
-        "https://api.spotify.com/v1/me/player/queue?" +
-          new URLSearchParams({
-            uri: track.track.uri,
-            device_id: deviceId,
-          }).toString(),
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer  ${accessToken}`,
-          },
-        },
-      ).catch((e) => {
-        console.error(e);
-      });
-    }
-  }
 }
 
 function getTreatedTracks(
@@ -316,21 +170,4 @@ function getTreatedTracks(
       if (keyA > keyB) return 1;
       return 0;
     });
-}
-
-function setQueueStart(
-  queue: PlaylistTrack[],
-  start: PlaylistTrack,
-): PlaylistTrack[] {
-  const queueWithFirstTrack = [...queue];
-
-  const trackIndex = queueWithFirstTrack.findIndex(
-    (other) => other.track.uri === start.track.uri,
-  );
-
-  void queueWithFirstTrack.splice(trackIndex, 1)[0];
-
-  queueWithFirstTrack.unshift(start);
-
-  return queueWithFirstTrack;
 }

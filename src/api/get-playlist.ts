@@ -31,7 +31,7 @@ export async function getPlaylist(
     },
   );
 
-  if (response.status != 200) {
+  if (!response.ok) {
     const json = (await response.json()) as SpotifyError;
 
     if (json?.error && json?.error_description)

@@ -7,7 +7,7 @@ export function User({ user }: { user: User | UserObject }) {
   return (
     <Link
       key={user.id}
-      className="flex items-center bg-secondary p-2 md:rounded-xl"
+      className="flex items-center bg-secondary p-2 hover:underline md:rounded-xl"
       href={`/profile/${user.providerAccountId}`}
     >
       <Image

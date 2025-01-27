@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
-import { ProfileView } from "../profile-view";
+import { Post } from "~/app/_components/post";
 
 export async function generateMetadata({
   params: { profileId },
@@ -46,11 +46,13 @@ export async function generateMetadata({
   };
 }
 
-export default async function OthersProfilePage({
+export default async function ProfilePage({
   params: { profileId },
 }: {
   params: { profileId: string };
 }) {
+  console.log("ta sendo chamado");
+
   const session = await getServerSession(authOptions);
 
   const user = await getUser(profileId);
@@ -59,7 +61,15 @@ export default async function OthersProfilePage({
     // no profile
     return <div className="self-center text-xl text-red-500">Error</div>;
 
-  if (!session) return <ProfileView sessionUser={null} user={user} />;
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex flex-col items-start gap-2 bg-main p-2 md:flex-row md:items-center md:rounded-b-2xl">
+        <div className="font-bold">{user.posts.length} Posts</div>
+      </div>
 
-  return <ProfileView sessionUser={session.user} user={user} />;
+      {user.posts.map((post) => (
+        <Post key={post.id} post={post} sessionUserId={session?.user.id} />
+      ))}
+    </div>
+  );
 }

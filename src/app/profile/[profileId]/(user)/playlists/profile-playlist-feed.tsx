@@ -1,7 +1,8 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import useLocalStorage from "~/hooks/use-local-storage";
+import { useMemo, useState } from "react";
+import { useLocalStorage } from "~/hooks/use-local-storage";
 import {
   type Playlist,
   PlaylistFeedStyle,
@@ -9,32 +10,29 @@ import {
   PlaylistsSortingColumn,
   PlaylistsSortingColumnOptions,
 } from "~/models/playlist.model";
-import { SpotifyLink } from "../_components/spotify-link";
-import { getMyPlaylists } from "~/api/get-my-playlists";
-import type { UserObject } from "~/models/user.model";
-import { getUsersPlaylists } from "~/api/get-users-playlists";
-import type { User } from "next-auth";
+import { SpotifyLink } from "~/app/_components/spotify-link";
 
 export default function ProfilePlaylistFeed({
-  sessionUser,
-  user,
+  playlists,
+  sessionUserId,
 }: {
-  sessionUser: User | null;
-  user: UserObject;
+  playlists: Playlist[];
+  sessionUserId?: string;
 }) {
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [filter, setFilter] = useState("");
 
   const [reversed, setReversed] = useLocalStorage<boolean>(
-    sessionUser ? `${sessionUser.id}:playlists_reversed` : "playlists_reversed",
+    sessionUserId
+      ? `${sessionUserId}:playlists_reversed`
+      : "playlists_reversed",
     false,
     (text) => text === "true",
     (value) => (value ? "true" : "false"),
   );
 
   const [feedStyle, setFeedStyle] = useLocalStorage<PlaylistFeedStyle>(
-    sessionUser
-      ? `${sessionUser.id}:playlists_feed_style`
+    sessionUserId
+      ? `${sessionUserId}:playlists_feed_style`
       : "playlists_feed_style",
     PlaylistFeedStyle.Grid,
     (text) => {
@@ -47,8 +45,8 @@ export default function ProfilePlaylistFeed({
 
   const [sortingColumn, setSortingColumn] =
     useLocalStorage<PlaylistsSortingColumn>(
-      sessionUser
-        ? `${sessionUser.id}:playlists_sorting_column`
+      sessionUserId
+        ? `${sessionUserId}:playlists_sorting_column`
         : "playlists_sorting_column",
       PlaylistsSortingColumn.CreatedAt,
       (text) => {
@@ -97,18 +95,6 @@ export default function ProfilePlaylistFeed({
 
     return temp;
   }, [playlists, filter, sortingColumn, reversed]);
-
-  useEffect(() => {
-    if (sessionUser?.id === user.id) {
-      getMyPlaylists(sessionUser.access_token)
-        .then((value) => setPlaylists(value))
-        .catch(console.error);
-    } else {
-      getUsersPlaylists(null, user.providerAccountId)
-        .then((value) => setPlaylists(value))
-        .catch(console.error);
-    }
-  }, [user, sessionUser]);
 
   return (
     <div className="flex flex-col gap-2">

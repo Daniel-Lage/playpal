@@ -4,18 +4,18 @@ import type { PlaylistTrack } from "~/models/track.model";
 
 export function PlaylistTracks({
   treatedTracks,
-  playerReady,
+  disabled,
   playTrack,
 }: {
   treatedTracks: PlaylistTrack[];
-  playerReady: boolean;
+  disabled: boolean;
   playTrack: (track: PlaylistTrack) => void;
 }) {
   return treatedTracks.map((track) => (
     <button
-      key={track.track.uri}
+      key={track.track.uri + track.added_at}
       className="flex items-center gap-1 bg-secondary p-1 font-bold md:rounded-lg"
-      disabled={!playerReady || track.is_local}
+      disabled={disabled || track.is_local}
       onClick={() => playTrack(track)}
     >
       {track.track.album.images[0]?.url ? (

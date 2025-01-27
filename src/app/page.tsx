@@ -19,7 +19,10 @@ export default async function HomePage() {
       {session?.user?.image && session?.user?.name ? (
         <div className="flex flex-col gap-2 bg-main p-2 md:rounded-xl">
           <div className="flex items-center justify-between">
-            <Link className="flex items-center" href={"/profile"}>
+            <Link
+              className="flex items-center hover:underline"
+              href={`/profile/${session.user.providerAccountId}`}
+            >
               <Image
                 width={40}
                 height={40}

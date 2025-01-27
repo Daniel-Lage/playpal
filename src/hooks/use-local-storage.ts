@@ -1,6 +1,6 @@
 import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
 
-export default function useLocalStorage<T>(
+export function useLocalStorage<T>(
   key: string,
   fallback: T,
   parse: (text: string | null) => T | null,

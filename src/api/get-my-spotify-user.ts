@@ -11,7 +11,7 @@ export async function getMySpotifyUser(accessToken: string | null) {
     },
   });
 
-  if (response.status != 200) {
+  if (!response.ok) {
     const json = (await response.json()) as SpotifyError;
 
     throw new Error(

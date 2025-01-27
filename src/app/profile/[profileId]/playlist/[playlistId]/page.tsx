@@ -4,7 +4,12 @@ import { authOptions } from "~/lib/auth";
 
 import type { Metadata } from "next";
 import { getPlaylist } from "~/api/get-playlist";
-import PlaylistView from "./playlist-view";
+import { PlaylistView } from "./playlist-view";
+import { getMySpotifyUser } from "~/api/get-my-spotify-user";
+import { getRandomSample } from "~/app/helpers/get-random-sample";
+import type { PlaylistTrack } from "~/models/track.model";
+import { playTracks } from "~/api/play-tracks";
+import { setFirstItem } from "~/app/helpers/set-first-item";
 
 export async function generateMetadata({
   params: { playlistId, profileId },
@@ -43,26 +48,48 @@ export async function generateMetadata({
 }
 
 export default async function PlaylistPage({
-  params: { playlistId, profileId },
+  params: { playlistId },
 }: {
-  params: { playlistId: string; profileId: string };
+  params: { playlistId: string };
 }) {
   const session = await getServerSession(authOptions);
 
-  if (!session)
-    return (
-      <PlaylistView
-        sessionUser={null}
-        playlistId={playlistId}
-        profileId={profileId}
-      />
-    );
+  const playlist = await getPlaylist(session?.user.access_token, playlistId);
+
+  if (!playlist) return <div>error</div>; // playlist not found
+
+  if (!session) return <PlaylistView playlist={playlist} />; // not logged in
+
+  const spotifyUser = await getMySpotifyUser(session.user.access_token);
+
+  if (spotifyUser.product !== "premium")
+    return <PlaylistView playlist={playlist} sessionUserId={session.user.id} />; // user cant play
+
+  const queue = getRandomSample(
+    playlist.tracks.items.filter((track) => !track.is_local),
+    99,
+  );
 
   return (
     <PlaylistView
-      sessionUser={session.user}
-      playlistId={playlistId}
-      profileId={profileId}
+      playlist={playlist}
+      sessionUserId={session.user.id}
+      play={async (start?: PlaylistTrack) => {
+        "use server";
+
+        if (start) {
+          await playTracks(
+            session.user.access_token,
+            setFirstItem(
+              queue,
+              start,
+              (other) => other.track.uri === start.track.uri,
+            ),
+          );
+        } else {
+          await playTracks(session.user.access_token, queue);
+        }
+      }}
     />
   );
 }

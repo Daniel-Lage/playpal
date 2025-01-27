@@ -30,7 +30,7 @@ export async function getUsersPlaylists(
     },
   );
 
-  if (response.status != 200) {
+  if (!response.ok) {
     const json = (await response.json()) as SpotifyError;
 
     throw new Error(
