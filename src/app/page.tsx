@@ -1,13 +1,11 @@
 import { getServerSession } from "next-auth";
-import Image from "next/image";
-import Link from "next/link";
 
 import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
 import { getPosts } from "~/server/get-posts";
 import { authOptions } from "~/lib/auth";
 import { Post } from "./_components/post";
-import { IMetadata, Substring } from "~/models/post.model";
+import type { IMetadata, Substring } from "~/models/post.model";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
 

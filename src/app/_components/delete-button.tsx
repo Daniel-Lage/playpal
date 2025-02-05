@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MainPostObject, PostObject } from "~/models/post.model";
+import type { MainPostObject, PostObject } from "~/models/post.model";
 import { deletePost } from "~/server/delete-post";
 
 export function DeleteButton({

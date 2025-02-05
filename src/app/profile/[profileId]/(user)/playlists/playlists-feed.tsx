@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SpotifyLink } from "~/app/_components/spotify-link";
-import { Playlist, PlaylistFeedStyle } from "~/models/playlist.model";
+import { type Playlist, PlaylistFeedStyle } from "~/models/playlist.model";
 
 export function PlaylistFeed({
   treatedPlaylists,

@@ -3,7 +3,7 @@ import {
   type Substring,
   type IMetadata,
   PostType,
-  MainPostObject,
+  type MainPostObject,
 } from "~/models/post.model";
 import { db } from "./db";
 import { postsTable, repliesTable } from "./db/schema";

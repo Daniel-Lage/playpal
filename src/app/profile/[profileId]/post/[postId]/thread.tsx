@@ -2,15 +2,7 @@
 
 import { useState } from "react";
 import { Post } from "~/app/_components/post";
-import { PostObject } from "~/models/post.model";
-
-// is main post: show line div
-// else
-// is last post: dont show anything
-// else
-// is at cutoff: show plus button
-// else
-// show line button
+import type { PostObject } from "~/models/post.model";
 
 export function Thread({
   thread,

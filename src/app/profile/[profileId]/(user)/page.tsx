@@ -3,9 +3,7 @@ import type { Metadata } from "next";
 
 import { authOptions } from "~/lib/auth";
 
-import { IMetadata, PostType, Substring } from "~/models/post.model";
-import Link from "next/link";
-import Image from "next/image";
+import { type IMetadata, PostType, type Substring } from "~/models/post.model";
 import { PostCreator } from "~/app/_components/post-creator";
 import { Post } from "~/app/_components/post";
 import { getUser } from "~/server/get-user";

@@ -5,7 +5,7 @@ import { getPost } from "~/server/get-post";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 import { Post } from "~/app/_components/post";
-import { IMetadata, Substring } from "~/models/post.model";
+import type { IMetadata, Substring } from "~/models/post.model";
 import { PostCreator } from "~/app/_components/post-creator";
 import { postPost } from "~/server/post-post";
 import { SignInButton } from "~/app/_components/signin-button";

@@ -12,7 +12,7 @@ import type { IMetadata, Substring } from "~/models/post.model";
 
 import { getMetadata } from "~/lib/get-metadata";
 import Image from "next/image";
-import { User } from "next-auth";
+import type { User } from "next-auth";
 
 export function PostCreator({
   send,

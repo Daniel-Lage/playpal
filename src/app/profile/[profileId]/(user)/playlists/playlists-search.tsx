@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 import {
   PlaylistFeedStyle,
   PlaylistFeedStyleOptions,
