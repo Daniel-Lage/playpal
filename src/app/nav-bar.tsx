@@ -10,7 +10,7 @@ export function NavBar({ profileURL }: { profileURL: string }) {
   ];
 
   return (
-    <div className="fixed bottom-0 flex h-16 w-full gap-6 bg-blue-50 font-bold md:h-full md:w-[19%] md:flex-col md:pl-10 md:pt-4">
+    <div className="fixed bottom-0 left-0 flex h-16 w-full gap-6 bg-nav font-bold md:h-full md:w-[19vw] md:flex-col md:pl-10 md:pt-4">
       <div className="w-0 md:w-auto">
         <Image
           className="rounded-md"

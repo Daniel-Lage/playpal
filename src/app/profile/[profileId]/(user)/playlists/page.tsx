@@ -6,7 +6,7 @@ import { authOptions } from "~/lib/auth";
 
 import { getMyPlaylists } from "~/api/get-my-playlists";
 import { getUsersPlaylists } from "~/api/get-users-playlists";
-import ProfilePlaylistFeed from "./profile-playlist-feed";
+import PlaylistsView from "./playlists-view";
 
 export async function generateMetadata({
   params: { profileId },
@@ -61,9 +61,6 @@ export default async function ProfilePage({
       : await getUsersPlaylists(session?.user.access_token, profileId);
 
   return (
-    <ProfilePlaylistFeed
-      playlists={playlists}
-      sessionUserId={session?.user.id}
-    />
+    <PlaylistsView playlists={playlists} sessionUserId={session?.user.id} />
   );
 }

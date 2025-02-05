@@ -7,13 +7,13 @@ export function User({ user }: { user: User | UserObject }) {
   return (
     <Link
       key={user.id}
-      className="flex items-center bg-secondary p-2 hover:underline md:rounded-xl"
+      className="bg-secondary-1 flex items-center p-2 hover:underline md:rounded-xl"
       href={`/profile/${user.providerAccountId}`}
     >
       <Image
         width={32}
         height={32}
-        className="rounded-full"
+        className="aspect-square rounded-full"
         src={user?.image ?? ""}
         alt={user?.name ?? ""}
       />

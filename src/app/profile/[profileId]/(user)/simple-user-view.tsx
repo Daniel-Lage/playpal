@@ -14,7 +14,7 @@ export function SimpleUserView({
   if (!user?.name || !user.image) return;
 
   return (
-    <div className="flex flex-col gap-2 overflow-hidden bg-main md:rounded-t-xl">
+    <div className="bg-main-1 flex flex-col gap-2 overflow-hidden md:rounded-t-xl">
       <div className="flex items-center gap-2 p-2">
         <Link
           className="flex grow items-center"
@@ -23,7 +23,7 @@ export function SimpleUserView({
           <Image
             width={40}
             height={40}
-            className="rounded-full"
+            className="aspect-square rounded-full"
             src={user.image}
             alt={user.name}
           />

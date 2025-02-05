@@ -29,42 +29,11 @@ interface postRelations {
 
 export type PostObject = typeof postsTable.$inferSelect & postRelations;
 
-/*
-
-{ 
-id: string
-userId: string
-type: PostType
-content: string
-createdAt: Date
-updatedAt: Date | null
-urls: Substring[] | null
-urlMetadata: IMetadata | null
-
-author: { ... }
-likes: { ... }[]
-replies: { ... }[]
-}[]' to type 'PostObject[]'
-
-*/
-
-interface clientPostRelations {
+interface mainPostRelations {
   author: User;
   likes?: LikeObject[];
   replies?: ReplyObject[][];
   thread?: ReplyObject[];
 }
 
-export type ClientPostObject = typeof postsTable.$inferSelect &
-  clientPostRelations;
-
-export interface parentPostObject {
-  id: string;
-  thread?: ReplyObject[];
-}
-
-export enum threadPosition {
-  First = "First",
-  Middle = "Middle",
-  Last = "Last",
-}
+export type MainPostObject = typeof postsTable.$inferSelect & mainPostRelations;

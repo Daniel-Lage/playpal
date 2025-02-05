@@ -1,13 +1,13 @@
 "use server";
 import { eq, desc } from "drizzle-orm";
-import type { ClientPostObject, PostObject } from "~/models/post.model";
+import type { MainPostObject, PostObject } from "~/models/post.model";
 import { db } from "./db";
 import { postsTable, repliesTable } from "./db/schema";
 import { getReplyThread } from "./get-reply-thread";
 
 export async function getPost(
   postId: string,
-): Promise<ClientPostObject | undefined> {
+): Promise<MainPostObject | undefined> {
   const post = (await db.query.postsTable.findFirst({
     where: eq(postsTable.id, postId),
     with: {
@@ -54,8 +54,8 @@ export async function getPost(
       await getReplyThread(replyThread, post.replies);
     }
 
-    return { ...post, replies } as ClientPostObject;
+    return { ...post, replies } as MainPostObject;
   }
 
-  return { ...post, replies: undefined } as ClientPostObject;
+  return { ...post, replies: undefined } as MainPostObject;
 }

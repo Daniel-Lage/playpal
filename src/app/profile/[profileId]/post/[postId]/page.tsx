@@ -1,15 +1,16 @@
-import { getServerSession, type Session } from "next-auth";
-import Image from "next/image";
-import Link from "next/link";
+import { getServerSession } from "next-auth";
 import type { Metadata } from "next";
 
 import { getPost } from "~/server/get-post";
 import { getUser } from "~/server/get-user";
-import { SignInButton } from "~/app/_components/signin-button";
-import { PostCreator } from "~/app/_components/post-creator";
 import { authOptions } from "~/lib/auth";
 import { Post } from "~/app/_components/post";
-import { threadPosition, type ClientPostObject } from "~/models/post.model";
+import { IMetadata, Substring } from "~/models/post.model";
+import { PostCreator } from "~/app/_components/post-creator";
+import { postPost } from "~/server/post-post";
+import { SignInButton } from "~/app/_components/signin-button";
+import { revalidatePath } from "next/cache";
+import { Thread } from "./thread";
 
 export const dynamic = "force-dynamic";
 
@@ -57,112 +58,55 @@ export default async function PostPage({
 
   return (
     <>
-      <div className="flex flex-col bg-secondary md:rounded-xl">
-        {post?.thread?.[0]?.repliee ? (
-          <>
-            <Post
-              post={post?.thread?.[0]?.repliee}
-              sessionUserId={session?.user.id}
-              position={threadPosition.First}
-            />
-
-            <div className="flex justify-stretch">
-              <div className="flex w-full flex-col items-stretch">
-                {post.thread?.map(
-                  ({ repliee }, index) =>
-                    repliee &&
-                    index !== 0 && (
-                      <Post
-                        key={repliee.id}
-                        post={repliee}
-                        sessionUserId={session?.user.id}
-                        position={threadPosition.Middle}
-                      />
-                    ),
-                )}
-
-                <div>
-                  <Post
-                    post={post}
-                    sessionUserId={session?.user.id}
-                    focused={true}
-                    position={threadPosition.Last}
-                  />
-                  <PostCreatorWrapper post={post} session={session} />
-                </div>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div>
-            <Post post={post} sessionUserId={session?.user.id} focused={true} />
-            <PostCreatorWrapper post={post} session={session} />
-          </div>
-        )}
-      </div>
-
-      {post.replies?.map((replythread) => (
-        <div
-          key={`${replythread[0]?.replierId}:thread`}
-          className="flex flex-col justify-stretch bg-secondary md:rounded-xl"
-        >
+      <div className="flex flex-col bg-secondary-1 md:rounded-xl">
+        <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
-            {replythread.map(
-              ({ replier }, index) =>
-                replier && (
-                  <Post
-                    key={replier.id}
-                    post={replier}
-                    sessionUserId={session?.user.id}
-                    position={
-                      index === 0
-                        ? threadPosition.First
-                        : index === replythread.length - 1
-                          ? threadPosition.Last
-                          : threadPosition.Middle
-                    }
-                  />
-                ),
-            )}
+            <div>
+              {post.thread && (
+                <Thread
+                  thread={post.thread.map(({ repliee }) => repliee)}
+                  sessionUserId={session?.user.id}
+                  isMainPost={true}
+                />
+              )}
+              <Post
+                post={post}
+                sessionUserId={session?.user.id}
+                isMainPost={true}
+              />
+              {session?.user?.image && session?.user?.name ? (
+                <PostCreator
+                  send={async (
+                    input: string,
+                    urls: Substring[] | undefined,
+                    metadata: IMetadata | undefined,
+                  ) => {
+                    "use server";
+                    await postPost(
+                      input,
+                      session.user.id,
+                      urls,
+                      metadata,
+                      post,
+                    );
+                    revalidatePath("/");
+                  }}
+                  sessionUser={session.user}
+                />
+              ) : (
+                <SignInButton />
+              )}
+            </div>
           </div>
         </div>
+      </div>
+      {post.replies?.map((thread) => (
+        <Thread
+          key={`${thread[0]?.replierId}:thread`}
+          thread={thread.map(({ replier }) => replier)}
+          sessionUserId={session?.user.id}
+        />
       ))}
     </>
   );
-}
-
-function PostCreatorWrapper({
-  session,
-  post,
-}: {
-  session: Session | null;
-  post: ClientPostObject;
-}) {
-  if (session?.user?.image && session?.user?.name)
-    return (
-      <div className="flex flex-col gap-2 bg-main p-2 md:rounded-b-xl">
-        <div className="flex items-center justify-between">
-          <Link
-            className="flex items-center"
-            href={`/profile/${session.user.id}`}
-          >
-            <Image
-              width={40}
-              height={40}
-              className="rounded-full"
-              src={session.user.image}
-              alt={session.user.name}
-            />
-            <div className="px-2 font-bold">{session.user.name}</div>
-          </Link>
-        </div>
-        <div className="flex">
-          <PostCreator
-            sessionUserId={session?.user.id}
-            parent={{ id: post.id, thread: post.thread }}
-          />
-        </div>
-      </div>
-    );
-  return <SignInButton />;
 }

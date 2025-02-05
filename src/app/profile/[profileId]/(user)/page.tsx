@@ -1,14 +1,16 @@
 import { getServerSession } from "next-auth";
 import type { Metadata } from "next";
 
-import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
-import { PostType } from "~/models/post.model";
+import { IMetadata, PostType, Substring } from "~/models/post.model";
 import Link from "next/link";
 import Image from "next/image";
 import { PostCreator } from "~/app/_components/post-creator";
 import { Post } from "~/app/_components/post";
+import { getUser } from "~/server/get-user";
+import { postPost } from "~/server/post-post";
+import { revalidatePath } from "next/cache";
 
 export async function generateMetadata({
   params: { profileId },
@@ -67,28 +69,24 @@ export default async function ProfilePage({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-col items-start gap-2 bg-main p-2 md:flex-row md:items-center md:rounded-b-2xl">
+      <div className="flex flex-col items-start gap-2 bg-main-1 p-2 md:flex-row md:items-center md:rounded-b-2xl">
         <div className="font-bold">{posts.length} Posts</div>
       </div>
 
       {session?.user.id === user.id && (
-        <div className="flex flex-col gap-2 bg-main p-2 md:rounded-xl">
-          <div className="flex items-center justify-between">
-            <Link className="flex items-center" href={"/profile"}>
-              <Image
-                width={40}
-                height={40}
-                className="rounded-full"
-                src={user.image ?? ""}
-                alt={user.name ?? ""}
-              />
-              <div className="px-2 font-bold">{user.name}</div>
-            </Link>
-          </div>
-          <div className="flex">
-            <PostCreator sessionUserId={session.user.id} />
-          </div>
-        </div>
+        <PostCreator
+          send={async (
+            input: string,
+            urls: Substring[] | undefined,
+            metadata: IMetadata | undefined,
+          ) => {
+            "use server";
+            await postPost(input, session.user.id, urls, metadata);
+
+            revalidatePath("/");
+          }}
+          sessionUser={session.user}
+        />
       )}
 
       {posts.map((post) => (

@@ -8,22 +8,22 @@ import {
   useMemo,
   useState,
 } from "react";
-import type {
-  IMetadata,
-  parentPostObject,
-  Substring,
-} from "~/models/post.model";
+import type { IMetadata, Substring } from "~/models/post.model";
 
-import { postPost } from "~/server/post-post";
 import { getMetadata } from "~/lib/get-metadata";
 import Image from "next/image";
+import { User } from "next-auth";
 
 export function PostCreator({
-  sessionUserId,
-  parent,
+  send,
+  sessionUser,
 }: {
-  sessionUserId: string;
-  parent?: parentPostObject;
+  send: (
+    input: string,
+    urls: Substring[] | undefined,
+    metadata: IMetadata | undefined,
+  ) => Promise<void>;
+  sessionUser: User;
 }) {
   const [input, setInput] = useState("");
   const [canPost, setCanPost] = useState(true);
@@ -83,31 +83,43 @@ export function PostCreator({
     }
   }, [urlForMetadata]);
 
-  async function send() {
+  async function handleSend() {
     setCanPost(false);
 
-    postPost(input, sessionUserId, parent, urls, metadata)
-      .then(() => {
-        setCanPost(true);
-        setInput("");
-      })
-      .catch(console.error);
+    await send(input, urls, metadata);
+
+    setCanPost(true);
+    setInput("");
   }
 
   return (
-    <div className="flex grow flex-col">
-      <TextInput
-        input={input}
-        urls={urls}
-        send={send}
-        canPost={canPost}
-        setInput={setInput}
-      />
-      <MetadataPreview
-        url={urlForMetadata}
-        metadata={metadata}
-        loadingMetadata={loadingMetadata}
-      />
+    <div className="flex flex-col gap-2 bg-main-1 p-2 md:rounded-xl">
+      <div className="flex items-center justify-between">
+        <Link className="flex items-center" href={"/profile"}>
+          <Image
+            width={40}
+            height={40}
+            className="aspect-square rounded-full"
+            src={sessionUser.image ?? ""}
+            alt={sessionUser.name ?? ""}
+          />
+          <div className="px-2 font-bold">{sessionUser.name}</div>
+        </Link>
+      </div>
+      <div className="flex grow flex-col">
+        <TextInput
+          input={input}
+          urls={urls}
+          send={handleSend}
+          canPost={canPost}
+          setInput={setInput}
+        />
+        <MetadataPreview
+          url={urlForMetadata}
+          metadata={metadata}
+          loadingMetadata={loadingMetadata}
+        />
+      </div>
     </div>
   );
 }
@@ -172,7 +184,7 @@ function MetadataPreview({
   if (url) {
     if (loadingMetadata)
       return (
-        <div className="flex items-start gap-2 rounded-lg bg-main3 p-2 font-bold">
+        <div className="flex items-start gap-2 rounded-lg bg-main-3 p-2 font-bold">
           Loading Metadata...
         </div>
       );
@@ -180,7 +192,7 @@ function MetadataPreview({
       return (
         <Link
           href={metadata.og_url}
-          className="flex items-start gap-2 rounded-lg bg-main3 p-2"
+          className="flex items-start gap-2 rounded-lg bg-main-3 p-2"
         >
           {metadata?.og_image && (
             <Image

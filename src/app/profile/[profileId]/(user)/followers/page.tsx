@@ -14,7 +14,7 @@ export default async function OthersProfileFollowersPage({
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex flex-col items-start gap-2 bg-main p-2 md:flex-row md:items-center md:rounded-b-xl">
+      <div className="flex flex-col items-start gap-2 bg-main-1 p-2 md:flex-row md:items-center md:rounded-b-xl">
         <div className="font-bold">{user.followers.length} Followers</div>
       </div>
       {user.followers.map(

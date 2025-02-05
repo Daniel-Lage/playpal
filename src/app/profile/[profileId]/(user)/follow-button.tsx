@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { UserObject } from "~/models/user.model";
 import { followUser } from "~/server/follow-user";
@@ -14,7 +15,12 @@ export function FollowButton({
 }) {
   const router = useRouter();
 
-  console.log(user, sessionUserId);
+  if (user.id === sessionUserId)
+    return (
+      <Link href={"/api/auth/signout"} className="hover:underline">
+        Log Out
+      </Link>
+    );
 
   if (user.followers.some((follow) => follow.followerId === sessionUserId))
     return (
@@ -24,6 +30,7 @@ export function FollowButton({
             ? unfollowUser(sessionUserId, user.id)
             : router.push("/api/auth/signin")
         }
+        className="hover:underline"
       >
         Unfollow
       </button>
@@ -36,6 +43,7 @@ export function FollowButton({
           ? followUser(sessionUserId, user.id)
           : router.push("/api/auth/signin")
       }
+      className="hover:underline"
     >
       Follow
     </button>

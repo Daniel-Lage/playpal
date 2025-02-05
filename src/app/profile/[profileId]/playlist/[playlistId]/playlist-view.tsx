@@ -51,8 +51,6 @@ export function PlaylistView({
     );
 
   const treatedTracks = useMemo(() => {
-    if (!playlist) return [];
-
     const temp = getTreatedTracks(
       [...playlist.tracks.items],
       sortingColumn,

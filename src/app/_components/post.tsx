@@ -2,52 +2,38 @@
 
 import Image from "next/image";
 
-import { unlikePost } from "~/server/unlike-post";
-import { likePost } from "~/server/like-post";
-import { deletePost } from "~/server/delete-post";
-
 import {
-  type ClientPostObject,
+  type MainPostObject,
   type PostObject,
   type Substring,
-  threadPosition,
 } from "~/models/post.model";
 import Link from "next/link";
+import { LikeButton } from "./like-button";
+import { DeleteButton } from "./delete-button";
 
 export function Post({
   post,
   sessionUserId,
-  focused,
-  position,
+  isMainPost,
 }: {
-  post: ClientPostObject | PostObject;
+  post: MainPostObject | PostObject;
   sessionUserId?: string | null;
-  focused?: boolean;
-  position?: threadPosition;
+  isMainPost?: boolean;
 }) {
   return (
-    <div
-      className={
-        focused
-          ? "flex items-stretch gap-2 bg-secondary md:rounded-t-xl"
-          : "flex items-stretch gap-2 bg-secondary md:rounded-xl"
-      }
-    >
-      <div className="flex shrink-0 flex-col items-center gap-2 pl-4">
-        <div
-          className={`h-2 w-1 rounded-b-xl ${position && position !== threadPosition.First ? "bg-gray-700" : ""}`}
-        ></div>
+    <div className={"flex items-stretch bg-secondary-1 md:rounded-xl"}>
+      <Link
+        href={`/profile/${post.author.providerAccountId}`}
+        className="self-start"
+      >
         <Image
           width={40}
           height={40}
-          className="rounded-full"
+          className="aspect-square h-14 w-14 flex-grow-0 rounded-full p-2"
           src={post.author?.image ?? ""}
           alt={post.author?.name ?? ""}
         />
-        <div
-          className={`w-1 grow rounded-t-xl ${position && position !== threadPosition.Last ? "bg-gray-700" : ""}`}
-        ></div>
-      </div>
+      </Link>
 
       <div className="flex grow flex-col gap-2 p-2 pl-0">
         <div className="flex items-center justify-between">
@@ -61,7 +47,7 @@ export function Post({
             className="flex h-full grow"
             href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
           ></Link>
-          <DeleteButton {...{ post, sessionUserId, focused }} />
+          <DeleteButton {...{ post, sessionUserId, isMainPost }} />
         </div>
 
         <FormattedContent
@@ -73,7 +59,7 @@ export function Post({
         {post?.urlMetadata?.og_url && (
           <Link
             href={post.urlMetadata.og_url}
-            className="flex items-start gap-2 rounded-lg bg-secondary2 p-2"
+            className="flex items-start gap-2 rounded-lg bg-secondary-2 p-2"
           >
             {post?.urlMetadata?.og_image && (
               <Image
@@ -169,56 +155,4 @@ function FormattedContent({
   }
 
   return content;
-}
-
-function DeleteButton({
-  post,
-  sessionUserId,
-  focused,
-}: {
-  post: ClientPostObject | PostObject;
-  sessionUserId?: string | null;
-  focused?: boolean;
-}) {
-  if (sessionUserId === post.userId) {
-    if (focused)
-      return (
-        <Link href={"/"} onClick={() => deletePost(post.id)}>
-          <Image height={24} width={24} src="/trash.png" alt="trash icon" />
-        </Link>
-      );
-    return (
-      <button onClick={() => deletePost(post.id)}>
-        <Image height={24} width={24} src="/trash.png" alt="trash icon" />
-      </button>
-    );
-  }
-}
-
-function LikeButton({
-  post,
-  sessionUserId,
-}: {
-  post: ClientPostObject | PostObject;
-  sessionUserId?: string | null;
-}) {
-  if (sessionUserId) {
-    if (post.likes?.some((like) => like.userId === sessionUserId))
-      return (
-        <button onClick={() => unlikePost(post.id, sessionUserId)}>
-          <Image height={24} width={24} src="/liked.png" alt="liked icon" />
-        </button>
-      );
-    return (
-      <button onClick={() => likePost(post.id, sessionUserId)}>
-        <Image height={24} width={24} src="/unliked.png" alt="unliked icon" />
-      </button>
-    );
-  }
-  return (
-    // eventually open modal to login
-    <button>
-      <Image height={24} width={24} src="/unliked.png" alt="unliked icon" />
-    </button>
-  );
 }

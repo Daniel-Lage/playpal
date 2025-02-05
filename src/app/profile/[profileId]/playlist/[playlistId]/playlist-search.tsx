@@ -26,9 +26,9 @@ export function PlaylistSearch({
   play: (start?: PlaylistTrack | undefined) => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-between gap-2 bg-main2 p-2 md:flex-row">
+    <div className="bg-main-2 flex flex-col items-center justify-between gap-2 p-2 md:flex-row">
       <div className="flex gap-2">
-        <div className="flex items-center justify-center gap-2 rounded-xl bg-main3 pl-1 pr-3 text-center">
+        <div className="bg-main-3 flex items-center justify-center gap-2 rounded-xl pl-1 pr-3 text-center">
           <div className="font-bold md:p-1">Sort by</div>
           <select
             onChange={sortColumn}

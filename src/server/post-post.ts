@@ -1,22 +1,19 @@
 "use server";
-import { revalidatePath } from "next/cache";
 import {
-  type parentPostObject,
   type Substring,
   type IMetadata,
   PostType,
+  MainPostObject,
 } from "~/models/post.model";
 import { db } from "./db";
 import { postsTable, repliesTable } from "./db/schema";
 
-// called in client
-
 export async function postPost(
   content: string,
   userId: string,
-  parent?: parentPostObject,
-  urls?: Substring[],
-  metadata?: IMetadata,
+  urls: Substring[] | undefined,
+  metadata: IMetadata | undefined,
+  parent?: MainPostObject,
 ) {
   if (parent) {
     const posts = await db
@@ -62,6 +59,4 @@ export async function postPost(
         urlMetadata: metadata,
       })
       .returning();
-
-  revalidatePath("/");
 }

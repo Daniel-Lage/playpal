@@ -15,7 +15,7 @@ export function ProfileTabs({ profileId }: { profileId: string }) {
   const pathname = usePathname();
 
   return (
-    <div className="flex gap-1 bg-main3 font-bold">
+    <div className="bg-main-3 flex gap-1 font-bold">
       {profileTabs.map(({ title, path }) => (
         <ProfileTabLink
           href={`/profile/${profileId}${path}`}
@@ -40,13 +40,13 @@ function ProfileTabLink({
   return (
     <Link
       href={href}
-      className={`w-1/2 justify-center bg-main p-1 text-center text-xs hover:underline md:text-base`}
+      className={`bg-main-1 w-1/2 justify-center p-1 text-center text-xs hover:underline md:text-base`}
       role="button"
       key={title}
     >
       {title}
       {href === pathname && (
-        <div className="float-end h-1 w-full bg-main3"></div>
+        <div className="bg-main-3 float-end h-1 w-full"></div>
       )}
     </Link>
   );

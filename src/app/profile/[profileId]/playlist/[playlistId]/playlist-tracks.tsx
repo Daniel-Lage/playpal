@@ -14,7 +14,7 @@ export function PlaylistTracks({
   return treatedTracks.map((track) => (
     <button
       key={track.track.uri + track.added_at}
-      className="flex items-center gap-1 bg-secondary p-1 font-bold md:rounded-lg"
+      className="bg-secondary-1 flex items-center gap-1 p-1 font-bold md:rounded-lg"
       disabled={disabled || track.is_local}
       onClick={() => playTrack(track)}
     >
