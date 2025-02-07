@@ -1,10 +1,10 @@
 "use server";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, sql } from "drizzle-orm";
 import { type PostObject, PostType } from "~/models/post.model";
 import { db } from "./db";
 import { repliesTable, postsTable } from "./db/schema";
 
-export async function getPosts() {
+export async function getPosts(lastQueried?: Date) {
   const posts = await db.query.postsTable.findMany({
     with: {
       author: true,
@@ -15,7 +15,10 @@ export async function getPosts() {
       },
     },
     orderBy: [desc(postsTable.createdAt)],
-    where: eq(postsTable.type, PostType.Post),
+    where: and(
+      eq(postsTable.type, PostType.Post),
+      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new posts
+    ),
     limit: 100,
   });
 

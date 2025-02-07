@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { LikeButton } from "./like-button";
 import { DeleteButton } from "./delete-button";
+import { formatTimelapse } from "~/helpers/format-timelapse";
 
 export function Post({
   post,
@@ -44,9 +45,12 @@ export function Post({
             <div className="font-bold">{post.author?.name}</div>
           </Link>
           <Link
-            className="flex h-full grow"
+            className="flex h-full grow pl-2"
             href={`/profile/${post.author.providerAccountId}/post/${post.id}`}
-          ></Link>
+          >
+            {formatTimelapse(Date.now() - post.createdAt.getTime()) ??
+              post.createdAt.toUTCString()}
+          </Link>
           <DeleteButton {...{ post, sessionUserId, isMainPost }} />
         </div>
 

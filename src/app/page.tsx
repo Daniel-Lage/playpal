@@ -4,10 +4,10 @@ import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
 import { getPosts } from "~/server/get-posts";
 import { authOptions } from "~/lib/auth";
-import { Post } from "./_components/post";
 import type { IMetadata, Substring } from "~/models/post.model";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
+import { PostsView } from "./posts-view";
 
 export const dynamic = "force-dynamic";
 
@@ -34,9 +34,11 @@ export default async function HomePage() {
       ) : (
         <SignInButton />
       )}
-      {posts.map((post) => (
-        <Post key={post.id} post={post} sessionUserId={session?.user.id} />
-      ))}
+      <PostsView
+        posts={posts}
+        sessionUserId={session?.user.id}
+        lastQueried={new Date()}
+      />
     </>
   );
 }

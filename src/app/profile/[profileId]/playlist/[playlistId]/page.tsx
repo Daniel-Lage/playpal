@@ -6,10 +6,10 @@ import type { Metadata } from "next";
 import { getPlaylist } from "~/api/get-playlist";
 import { PlaylistView } from "./playlist-view";
 import { getMySpotifyUser } from "~/api/get-my-spotify-user";
-import { getRandomSample } from "~/app/helpers/get-random-sample";
+import { getRandomSample } from "~/helpers/get-random-sample";
 import type { PlaylistTrack } from "~/models/track.model";
 import { playTracks } from "~/api/play-tracks";
-import { setFirstItem } from "~/app/helpers/set-first-item";
+import { setFirstItem } from "~/helpers/set-first-item";
 
 export async function generateMetadata({
   params: { playlistId, profileId },
