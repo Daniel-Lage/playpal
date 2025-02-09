@@ -1,12 +1,14 @@
 "use server";
+
 import type { SpotifyError } from "~/models/error.model";
 import type { Paging } from "~/models/paging.model";
 import type { Playlist } from "~/models/playlist.model";
 import { getTokens } from "./get-tokens";
+import { getProviderAccountId } from "~/server/get-provider-account-id";
 
 export async function getUsersPlaylists(
   accessToken: string | null | undefined,
-  profileId: string,
+  userId: string,
 ) {
   if (!accessToken) {
     if (process.env.FALLBACK_REFRESH_TOKEN === undefined)
@@ -21,8 +23,10 @@ export async function getUsersPlaylists(
 
   if (accessToken === null) throw new Error("acessToken is null");
 
+  const providerAccountId = await getProviderAccountId(userId);
+
   const response = await fetch(
-    `https://api.spotify.com/v1/users/${profileId}/playlists?limit=50`,
+    `https://api.spotify.com/v1/users/${providerAccountId}/playlists?limit=50`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,

@@ -4,11 +4,9 @@ import type { UserObject } from "~/models/user.model";
 import { db } from "./db";
 import { usersTable, repliesTable } from "./db/schema";
 
-export async function getUser(
-  profileId: string,
-): Promise<UserObject | undefined> {
+export async function getUser(userId: string): Promise<UserObject | undefined> {
   const user = await db.query.usersTable.findFirst({
-    where: eq(usersTable.providerAccountId, profileId),
+    where: eq(usersTable.id, userId),
     with: {
       posts: {
         with: {

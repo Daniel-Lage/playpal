@@ -29,16 +29,8 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    signIn: async ({ user, account }) => {
-      if (account?.providerAccountId)
-        user.providerAccountId = account?.providerAccountId;
-      return true;
-    },
     session: async ({ session, user }) => {
-      if (user) {
-        session.user.id = user.id;
-        session.user.providerAccountId = user.providerAccountId;
-      }
+      if (user) session.user.id = user.id;
 
       // get account to refresh token
       const account = (await db.query.accountsTable.findFirst({

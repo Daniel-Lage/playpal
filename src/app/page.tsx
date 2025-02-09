@@ -38,6 +38,10 @@ export default async function HomePage() {
         posts={posts}
         sessionUserId={session?.user.id}
         lastQueried={new Date()}
+        refresh={async (lastQueried: Date) => {
+          "use server";
+          return await getPosts(lastQueried);
+        }}
       />
     </>
   );

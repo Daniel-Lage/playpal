@@ -33,9 +33,7 @@ export default async function RootLayout({
         </main>
         <NavBar
           profileURL={
-            session
-              ? `/profile/${session?.user.providerAccountId}`
-              : "/api/auth/signin"
+            session ? `/user/${session?.user.id}` : "/api/auth/signin"
           }
         />
       </body>
