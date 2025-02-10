@@ -68,7 +68,7 @@ export default function PlaylistsView({
   }, [playlists, filter, sortingColumn, reversed]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <>
       <PlaylistsSearch
         sortingColumn={sortingColumn}
         reversed={reversed}
@@ -90,7 +90,7 @@ export default function PlaylistsView({
         treatedPlaylists={treatedPlaylists}
         style={feedStyle ?? PlaylistFeedStyle.Grid}
       />
-    </div>
+    </>
   );
 }
 

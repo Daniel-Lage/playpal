@@ -27,21 +27,20 @@ export function PlaylistsSearch({
   changeStyle: (e: ChangeEvent<HTMLSelectElement>) => void;
 }) {
   return (
-    <div className="flex flex-col items-start gap-2 bg-main-1 p-2 md:flex-row md:items-center md:rounded-b-2xl">
-      <div className="flex items-start gap-2">
-        <div className="flex items-center justify-center gap-2 rounded-xl bg-main-3 p-2 text-center text-sm">
-          <div className="font-bold">Sorting column</div>
-          <select
-            onChange={sortColumn}
-            defaultValue={sortingColumn ?? PlaylistsSortingColumn.CreatedAt}
-          >
-            {PlaylistsSortingColumnOptions.map((sortingColumn) => (
-              <option key={sortingColumn}>{sortingColumn}</option>
-            ))}
-          </select>
-        </div>
+    <div className="flex flex-col items-start gap-2 bg-main-1 p-2 md:flex-row md:items-center md:rounded-md">
+      {length} Playlists
+      <div className="flex items-center justify-center gap-2 rounded-md bg-main-3 p-2 text-center text-sm">
+        <div className="font-bold">Sorting column</div>
+        <select
+          onChange={sortColumn}
+          defaultValue={sortingColumn ?? PlaylistsSortingColumn.CreatedAt}
+        >
+          {PlaylistsSortingColumnOptions.map((sortingColumn) => (
+            <option key={sortingColumn}>{sortingColumn}</option>
+          ))}
+        </select>
 
-        <button onClick={reverse}>
+        <button onClick={reverse} className="my-[-10px]">
           <Image
             height={32}
             width={32}
@@ -51,8 +50,7 @@ export function PlaylistsSearch({
           />
         </button>
       </div>
-
-      <div className="flex items-center justify-center gap-2 rounded-xl bg-main-3 p-2 text-center text-sm">
+      <div className="flex items-center justify-center gap-2 rounded-md bg-main-3 p-2 text-center text-sm">
         <div className="font-bold">Feed Style</div>
         <select
           onChange={changeStyle}
@@ -63,9 +61,6 @@ export function PlaylistsSearch({
           ))}
         </select>
       </div>
-
-      <div className="font-bold">{length} Playlists</div>
-
       <input
         placeholder="Search something!"
         className="grow bg-transparent placeholder-zinc-600 outline-none"

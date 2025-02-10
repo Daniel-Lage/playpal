@@ -22,7 +22,7 @@ export function PostView({
   isMainPost?: boolean;
 }) {
   return (
-    <div className={"flex items-stretch bg-secondary-1 md:rounded-xl"}>
+    <div className={"flex items-stretch bg-secondary-1 md:rounded-md"}>
       <Link href={`/user/${post.author.id}`} className="self-start">
         <Image
           width={40}
@@ -57,7 +57,7 @@ export function PostView({
         {post?.urlMetadata?.og_url && (
           <Link
             href={post.urlMetadata.og_url}
-            className="flex items-start gap-2 rounded-lg bg-secondary-2 p-2"
+            className="flex items-start gap-2 rounded-md bg-secondary-2 p-2"
           >
             {post?.urlMetadata?.og_image && (
               <Image

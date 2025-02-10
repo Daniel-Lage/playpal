@@ -12,7 +12,7 @@ export function PlaylistFeed({
 }) {
   if (style === PlaylistFeedStyle.Grid)
     return (
-      <div className="grid grid-cols-2 gap-2 px-2 pt-0 md:grid-cols-4 md:gap-4">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-4 md:gap-4">
         {treatedPlaylists.map((playlist) => (
           <PlaylistGrid key={playlist.id} playlist={playlist} />
         ))}
@@ -20,7 +20,7 @@ export function PlaylistFeed({
     );
 
   return (
-    <div className="flex flex-col gap-2">
+    <>
       {treatedPlaylists.map((playlist) =>
         style === PlaylistFeedStyle.Compact ? (
           <PlaylistCompact key={playlist.id} playlist={playlist} />
@@ -28,13 +28,13 @@ export function PlaylistFeed({
           <PlaylistRow key={playlist.id} playlist={playlist} />
         ),
       )}
-    </div>
+    </>
   );
 }
 
 function PlaylistGrid({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="flex flex-col items-end justify-between rounded-xl bg-secondary-1 p-2">
+    <div className="flex flex-col items-end justify-between rounded-md bg-secondary-1 p-2">
       <Link
         href={`/playlist/${playlist.id}`}
         className="grow"
@@ -43,7 +43,7 @@ function PlaylistGrid({ playlist }: { playlist: Playlist }) {
         <Image
           width={500}
           height={500}
-          className="aspect-square rounded-lg"
+          className="aspect-square rounded-md"
           src={playlist.images[0]?.url ?? ""}
           alt={playlist.name}
         />
@@ -57,7 +57,7 @@ function PlaylistGrid({ playlist }: { playlist: Playlist }) {
 
 function PlaylistCompact({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="flex items-center gap-2 overflow-hidden bg-secondary-1 p-1 font-bold md:rounded-lg">
+    <div className="my-[-4px] flex items-center gap-2 overflow-hidden bg-secondary-1 p-1 font-bold md:rounded-md">
       <Link
         href={`/playlist/${playlist.id}`}
         className="grow"
@@ -82,7 +82,7 @@ function PlaylistCompact({ playlist }: { playlist: Playlist }) {
 
 function PlaylistRow({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="flex items-start gap-2 bg-secondary-1 p-2 font-bold md:rounded-lg">
+    <div className="flex items-start gap-2 bg-secondary-1 p-2 font-bold md:rounded-md">
       <Link
         href={`/playlist/${playlist.id}`}
         className="flex grow gap-2"

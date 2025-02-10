@@ -58,7 +58,7 @@ export default async function PostPage({
 
   return (
     <>
-      <div className="flex flex-col bg-secondary-1 md:rounded-xl">
+      <div className="flex flex-col bg-secondary-1 md:rounded-md">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
             <div>

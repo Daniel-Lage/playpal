@@ -61,11 +61,7 @@ export default async function ProfilePage({
   const posts = await getUsersPosts(userId);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col items-start gap-2 bg-main-1 p-2 md:flex-row md:items-center md:rounded-b-2xl">
-        <div className="font-bold">{posts.length} Posts</div>
-      </div>
-
+    <>
       {session?.user.id === userId && (
         <PostCreator
           send={async (
@@ -91,6 +87,6 @@ export default async function ProfilePage({
           return await getUsersPosts(userId, false, lastQueried);
         }}
       />
-    </div>
+    </>
   );
 }

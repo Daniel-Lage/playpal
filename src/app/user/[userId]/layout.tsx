@@ -22,13 +22,13 @@ export default async function ProfileLayout({
     return <div className="self-center text-xl text-red-500">Error</div>;
 
   return (
-    <div>
-      <div className="flex flex-col gap-2 overflow-hidden bg-main-1 md:rounded-t-xl">
+    <>
+      <div className="flex flex-col gap-2 overflow-hidden bg-main-1 md:rounded-md">
         <SimpleUserView user={user} sessionUserId={session?.user.id} />
 
         <ProfileTabs userId={userId} />
       </div>
       {children}
-    </div>
+    </>
   );
 }

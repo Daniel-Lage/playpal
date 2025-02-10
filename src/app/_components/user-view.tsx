@@ -7,12 +7,12 @@ export function UserView({ user }: { user: User | UserObject }) {
   return (
     <Link
       key={user.id}
-      className="flex items-center bg-secondary-1 p-2 hover:underline md:rounded-xl"
+      className="flex grow-0 flex-col items-center bg-secondary-1 p-2 hover:underline md:rounded-md"
       href={`/user/${user.id}`}
     >
       <Image
-        width={32}
-        height={32}
+        width={80}
+        height={80}
         className="aspect-square rounded-full"
         src={user?.image ?? ""}
         alt={user?.name ?? ""}

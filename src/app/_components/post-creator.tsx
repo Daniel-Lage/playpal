@@ -93,7 +93,7 @@ export function PostCreator({
   }
 
   return (
-    <div className="flex flex-col gap-2 bg-main-1 p-2 md:rounded-xl">
+    <div className="flex flex-col gap-2 bg-main-1 p-2 md:rounded-md">
       <div className="flex items-center justify-between">
         <Link className="flex items-center" href={"/profile"}>
           <Image
@@ -184,7 +184,7 @@ function MetadataPreview({
   if (url) {
     if (loadingMetadata)
       return (
-        <div className="flex items-start gap-2 rounded-lg bg-main-3 p-2 font-bold">
+        <div className="flex items-start gap-2 rounded-md bg-main-3 p-2 font-bold">
           Loading Metadata...
         </div>
       );
@@ -192,7 +192,7 @@ function MetadataPreview({
       return (
         <Link
           href={metadata.og_url}
-          className="flex items-start gap-2 rounded-lg bg-main-3 p-2"
+          className="flex items-start gap-2 rounded-md bg-main-3 p-2"
         >
           {metadata?.og_image && (
             <Image
@@ -231,33 +231,31 @@ function TextInput({
   setInput: Dispatch<SetStateAction<string>>;
 }) {
   return (
-    <div className="flex grow gap-2">
-      <div className="flex grow overflow-hidden text-clip">
-        <div className="relative flex h-10 w-full grow">
-          <input
-            placeholder="Type something!"
-            className="absolute z-10 w-full select-text bg-transparent text-transparent placeholder-zinc-600 caret-black outline-none"
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
+    <div className="flex grow overflow-hidden text-clip">
+      <div className="relative flex h-10 w-full grow">
+        <input
+          placeholder="Type something!"
+          className="absolute z-10 w-full select-text bg-transparent text-transparent placeholder-zinc-600 caret-black outline-none"
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
 
-                if (input !== "" && canPost) {
-                  void send();
-                }
+              if (input !== "" && canPost) {
+                void send();
               }
-            }}
-          />
-          <FormattedContent input={input} urls={urls} />
-        </div>
-        {canPost && input !== "" && (
-          <button onClick={() => void send()} className="pl-2 font-bold">
-            Post
-          </button>
-        )}
+            }
+          }}
+        />
+        <FormattedContent input={input} urls={urls} />
       </div>
+      {canPost && input !== "" && (
+        <button onClick={() => void send()} className="pl-2 font-bold">
+          Post
+        </button>
+      )}
     </div>
   );
 }

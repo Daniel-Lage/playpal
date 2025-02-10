@@ -5,7 +5,7 @@ export function SignInButton() {
   return (
     <Link
       href="/api/auth/signin"
-      className="bg-main-1 flex justify-center gap-4 p-4 font-bold md:rounded-xl"
+      className="flex justify-center gap-4 bg-main-1 p-4 font-bold md:rounded-md"
     >
       <Image height={40} width={40} src="/enter.png" alt="enter icon" />
     </Link>

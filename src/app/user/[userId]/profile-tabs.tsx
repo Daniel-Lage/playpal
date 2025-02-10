@@ -40,14 +40,11 @@ function ProfileTabLink({
   return (
     <Link
       href={href}
-      className={`w-1/2 justify-center bg-main-1 p-1 text-center text-xs hover:underline md:text-base`}
+      className={`w-1/2 justify-center ${href === pathname ? "bg-main-3" : "bg-main-1"} p-1 text-center text-xs hover:underline md:text-base`}
       role="button"
       key={title}
     >
       {title}
-      {href === pathname && (
-        <div className="float-end h-1 w-full bg-main-3"></div>
-      )}
     </Link>
   );
 }

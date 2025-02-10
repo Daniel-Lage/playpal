@@ -79,7 +79,7 @@ export function PlaylistView({
 
   return (
     <>
-      <div className="flex flex-col overflow-hidden md:rounded-2xl">
+      <div className="flex flex-col overflow-hidden md:rounded-md">
         <PlaylistContent playlist={playlist} />
 
         <PlaylistSearch

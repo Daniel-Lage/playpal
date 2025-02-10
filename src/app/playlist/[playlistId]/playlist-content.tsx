@@ -4,11 +4,11 @@ import type { Playlist } from "~/models/playlist.model";
 
 export function PlaylistContent({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="bg-main-1 flex flex-col items-center gap-2 p-2 md:flex-row md:items-start">
+    <div className="flex flex-col items-center gap-2 bg-main-1 p-2 md:flex-row md:items-start">
       <Image
         width={200}
         height={200}
-        className="aspect-square rounded-xl"
+        className="aspect-square rounded-md"
         src={playlist.images[0]?.url ?? ""}
         alt={playlist.name}
       />

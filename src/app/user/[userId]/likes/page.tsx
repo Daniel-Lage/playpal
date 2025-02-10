@@ -57,10 +57,7 @@ export default async function ProfilePage({
   const likes = await getUsersLikes(userId);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-col items-start gap-2 bg-main-1 p-2 md:flex-row md:items-center md:rounded-b-2xl">
-        <div className="font-bold">{likes.length} Likes</div>
-      </div>
+    <>
       {likes.map(
         (like) =>
           like?.likee && (
@@ -71,6 +68,6 @@ export default async function ProfilePage({
             />
           ),
       )}
-    </div>
+    </>
   );
 }
