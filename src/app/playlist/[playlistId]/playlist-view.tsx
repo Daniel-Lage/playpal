@@ -78,7 +78,7 @@ export function PlaylistView({
 
       setDisabled(false);
     },
-    [play],
+    [play, router, sessionUserId],
   );
 
   return (
