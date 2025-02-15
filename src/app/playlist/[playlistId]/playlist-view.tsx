@@ -14,6 +14,7 @@ import { PlaylistContent } from "./playlist-content";
 import { PlaylistSearch } from "./playlist-search";
 import { PlaylistTracks } from "./playlist-tracks";
 import { useLocalStorage } from "~/hooks/use-local-storage";
+import { useRouter } from "next/navigation";
 
 export function PlaylistView({
   playlist,
@@ -26,7 +27,9 @@ export function PlaylistView({
   sessionUserId?: string;
   play?: (start?: PlaylistTrack) => Promise<void>;
 }) {
-  const [disabled, setDisabled] = useState(!play);
+  const router = useRouter();
+
+  const [disabled, setDisabled] = useState(false);
 
   const [filter, setFilter] = useState("");
 
@@ -66,6 +69,7 @@ export function PlaylistView({
 
   const handlePlay = useCallback(
     async (start?: PlaylistTrack) => {
+      if (!sessionUserId) return router.replace("/api/auth/signin");
       if (!play) return;
 
       setDisabled(true);
