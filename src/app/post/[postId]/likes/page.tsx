@@ -17,7 +17,7 @@ export default async function PostLikesPage({
 
   return (
     <>
-      <div className="flex flex-col gap-1 bg-main-1 md:rounded-md">
+      <div className="flex flex-col gap-1 rounded-md bg-main-1">
         <PostView
           post={post}
           sessionUserId={session?.user.id}

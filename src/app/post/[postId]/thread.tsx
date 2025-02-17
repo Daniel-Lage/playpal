@@ -16,7 +16,7 @@ export function Thread({
   const [cutoff, setCutoff] = useState(thread.length - 1);
 
   return (
-    <div className="flex flex-col justify-stretch bg-secondary-1 md:rounded-md">
+    <div className="flex flex-col justify-stretch rounded-md bg-secondary-1">
       {thread.map(
         (post, index) =>
           post &&

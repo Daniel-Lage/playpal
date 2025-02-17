@@ -93,7 +93,7 @@ export function PostCreator({
   }
 
   return (
-    <div className="flex flex-col gap-2 bg-main-1 p-2 md:rounded-md">
+    <div className="flex flex-col gap-2 rounded-md bg-main-1 p-2">
       <div className="flex items-center justify-between">
         <Link className="flex items-center" href={"/profile"}>
           <Image

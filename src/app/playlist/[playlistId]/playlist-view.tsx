@@ -14,7 +14,7 @@ import { PlaylistContent } from "./playlist-content";
 import { PlaylistSearch } from "./playlist-search";
 import { PlaylistTracks } from "./playlist-tracks";
 import { useLocalStorage } from "~/hooks/use-local-storage";
-import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export function PlaylistView({
   playlist,
@@ -27,8 +27,6 @@ export function PlaylistView({
   sessionUserId?: string;
   play?: (start?: PlaylistTrack) => Promise<void>;
 }) {
-  const router = useRouter();
-
   const [disabled, setDisabled] = useState(false);
 
   const [filter, setFilter] = useState("");
@@ -69,7 +67,7 @@ export function PlaylistView({
 
   const handlePlay = useCallback(
     async (start?: PlaylistTrack) => {
-      if (!sessionUserId) return router.replace("/api/auth/signin");
+      if (!sessionUserId) return signIn("spotify");
       if (!play) return;
 
       setDisabled(true);
@@ -78,12 +76,12 @@ export function PlaylistView({
 
       setDisabled(false);
     },
-    [play, router, sessionUserId],
+    [play, sessionUserId],
   );
 
   return (
     <>
-      <div className="flex flex-col overflow-hidden md:rounded-md">
+      <div className="flex flex-col overflow-hidden rounded-md">
         <PlaylistContent playlist={playlist} />
 
         <PlaylistSearch

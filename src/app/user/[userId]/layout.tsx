@@ -23,7 +23,7 @@ export default async function ProfileLayout({
 
   return (
     <>
-      <div className="flex flex-col gap-2 overflow-hidden bg-main-1 md:rounded-md">
+      <div className="flex flex-col gap-2 overflow-hidden rounded-md bg-main-1">
         <SimpleUserView user={user} sessionUserId={session?.user.id} />
 
         <ProfileTabs userId={userId} />

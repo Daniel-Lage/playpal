@@ -14,7 +14,7 @@ export function SimpleUserView({
   if (!user?.name || !user.image) return;
 
   return (
-    <div className="flex flex-col gap-2 overflow-hidden bg-main-1 md:rounded-t-xl">
+    <div className="flex flex-col gap-2 overflow-hidden bg-main-1">
       <div className="flex items-center gap-2 p-2">
         <Link className="flex grow items-center" href={`/user/${user.id}`}>
           <Image

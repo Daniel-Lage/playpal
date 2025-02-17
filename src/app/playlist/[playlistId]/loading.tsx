@@ -3,7 +3,7 @@ import Image from "next/image";
 export default async function LoadingPlaylistPage() {
   return (
     <>
-      <div className="flex flex-col overflow-hidden md:rounded-md">
+      <div className="flex flex-col overflow-hidden rounded-md">
         <div className="flex flex-col items-center gap-2 bg-main-1 p-2 md:flex-row md:items-start">
           <div className="aspect-square w-[200px] grow-0 rounded-md bg-gray-950"></div>
           <div className="flex h-full w-full">

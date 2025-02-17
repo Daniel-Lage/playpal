@@ -8,7 +8,6 @@ import { PostView } from "~/app/_components/post-view";
 import type { IMetadata, Substring } from "~/models/post.model";
 import { PostCreator } from "~/app/_components/post-creator";
 import { postPost } from "~/server/post-post";
-import { SignInButton } from "~/app/_components/signin-button";
 import { revalidatePath } from "next/cache";
 import { Thread } from "./thread";
 
@@ -58,7 +57,7 @@ export default async function PostPage({
 
   return (
     <>
-      <div className="flex flex-col bg-secondary-1 md:rounded-md">
+      <div className="flex flex-col rounded-md bg-secondary-1">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
             <div>
@@ -74,7 +73,7 @@ export default async function PostPage({
                 sessionUserId={session?.user.id}
                 isMainPost={true}
               />
-              {session?.user?.image && session?.user?.name ? (
+              {session?.user?.image && session?.user?.name && (
                 <PostCreator
                   send={async (
                     input: string,
@@ -93,8 +92,6 @@ export default async function PostPage({
                   }}
                   sessionUser={session.user}
                 />
-              ) : (
-                <SignInButton />
               )}
             </div>
           </div>

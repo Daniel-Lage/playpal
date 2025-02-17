@@ -57,7 +57,7 @@ function PlaylistGrid({ playlist }: { playlist: Playlist }) {
 
 function PlaylistCompact({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="my-[-4px] flex items-center gap-2 overflow-hidden bg-secondary-1 p-1 font-bold md:rounded-md">
+    <div className="flex items-center gap-2 overflow-hidden rounded-md bg-secondary-1 p-1 font-bold">
       <Link
         href={`/playlist/${playlist.id}`}
         className="grow"
@@ -82,7 +82,7 @@ function PlaylistCompact({ playlist }: { playlist: Playlist }) {
 
 function PlaylistRow({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="flex items-start gap-2 bg-secondary-1 p-2 font-bold md:rounded-md">
+    <div className="flex items-start gap-2 rounded-md bg-secondary-1 p-2 font-bold">
       <Link
         href={`/playlist/${playlist.id}`}
         className="flex grow gap-2"

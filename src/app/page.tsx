@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth";
 
-import { SignInButton } from "~/app/_components/signin-button";
 import { PostCreator } from "~/app/_components/post-creator";
 import { getPosts } from "~/server/get-posts";
 import { authOptions } from "~/lib/auth";
@@ -17,7 +16,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {session?.user?.image && session?.user?.name ? (
+      {session?.user?.image && session?.user?.name && (
         <PostCreator
           send={async (
             input: string,
@@ -31,8 +30,6 @@ export default async function HomePage() {
           }}
           sessionUser={session.user}
         />
-      ) : (
-        <SignInButton />
       )}
       <PostsView
         posts={posts}

@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { signIn, signOut } from "next-auth/react";
 import type { UserObject } from "~/models/user.model";
 import { followUser } from "~/server/follow-user";
 import { unfollowUser } from "~/server/unfollow-user";
@@ -13,13 +13,13 @@ export function FollowButton({
   sessionUserId: string | undefined;
 }) {
   return !sessionUserId ? (
-    <Link href={"/api/auth/signin"} className="hover:underline">
+    <button onClick={() => signIn("spotify")} className="hover:underline">
       Follow
-    </Link>
+    </button>
   ) : user.id === sessionUserId ? (
-    <Link href={"/api/auth/signout"} className="hover:underline">
+    <button onClick={() => signOut()} className="hover:underline">
       Log Out
-    </Link>
+    </button>
   ) : user.followers.some((follow) => follow.followerId === sessionUserId) ? (
     <button
       onClick={() => unfollowUser(sessionUserId, user.id)}

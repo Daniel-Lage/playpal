@@ -27,7 +27,7 @@ export function PlaylistsSearch({
   changeStyle: (e: ChangeEvent<HTMLSelectElement>) => void;
 }) {
   return (
-    <div className="flex flex-col items-start gap-2 bg-main-1 p-2 md:flex-row md:items-center md:rounded-md">
+    <div className="flex flex-col items-start gap-2 rounded-md bg-main-1 p-2 md:flex-row md:items-center">
       {length} Playlists
       <div className="flex items-center justify-center gap-2 rounded-md bg-main-3 p-2 text-center text-sm">
         <div className="font-bold">Sorting column</div>

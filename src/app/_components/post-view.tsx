@@ -22,12 +22,15 @@ export function PostView({
   isMainPost?: boolean;
 }) {
   return (
-    <div className={"flex items-stretch bg-secondary-1 md:rounded-md"}>
-      <Link href={`/user/${post.author.id}`} className="self-start">
+    <div className={"flex items-stretch rounded-md bg-secondary-1"}>
+      <Link
+        href={`/user/${post.author.id}`}
+        className="shrink-0 grow-0 self-start"
+      >
         <Image
           width={40}
           height={40}
-          className="aspect-square h-14 w-14 flex-grow-0 rounded-full p-2"
+          className="aspect-square h-14 w-14 shrink-0 grow-0 rounded-full p-2"
           src={post.author?.image ?? ""}
           alt={post.author?.name ?? ""}
         />

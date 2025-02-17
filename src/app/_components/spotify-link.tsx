@@ -9,7 +9,7 @@ export function SpotifyLink({
   size: number;
 }) {
   return (
-    <Link href={external_url} className="shrink-0">
+    <Link href={external_url} className="">
       <Image height={size} width={size} src="/spotify.png" alt="spotify icon" />
     </Link>
   );

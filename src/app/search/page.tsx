@@ -10,7 +10,7 @@ export default async function SearchPage({
 }) {
   if (!q)
     return (
-      <form action="/search" className="flex gap-2 bg-main-1 p-2 md:rounded-md">
+      <form action="/search" className="flex gap-2 rounded-md bg-main-1 p-2">
         <input
           name="q"
           defaultValue={q}
@@ -29,7 +29,7 @@ export default async function SearchPage({
 
   return (
     <>
-      <form action="/search" className="flex gap-2 bg-main-1 p-2 md:rounded-md">
+      <form action="/search" className="flex gap-2 rounded-md bg-main-1 p-2">
         <input
           name="q"
           defaultValue={q}
