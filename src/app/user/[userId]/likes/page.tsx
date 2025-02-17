@@ -47,7 +47,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProfilePage({
+export default async function LikesPage({
   params: { userId },
 }: {
   params: { userId: string };

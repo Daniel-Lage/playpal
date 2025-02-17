@@ -36,7 +36,7 @@ export function StartNav({ profileURL }: { profileURL?: string }) {
             </Link>
           ) : (
             <button
-              onClick={() => signIn("spotify")}
+              onClick={() => signIn("spotify", { callbackUrl: "/user" })}
               className="flex items-end gap-2"
               role="button"
             >

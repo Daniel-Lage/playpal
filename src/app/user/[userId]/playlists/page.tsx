@@ -48,7 +48,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProfilePage({
+export default async function PlaylistsPage({
   params: { userId },
 }: {
   params: { userId: string };

@@ -1,7 +1,7 @@
 import { getUsersFollowing } from "~/server/get-users-following";
 import { UserView } from "~/app/_components/user-view";
 
-export default async function OthersProfileFollowingPage({
+export default async function FollowingPage({
   params: { userId },
 }: {
   params: { userId: string };
