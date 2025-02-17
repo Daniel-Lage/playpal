@@ -1,5 +1,5 @@
 "use server";
-import type { SpotifyError } from "~/models/error.model";
+import type { ApiError } from "~/models/error.model";
 import type { Tokens } from "~/models/tokens.model";
 
 export async function getTokens(refreshToken: string) {
@@ -16,9 +16,11 @@ export async function getTokens(refreshToken: string) {
   });
 
   if (!response.ok) {
-    const error = (await response.json()) as SpotifyError;
+    const { error } = (await response.json()) as ApiError;
 
-    throw new Error(`${error.error}:${error.error_description}`);
+    throw new Error(
+      `Status: ${response.statusText}; Description: ${error?.message};`,
+    );
   }
 
   return (await response.json()) as Tokens;

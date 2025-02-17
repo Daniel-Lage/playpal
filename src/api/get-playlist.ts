@@ -1,13 +1,13 @@
 "use server";
-import type { SpotifyError } from "~/models/error.model";
+import type { ApiError } from "~/models/error.model";
 import type { Paging } from "~/models/paging.model";
 import type { Playlist } from "~/models/playlist.model";
 import type { PlaylistTrack } from "~/models/track.model";
 import { getTokens } from "./get-tokens";
 
 export async function getPlaylist(
-  accessToken: string | null | undefined,
   playlistId: string,
+  accessToken?: string,
 ): Promise<Playlist | undefined> {
   if (!accessToken) {
     if (process.env.FALLBACK_REFRESH_TOKEN === undefined)
@@ -17,10 +17,10 @@ export async function getPlaylist(
       process.env.FALLBACK_REFRESH_TOKEN,
     );
 
-    accessToken = access_token;
+    if (access_token) accessToken = access_token;
   }
 
-  if (accessToken === null) throw new Error("acessToken is null");
+  if (!accessToken) throw new Error("acessToken is undefined");
 
   const response = await fetch(
     `https://api.spotify.com/v1/playlists/${playlistId}`,
@@ -32,14 +32,11 @@ export async function getPlaylist(
   );
 
   if (!response.ok) {
-    const json = (await response.json()) as SpotifyError;
+    const { error } = (await response.json()) as ApiError;
 
-    if (json?.error && json?.error_description)
-      throw new Error(
-        `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
-      );
-
-    throw new Error(`Status: ${response.statusText}`);
+    throw new Error(
+      `Status: ${response.statusText}; Description: ${error?.message};`,
+    );
   }
 
   const playlist = (await response.json()) as Playlist;

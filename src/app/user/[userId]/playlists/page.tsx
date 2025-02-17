@@ -58,7 +58,7 @@ export default async function PlaylistsPage({
   const playlists =
     session?.user.id === userId
       ? await getMyPlaylists(session.user.access_token)
-      : await getUsersPlaylists(session?.user.access_token, userId);
+      : await getUsersPlaylists(userId, session?.user.access_token);
 
   return (
     <PlaylistsView playlists={playlists} sessionUserId={session?.user.id} />

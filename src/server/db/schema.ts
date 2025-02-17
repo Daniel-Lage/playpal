@@ -25,6 +25,7 @@ export const usersTable = createTable("user", {
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
   access_token: text("acess_token"),
+  expires_at: integer("expires_at"),
 });
 
 export const accountsTable = createTable(

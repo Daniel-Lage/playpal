@@ -21,11 +21,13 @@ export function PlaylistView({
   // userId, // to know if the playlist is yours?
   sessionUserId,
   play,
+  expires_at,
 }: {
   // userId: string;
   playlist: Playlist;
   sessionUserId?: string;
-  play?: (start?: PlaylistTrack) => Promise<void>;
+  play?: (expired: boolean, start?: PlaylistTrack) => Promise<void>;
+  expires_at?: number;
 }) {
   const [disabled, setDisabled] = useState(false);
 
@@ -68,15 +70,15 @@ export function PlaylistView({
   const handlePlay = useCallback(
     async (start?: PlaylistTrack) => {
       if (!sessionUserId) return signIn("spotify");
-      if (!play) return;
+      if (!play || !expires_at) return;
 
       setDisabled(true);
 
-      await play(start);
+      await play(expires_at < Math.floor(new Date().getTime() / 1000), start);
 
       setDisabled(false);
     },
-    [play, sessionUserId],
+    [expires_at, play, sessionUserId],
   );
 
   return (

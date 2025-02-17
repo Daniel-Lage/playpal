@@ -1,15 +1,12 @@
 "use server";
 
-import type { SpotifyError } from "~/models/error.model";
+import type { ApiError } from "~/models/error.model";
 import type { Paging } from "~/models/paging.model";
 import type { Playlist } from "~/models/playlist.model";
 import { getTokens } from "./get-tokens";
 import { getProviderAccountId } from "~/server/get-provider-account-id";
 
-export async function getUsersPlaylists(
-  accessToken: string | null | undefined,
-  userId: string,
-) {
+export async function getUsersPlaylists(userId: string, accessToken?: string) {
   if (!accessToken) {
     if (process.env.FALLBACK_REFRESH_TOKEN === undefined)
       throw new Error("FALLBACK_REFRESH_TOKEN is not defined in env");
@@ -18,10 +15,10 @@ export async function getUsersPlaylists(
       process.env.FALLBACK_REFRESH_TOKEN,
     );
 
-    accessToken = access_token;
+    if (access_token) accessToken = access_token;
   }
 
-  if (accessToken === null) throw new Error("acessToken is null");
+  if (!accessToken) throw new Error("acessToken is undefined");
 
   const providerAccountId = await getProviderAccountId(userId);
 
@@ -35,12 +32,13 @@ export async function getUsersPlaylists(
   );
 
   if (!response.ok) {
-    const json = (await response.json()) as SpotifyError;
+    const { error } = (await response.json()) as ApiError;
 
     throw new Error(
-      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+      `Status: ${response.statusText}; Description: ${error?.message};`,
     );
   }
+
   const playlists = (await response.json()) as Paging<Playlist>;
 
   if (playlists.next) {

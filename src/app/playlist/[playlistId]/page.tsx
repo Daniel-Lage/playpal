@@ -10,16 +10,14 @@ import { getRandomSample } from "~/helpers/get-random-sample";
 import type { PlaylistTrack } from "~/models/track.model";
 import { playTracks } from "~/api/play-tracks";
 import { setFirstItem } from "~/helpers/set-first-item";
+import { revalidatePath } from "next/cache";
 
 export async function generateMetadata({
   params: { playlistId },
 }: {
   params: { playlistId: string };
 }): Promise<Metadata> {
-  const playlist = await getPlaylist(
-    null, // will use fallback
-    playlistId,
-  );
+  const playlist = await getPlaylist(playlistId);
 
   if (!playlist)
     return {
@@ -52,7 +50,7 @@ export default async function PlaylistPage({
 }) {
   const session = await getServerSession(authOptions);
 
-  const playlist = await getPlaylist(session?.user.access_token, playlistId);
+  const playlist = await getPlaylist(playlistId, session?.user.access_token);
 
   if (!playlist) return <div>error</div>; // playlist not found
 
@@ -72,20 +70,23 @@ export default async function PlaylistPage({
     <PlaylistView
       playlist={playlist}
       sessionUserId={session.user.id}
-      play={async (start?: PlaylistTrack) => {
+      expires_at={session.user.expires_at}
+      play={async (expired: boolean, start?: PlaylistTrack) => {
         "use server";
+
+        if (expired) return revalidatePath("/playlist", "page");
 
         if (start) {
           await playTracks(
-            session.user.access_token,
             setFirstItem(
               queue,
               start,
               (other) => other.track.uri === start.track.uri,
             ),
+            session.user.access_token,
           );
         } else {
-          await playTracks(session.user.access_token, queue);
+          await playTracks(queue, session.user.access_token);
         }
       }}
     />

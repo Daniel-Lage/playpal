@@ -1,4 +1,3 @@
-export interface SpotifyError {
-  error?: string;
-  error_description?: string;
+export interface ApiError {
+  error?: { status: number; message: string };
 }

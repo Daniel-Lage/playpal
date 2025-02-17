@@ -1,13 +1,13 @@
 "use server";
 import type { Devices } from "~/models/device.model";
-import type { SpotifyError } from "~/models/error.model";
+import type { ApiError } from "~/models/error.model";
 import type { PlaylistTrack } from "~/models/track.model";
 
 export async function playTracks(
-  accessToken: string | null,
   tracks: PlaylistTrack[],
+  accessToken?: string,
 ) {
-  if (accessToken === null) throw new Error("acessToken is null");
+  if (!accessToken) throw new Error("acessToken is undefined");
 
   const response = await fetch("https://api.spotify.com/v1/me/player/devices", {
     headers: {
@@ -16,10 +16,10 @@ export async function playTracks(
   });
 
   if (!response.ok) {
-    const json = (await response.json()) as SpotifyError;
+    const { error } = (await response.json()) as ApiError;
 
     throw new Error(
-      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+      `Status: ${response.statusText}; Description: ${error?.message};`,
     );
   }
 
@@ -32,8 +32,8 @@ export async function playTracks(
   const firstTrack = tracks.shift();
 
   if (!firstTrack) {
-    console.log("Tracks: ", tracks);
-    console.log("Shuffled Tracks: ", tracks);
+    console.error("Error: Tracks: ", tracks);
+    console.error("Error: Shuffled Tracks: ", tracks);
 
     throw new Error("Empty Track Array");
   }
@@ -53,7 +53,7 @@ export async function playTracks(
   );
 
   if (!addedToQueue.ok) {
-    console.log("Response: ", addedToQueue);
+    console.error("Error: Response: ", addedToQueue);
 
     throw new Error(addedToQueue.statusText);
   }
@@ -72,7 +72,7 @@ export async function playTracks(
   );
 
   if (!skipped.ok) {
-    console.log("Response: ", skipped);
+    console.error("Error: Response: ", skipped);
 
     throw new Error(skipped.statusText);
   }

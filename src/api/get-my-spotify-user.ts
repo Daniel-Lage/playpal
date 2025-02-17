@@ -1,9 +1,9 @@
 "use server";
-import type { SpotifyError } from "~/models/error.model";
+import type { ApiError } from "~/models/error.model";
 import type { SpotifyUser } from "~/models/user.model";
 
-export async function getMySpotifyUser(accessToken: string | null) {
-  if (accessToken === null) throw new Error("acessToken is null");
+export async function getMySpotifyUser(accessToken?: string) {
+  if (!accessToken) throw new Error("acessToken is undefined");
 
   const response = await fetch("https://api.spotify.com/v1/me", {
     headers: {
@@ -12,10 +12,10 @@ export async function getMySpotifyUser(accessToken: string | null) {
   });
 
   if (!response.ok) {
-    const json = (await response.json()) as SpotifyError;
+    const { error } = (await response.json()) as ApiError;
 
     throw new Error(
-      `Status: ${response.statusText}; Error: ${json.error}; Description: ${json.error_description}`,
+      `Status: ${response.statusText}; Description: ${error?.message};`,
     );
   }
 

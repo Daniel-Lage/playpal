@@ -20,7 +20,5 @@ export async function getMetadata(url: string): Promise<IMetadata> {
 
   const metadata = Object.fromEntries(tags);
 
-  console.log(text);
-
   return metadata as IMetadata;
 }
