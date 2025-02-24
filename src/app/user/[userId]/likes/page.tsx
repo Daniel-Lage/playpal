@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
-import { PostView } from "~/app/_components/post-view";
 import { getUsersLikes } from "~/server/get-users-likes";
+import { PostsView } from "~/app/posts-view";
 
 export async function generateMetadata({
   params: { userId },
@@ -54,20 +54,17 @@ export default async function LikesPage({
 }) {
   const session = await getServerSession(authOptions);
 
-  const likes = await getUsersLikes(userId);
+  const posts = await getUsersLikes(userId);
 
   return (
-    <>
-      {likes.map(
-        (like) =>
-          like?.likee && (
-            <PostView
-              key={like.likee.id}
-              post={like.likee}
-              sessionUserId={session?.user.id}
-            />
-          ),
-      )}
-    </>
+    <PostsView
+      posts={posts}
+      sessionUserId={session?.user.id}
+      lastQueried={new Date()}
+      refresh={async (lastQueried: Date) => {
+        "use server";
+        return await getUsersLikes(userId, lastQueried);
+      }}
+    />
   );
 }

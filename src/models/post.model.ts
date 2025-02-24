@@ -37,3 +37,10 @@ interface mainPostRelations {
 }
 
 export type MainPostObject = typeof postsTable.$inferSelect & mainPostRelations;
+
+export enum PostsSortingColumn {
+  CreatedAt = "Created at",
+  Replies = "Replies",
+  Likes = "Likes",
+}
+export const PostsSortingColumnOptions = Object.values(PostsSortingColumn);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import {
   type Playlist,
@@ -26,8 +26,8 @@ export default function PlaylistsView({
       ? `${sessionUserId}:playlists_reversed`
       : "playlists_reversed",
     false,
-    (text) => text === "true",
-    (value) => (value ? "true" : "false"),
+    useCallback((text) => text === "true", []),
+    useCallback((value) => (value ? "true" : "false"), []),
   );
 
   const [feedStyle, setFeedStyle] = useLocalStorage<PlaylistFeedStyle>(
@@ -35,12 +35,12 @@ export default function PlaylistsView({
       ? `${sessionUserId}:playlists_feed_style`
       : "playlists_feed_style",
     PlaylistFeedStyle.Grid,
-    (text) => {
+    useCallback((text) => {
       if (PlaylistFeedStyleOptions.some((pfso) => pfso === text))
         return text as PlaylistFeedStyle;
       return null;
-    },
-    (pfs) => pfs, // already is text so no conversion is needed
+    }, []),
+    useCallback((pfs) => pfs, []), // already is text so no conversion is needed
   );
 
   const [sortingColumn, setSortingColumn] =
@@ -49,12 +49,12 @@ export default function PlaylistsView({
         ? `${sessionUserId}:playlists_sorting_column`
         : "playlists_sorting_column",
       PlaylistsSortingColumn.CreatedAt,
-      (text) => {
+      useCallback((text) => {
         if (PlaylistsSortingColumnOptions.some((psco) => psco === text))
           return text as PlaylistsSortingColumn;
         return null;
-      },
-      (psc) => psc, // already is text so no conversion is needed
+      }, []),
+      useCallback((psc) => psc, []), // already is text so no conversion is needed
     );
 
   const treatedPlaylists = useMemo(() => {
@@ -108,25 +108,14 @@ function getTreatedPlaylists(
           .includes(filter.toLowerCase()),
     )
     .sort((playlistA, playlistB) => {
-      let keyA = "";
-      let keyB = "";
+      const key = {
+        [PlaylistsSortingColumn.CreatedAt]: () => 0, // default
+        [PlaylistsSortingColumn.Length]: (p: Playlist) => -p.tracks.total,
+        [PlaylistsSortingColumn.Name]: (p: Playlist) => p.name.toLowerCase(),
+      }[sortingColumn];
 
-      if (sortingColumn === PlaylistsSortingColumn.Length) {
-        return -playlistA.tracks.total + playlistB.tracks.total;
-      }
-
-      if (sortingColumn === PlaylistsSortingColumn.Name) {
-        keyA = playlistA.name.toLowerCase();
-        keyB = playlistB.name.toLowerCase();
-      }
-
-      if (sortingColumn === PlaylistsSortingColumn.Owner) {
-        keyA = playlistA.owner.display_name.toLowerCase();
-        keyB = playlistB.owner.display_name.toLowerCase();
-      }
-
-      if (keyA < keyB) return -1;
-      if (keyA > keyB) return 1;
+      if (key(playlistA) < key(playlistB)) return -1;
+      if (key(playlistA) > key(playlistB)) return 1;
       return 0;
     });
 }

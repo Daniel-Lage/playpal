@@ -1,4 +1,10 @@
-import { type Dispatch, type SetStateAction, useEffect, useState } from "react";
+import {
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 export function useLocalStorage<T>(
   key: string,
@@ -6,21 +12,22 @@ export function useLocalStorage<T>(
   parse: (text: string | null) => T | null,
   stringify: (value: T) => string,
 ): [T, Dispatch<SetStateAction<T>>] {
-  const [value, setValue] = useState<T>(() => {
-    try {
-      return parse(localStorage.getItem(key)) ?? fallback;
-    } catch {
-      return fallback;
-    }
-  });
+  const firstRender = useRef(true);
+  const [value, setValue] = useState<T>(fallback);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(key, stringify(value));
-    } catch {
-      console.error("error writing to localStorage");
+    if (localStorage !== undefined) {
+      setValue(parse(localStorage.getItem(key)) ?? fallback);
     }
-  }, [key, value, stringify]);
+  }, [fallback, key, parse]);
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+    } else if (localStorage !== undefined) {
+      localStorage.setItem(key, stringify(value));
+    }
+  }, [value, key, stringify]);
 
   return [value, setValue];
 }

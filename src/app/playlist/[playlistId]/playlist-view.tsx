@@ -36,8 +36,8 @@ export function PlaylistView({
   const [reversed, setReversed] = useLocalStorage<boolean>(
     sessionUserId ? `${sessionUserId}:tracks_reversed` : "tracks_reversed",
     false,
-    (text) => text === "true",
-    (value) => (value ? "true" : "false"),
+    useCallback((text) => text === "true", []),
+    useCallback((value) => (value ? "true" : "false"), []),
   );
   const [sortingColumn, setSortingColumn] =
     useLocalStorage<TracksSortingColumn>(
@@ -45,12 +45,12 @@ export function PlaylistView({
         ? `${sessionUserId}:tracks_sorting_column`
         : "tracks_sorting_column",
       TracksSortingColumn.AddedAt,
-      (text) => {
+      useCallback((text) => {
         if (TracksSortingColumnOptions.some((tsco) => tsco === text))
           return text as TracksSortingColumn;
         return null;
-      },
-      (tsc) => tsc, // already is text so no conversion is needed
+      }, []),
+      useCallback((tsc) => tsc, []), // already is text so no conversion is needed
     );
 
   const treatedTracks = useMemo(() => {
@@ -126,50 +126,28 @@ function getTreatedTracks(
         ),
     )
     .sort((trackA, trackB) => {
-      let keyA = "";
-      let keyB = "";
-
-      if (sortingColumn === TracksSortingColumn.Name) {
-        keyA = trackA.track.name.toLowerCase();
-        keyB = trackB.track.name.toLowerCase();
+      function sortArtists(
+        artistA: SimplifiedArtist,
+        artistB: SimplifiedArtist,
+      ) {
+        const keyA = artistA.name.toLowerCase();
+        const keyB = artistB.name.toLowerCase();
+        if (keyA < keyB) return -1;
+        if (keyA > keyB) return 1;
+        return 0;
       }
+      const key = {
+        [TracksSortingColumn.AddedAt]: () => 0, // default
+        [TracksSortingColumn.Album]: (t: PlaylistTrack) =>
+          t.track.album.name.toLowerCase(),
+        [TracksSortingColumn.Artists]: (t: PlaylistTrack) =>
+          t.track.artists.sort(sortArtists)[0]?.name.toLowerCase() ?? 0,
+        [TracksSortingColumn.Name]: (t: PlaylistTrack) =>
+          t.track.name.toLowerCase(),
+      }[sortingColumn];
 
-      if (sortingColumn === TracksSortingColumn.Album) {
-        keyA = trackA.track.album.name.toLowerCase();
-        keyB = trackB.track.album.name.toLowerCase();
-      }
-
-      if (sortingColumn === TracksSortingColumn.Artists) {
-        function getHighestArtist(
-          artistA: SimplifiedArtist,
-          artistB: SimplifiedArtist,
-        ) {
-          const keyA = artistA.name.toLowerCase();
-          const keyB = artistB.name.toLowerCase();
-          if (keyA < keyB) return -1;
-          if (keyA > keyB) return 1;
-          return 0;
-        }
-
-        const artistA =
-          trackA.track.artists.length === 1
-            ? trackA.track.artists[0]
-            : trackA.track.artists.sort(getHighestArtist)[0];
-
-        const artistB =
-          trackB.track.artists.length === 1
-            ? trackB.track.artists[0]
-            : trackB.track.artists.sort(getHighestArtist)[0];
-
-        if (!artistA) return 0;
-        if (!artistB) return 0;
-
-        keyA = artistA.name.toLowerCase();
-        keyB = artistB.name.toLowerCase();
-      }
-
-      if (keyA < keyB) return -1;
-      if (keyA > keyB) return 1;
+      if (key(trackA) < key(trackB)) return -1;
+      if (key(trackA) > key(trackB)) return 1;
       return 0;
     });
 }

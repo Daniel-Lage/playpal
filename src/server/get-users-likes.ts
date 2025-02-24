@@ -1,12 +1,19 @@
 "use server";
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "./db";
 import { likesTable, repliesTable } from "./db/schema";
-import type { LikeObject } from "~/models/like.model";
+import type { PostObject } from "~/models/post.model";
 
-export async function getUsersLikes(userId: string): Promise<LikeObject[]> {
+export async function getUsersLikes(
+  userId: string,
+  lastQueried?: Date,
+): Promise<PostObject[]> {
   const likes = await db.query.likesTable.findMany({
-    where: eq(likesTable.userId, userId),
+    where: and(
+      eq(likesTable.userId, userId),
+
+      lastQueried && sql`${likesTable.createdAt} > ${lastQueried}`, // get new posts
+    ),
     with: {
       likee: {
         with: {
@@ -21,5 +28,7 @@ export async function getUsersLikes(userId: string): Promise<LikeObject[]> {
     },
   });
 
-  return likes as LikeObject[];
+  const posts = likes.map((like) => like.likee);
+
+  return posts as PostObject[];
 }

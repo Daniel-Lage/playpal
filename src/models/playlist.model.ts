@@ -23,7 +23,6 @@ export interface Playlist {
 export enum PlaylistsSortingColumn {
   CreatedAt = "Created at",
   Name = "Name",
-  Owner = "Owner",
   Length = "Length",
 }
 export const PlaylistsSortingColumnOptions = Object.values(
