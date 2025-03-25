@@ -81,7 +81,7 @@ export async function playTracks(
     const track = tracks[index];
     if (track) {
       track.track.disc_number = index;
-      fetch(
+      await fetch(
         "https://api.spotify.com/v1/me/player/queue?" +
           new URLSearchParams({
             uri: track.track.uri,
