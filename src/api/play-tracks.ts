@@ -5,7 +5,7 @@ import type { PlaylistTrack } from "~/models/track.model";
 
 export async function playTracks(
   tracks: PlaylistTrack[],
-  accessToken?: string,
+  accessToken?: string | null,
 ) {
   if (!accessToken) throw new Error("acessToken is undefined");
 
@@ -77,25 +77,37 @@ export async function playTracks(
     throw new Error(skipped.statusText);
   }
 
-  for (let index = 0; index < tracks.length; index++) {
-    const track = tracks[index];
-    if (track) {
-      track.track.disc_number = index;
-      await fetch(
-        "https://api.spotify.com/v1/me/player/queue?" +
-          new URLSearchParams({
-            uri: track.track.uri,
-            device_id: deviceId,
-          }).toString(),
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer  ${accessToken}`,
-          },
-        },
-      ).catch((e) => {
-        console.error(e);
-      });
-    }
-  }
+  const wait = new Promise((resolve) => {
+    let index = 0;
+    const interval = setInterval(() => {
+      if (index < tracks.length) {
+        const track = tracks[index];
+        if (track) {
+          track.track.disc_number = index;
+
+          fetch(
+            "https://api.spotify.com/v1/me/player/queue?" +
+              new URLSearchParams({
+                uri: track.track.uri,
+                device_id: deviceId,
+              }).toString(),
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer  ${accessToken}`,
+              },
+            },
+          ).catch((e) => {
+            console.error(e);
+          });
+        }
+        index++;
+      } else {
+        resolve(true);
+        clearInterval(interval);
+      }
+    }, 10);
+  });
+
+  return await wait;
 }
