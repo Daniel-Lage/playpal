@@ -27,7 +27,7 @@ export function PlaylistView({
   playlist: Playlist;
   sessionUserId?: string;
   play?: (expired: boolean, start?: PlaylistTrack) => Promise<void>;
-  expires_at?: number;
+  expires_at?: number | null;
 }) {
   const [disabled, setDisabled] = useState(false);
 
@@ -83,24 +83,22 @@ export function PlaylistView({
 
   return (
     <>
-      <div className="flex flex-col overflow-hidden rounded-md">
-        <PlaylistContent playlist={playlist} />
+      <PlaylistContent playlist={playlist} />
 
-        <PlaylistSearch
-          sortingColumn={sortingColumn}
-          reversed={reversed}
-          filter={filter}
-          disabled={disabled}
-          sortColumn={(e) => {
-            setSortingColumn(e.target.value as TracksSortingColumn);
-          }}
-          reverse={() => {
-            setReversed((prev) => !prev);
-          }}
-          filterTracks={(e) => setFilter(e.target.value)}
-          play={handlePlay}
-        />
-      </div>
+      <PlaylistSearch
+        sortingColumn={sortingColumn}
+        reversed={reversed}
+        filter={filter}
+        disabled={disabled}
+        sortColumn={(value: string) =>
+          setSortingColumn(value as TracksSortingColumn)
+        }
+        reverse={() => {
+          setReversed((prev) => !prev);
+        }}
+        filterTracks={(e) => setFilter(e.target.value)}
+        play={handlePlay}
+      />
 
       <PlaylistTracks
         treatedTracks={treatedTracks}

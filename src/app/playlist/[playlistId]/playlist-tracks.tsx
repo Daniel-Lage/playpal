@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SpotifyLink } from "~/app/_components/spotify-link";
+import { SpotifyLink } from "~/components/spotify-link";
 import type { PlaylistTrack } from "~/models/track.model";
 
 export function PlaylistTracks({
@@ -14,7 +14,7 @@ export function PlaylistTracks({
   return treatedTracks.map((track) => (
     <button
       key={track.track.uri + track.added_at}
-      className="flex items-center gap-1 rounded-md bg-secondary-1 p-1 font-bold"
+      className="flex items-center gap-1 rounded-md bg-secondary p-1 font-bold"
       disabled={disabled || track.is_local}
       onClick={() => playTrack(track)}
     >
@@ -42,11 +42,10 @@ export function PlaylistTracks({
           {track.track.artists.map((artist) => artist.name).join(", ")}
         </div>
       </div>
-      {!!track.track.external_urls?.spotify && (
-        <SpotifyLink
-          size={32}
-          external_url={track.track.external_urls.spotify}
-        />
+      {!!track.track.external_urls?.spotify ? (
+        <SpotifyLink external_url={track.track.external_urls.spotify} />
+      ) : (
+        <div className="h-8 w-8"></div>
       )}
     </button>
   ));

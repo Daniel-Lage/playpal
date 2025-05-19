@@ -3,7 +3,7 @@ import type { ApiError } from "~/models/error.model";
 import type { Paging } from "~/models/paging.model";
 import type { Playlist } from "~/models/playlist.model";
 
-export async function getMyPlaylists(accessToken?: string) {
+export async function getMyPlaylists(accessToken?: string | null) {
   if (!accessToken) throw new Error("acessToken is undefined");
 
   const response = await fetch(

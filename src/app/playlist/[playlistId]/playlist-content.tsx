@@ -1,10 +1,11 @@
 import Image from "next/image";
-import { SpotifyLink } from "~/app/_components/spotify-link";
+import { ShareButton } from "~/components/share-button";
+import { SpotifyLink } from "~/components/spotify-link";
 import type { Playlist } from "~/models/playlist.model";
 
 export function PlaylistContent({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="flex flex-col items-center gap-2 bg-main-1 p-2 md:flex-row md:items-start">
+    <div className="flex flex-col items-center gap-2 rounded-md bg-primary p-2 md:flex-row md:items-start">
       <Image
         width={200}
         height={200}
@@ -13,7 +14,7 @@ export function PlaylistContent({ playlist }: { playlist: Playlist }) {
         alt={playlist.name}
       />
 
-      <div className="flex h-full w-full">
+      <div className="flex h-full w-full gap-2">
         <div className="flex grow flex-col items-start truncate">
           <div className="flex items-start justify-between text-wrap text-2xl font-bold">
             {playlist.name}
@@ -26,7 +27,8 @@ export function PlaylistContent({ playlist }: { playlist: Playlist }) {
           </div>
         </div>
 
-        <SpotifyLink size={32} external_url={playlist.external_urls.spotify} />
+        <SpotifyLink external_url={playlist.external_urls.spotify} />
+        <ShareButton path={`/playlist/${playlist.id}`} />
       </div>
     </div>
   );

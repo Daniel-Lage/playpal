@@ -45,6 +45,8 @@ export async function getPost(
     },
   })) as PostObject;
 
+  if (!post) return undefined;
+
   if (post?.replies) {
     const replies = post.replies
       .filter((reply) => reply.separation === 0)
@@ -56,6 +58,5 @@ export async function getPost(
 
     return { ...post, replies } as MainPostObject;
   }
-
   return { ...post, replies: undefined } as MainPostObject;
 }

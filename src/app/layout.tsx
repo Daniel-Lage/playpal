@@ -26,12 +26,12 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
 
   return (
-    <html lang="en" className={`${GeistSans.variable}`}>
-      <body className="flex h-screen flex-col-reverse overflow-x-hidden md:flex-row">
+    <html lang="en" className={GeistSans.variable}>
+      <body className="flex h-svh flex-col-reverse overflow-hidden md:flex-row">
         <StartNav
           profileURL={session ? `/user/${session?.user.id}` : undefined}
         />
-        <main className="grow overflow-scroll overflow-x-hidden md:h-screen">
+        <main className="grow overflow-scroll overflow-x-hidden md:h-svh">
           <div className="flex h-max grow flex-col gap-2 p-2 md:gap-4 md:p-4">
             {children}
           </div>

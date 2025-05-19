@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  color-scheme: dark;
+}
+
 html {
   @apply text-black;
 }
@@ -11,42 +15,45 @@ body {
   min-width: 100vw;
 }
 
-select {
-  font-size: 0px;
-  height: 20px;
-  width: 20px;
-  @apply bg-main-3;
-  background-image: url("/open-menu.png");
-  background-position: center;
-  background-size: contain;
-  cursor: pointer;
-  outline: none;
-}
-
-option {
-  @apply text-base;
-}
-
-* {
-  user-select: none;
-  overflow-x: hidden;
-}
-
-.insertion-point {
-  height: 1rem;
-  width: 1px;
-  background-color: black;
-  animation: blink-animation 2s steps(2, start) infinite;
-  -webkit-animation: blink-animation 2s steps(2, start) infinite;
-}
-
-@keyframes blink-animation {
-  to {
-    visibility: hidden;
+@layer base {
+  :root {
+    --background: hsl(215, 28%, 17%); /* only used by me */
+    --foreground: hsl(0, 0%, 0%); /* text */
+    --card: hsl(0, 0%, 100%); /* idk */
+    --card-foreground: hsl(0, 0%, 4%); /* idk */
+    --popover: hsl(270, 97%, 87%); /* menu */
+    --popover-foreground: hsl(0, 0%, 0%); /* idk */
+    --primary: hsl(270, 97%, 85%); /* only used by me */
+    --primary-accent: hsl(270, 95%, 75%); /* only used by me */
+    --primary-foreground: hsl(0, 0%, 98%); /* idk */
+    --secondary: hsl(170, 95%, 83%); /* only used by me */
+    --secondary-foreground: hsl(0, 0%, 9%); /* idk */
+    --secondary-accent: hsl(170, 50%, 60%); /* only used by me */
+    --terciary: hsl(210, 95%, 83%); /* only used by me */
+    --terciary-accent: hsl(210, 70%, 70%); /* only used by me */
+    --muted: hsl(0, 0%, 96%); /* idk */
+    --muted-foreground: hsl(0, 0%, 45.1%); /* idk */
+    --accent: hsl(249, 66%, 37%); /* selected option */
+    --accent-foreground: hsl(0, 100%, 50%); /* text on selected option */
+    --destructive: hsl(0, 84% 60%); /* idk */
+    --destructive-foreground: hsl(0, 0%, 98%); /* idk */
+    --border: hsl(0, 0%, 89.8%); /* idk */
+    --input: hsl(0, 0%, 89.8%); /* idk */
+    --ring: hsl(0, 0%, 3.9%); /* idk */
+    --chart-1: hsl(12, 76%, 61%); /* idk */
+    --chart-2: hsl(173, 58%, 39%); /* idk */
+    --chart-3: hsl(197, 37%, 24%); /* idk */
+    --chart-4: hsl(43, 74%, 66%); /* idk */
+    --chart-5: hsl(27, 87%, 67%); /* idk */
+    --radius: 0.5rem;
   }
 }
-@-webkit-keyframes blink-animation {
-  to {
-    visibility: hidden;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

@@ -11,8 +11,13 @@ export async function refreshTokens(userId: string) {
 
   const now = Math.floor(new Date().getTime() / 1000);
 
-  if (!account?.access_token || !account?.refresh_token || !account?.expires_at)
+  if (
+    !account?.access_token ||
+    !account?.refresh_token ||
+    !account?.expires_at
+  ) {
     return;
+  }
 
   if (now < account.expires_at) {
     return {

@@ -7,7 +7,7 @@ import { getTokens } from "./get-tokens";
 
 export async function getPlaylist(
   playlistId: string,
-  accessToken?: string,
+  accessToken?: string | null,
 ): Promise<Playlist | undefined> {
   if (!accessToken) {
     if (process.env.FALLBACK_REFRESH_TOKEN === undefined)

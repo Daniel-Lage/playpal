@@ -2,30 +2,45 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  type IMetadata,
   type PostObject,
   PostsSortingColumn,
   PostsSortingColumnOptions,
+  type Substring,
 } from "~/models/post.model";
-import { PostView } from "./_components/post-view";
-import Image from "next/image";
+import { PostView } from "~/components/post-view";
 import { useLocalStorage } from "~/hooks/use-local-storage";
+import { Sorter } from "~/components/sorter";
+import type { User } from "next-auth";
+import { PostCreator } from "~/components/post-creator";
 
 export function PostsView({
   posts: postsProp,
-  sessionUserId,
+  sessionUser,
   lastQueried: lastQueriedProp,
   refresh,
+  send,
 }: {
   posts: PostObject[];
   lastQueried: Date;
-  sessionUserId?: string | null | undefined;
+  sessionUser?: User | undefined;
   refresh: (lastQueried: Date) => Promise<PostObject[]>;
+  send?: (
+    input: string,
+    urls: Substring[] | undefined,
+    metadata: IMetadata | undefined,
+  ) => Promise<void>;
 }) {
   const [posts, setPosts] = useState(postsProp);
+
+  useEffect(() => {
+    setPosts(postsProp);
+  }, [postsProp]);
+
   const lastQueried = useRef(lastQueriedProp);
 
   const [reversed, setReversed] = useLocalStorage<boolean>(
-    sessionUserId ? `${sessionUserId}:posts_reversed` : "posts_reversed",
+    sessionUser?.id ? `${sessionUser.id}:posts_reversed` : "posts_reversed",
     false,
     useCallback((text: string | null) => text === "true", []),
     useCallback(
@@ -35,8 +50,8 @@ export function PostsView({
   );
 
   const [sortingColumn, setSortingColumn] = useLocalStorage<PostsSortingColumn>(
-    sessionUserId
-      ? `${sessionUserId}:posts_sorting_column`
+    sessionUser?.id
+      ? `${sessionUser.id}:posts_sorting_column`
       : "posts_sorting_column",
     PostsSortingColumn.CreatedAt,
     useCallback((text) => {
@@ -71,39 +86,28 @@ export function PostsView({
 
   return (
     <>
-      <div className="flex flex-col items-start gap-2 rounded-md bg-main-1 p-2 md:flex-row md:items-center">
+      <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center md:justify-between">
         {posts.length} Posts
-        <div className="flex items-center justify-center gap-2 rounded-md bg-main-3 p-2 text-center text-sm">
-          <div className="font-bold">Sorting column</div>
-          <select
-            onChange={(e) => {
-              setSortingColumn(e.target.value as PostsSortingColumn);
-            }}
-            defaultValue={sortingColumn ?? PostsSortingColumn.CreatedAt}
-          >
-            {PostsSortingColumnOptions.map((sortingColumn) => (
-              <option key={sortingColumn}>{sortingColumn}</option>
-            ))}
-          </select>
-
-          <button
-            onClick={() => {
-              setReversed((prev) => !prev);
-            }}
-            className="my-[-10px]"
-          >
-            <Image
-              height={32}
-              width={32}
-              src="/direction.png"
-              alt="direction icon"
-              className={reversed ? "rotate-180" : ""}
-            />
-          </button>
-        </div>
+        <Sorter
+          title="Sort by"
+          onSelect={(value: string) =>
+            setSortingColumn(value as PostsSortingColumn)
+          }
+          value={sortingColumn ?? PostsSortingColumn.CreatedAt}
+          options={PostsSortingColumnOptions}
+          reversed={reversed}
+          reverse={() => {
+            setReversed((prev) => !prev);
+          }}
+        />
       </div>
+
+      {sessionUser?.image && sessionUser?.name && send && (
+        <PostCreator send={send} sessionUser={sessionUser} />
+      )}
+
       {treatedPosts.map((post) => (
-        <PostView key={post.id} post={post} sessionUserId={sessionUserId} />
+        <PostView key={post.id} post={post} sessionUserId={sessionUser?.id} />
       ))}
     </>
   );
@@ -115,13 +119,13 @@ function getTreatedPosts(
 ) {
   return posts.sort((postA, postB) => {
     const key = {
-      [PostsSortingColumn.Likes]: (p: PostObject) => -p.likes.length,
-      [PostsSortingColumn.Replies]: (p: PostObject) => -p.replies.length,
-      [PostsSortingColumn.CreatedAt]: (p: PostObject) => -p.createdAt.getTime(),
+      [PostsSortingColumn.Likes]: (p: PostObject) => p.likes.length,
+      [PostsSortingColumn.Replies]: (p: PostObject) => p.replies.length,
+      [PostsSortingColumn.CreatedAt]: (p: PostObject) => p.createdAt,
     }[sortingColumn];
 
-    if (key(postA) < key(postB)) return -1;
-    if (key(postA) > key(postB)) return 1;
+    if (key(postA) > key(postB)) return -1;
+    if (key(postA) < key(postB)) return 1;
     return 0;
   });
 }

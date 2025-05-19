@@ -5,6 +5,7 @@ import { db } from "./db";
 import { repliesTable, postsTable } from "./db/schema";
 
 export async function getPosts(lastQueried?: Date) {
+  console.log("getting posts");
   const posts = await db.query.postsTable.findMany({
     with: {
       author: true,

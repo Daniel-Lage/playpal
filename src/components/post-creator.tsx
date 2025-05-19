@@ -1,13 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  type Dispatch,
-  type SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { IMetadata, Substring } from "~/models/post.model";
 
 import { getMetadata } from "~/lib/get-metadata";
@@ -93,9 +87,9 @@ export function PostCreator({
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded-md bg-main-1 p-2">
+    <div className="flex flex-col gap-2 rounded-md bg-primary p-2">
       <div className="flex items-center justify-between">
-        <Link className="flex items-center" href={"/profile"}>
+        <Link className="flex items-center" href={`/user/${sessionUser.id}`}>
           <Image
             width={40}
             height={40}
@@ -119,6 +113,14 @@ export function PostCreator({
           metadata={metadata}
           loadingMetadata={loadingMetadata}
         />
+        <button
+          onClick={() => input !== "" && canPost && void handleSend()}
+          className="cursor-pointer self-end pr-2 font-bold hover:underline"
+          role="button"
+          disabled={input === "" || !canPost}
+        >
+          Post
+        </button>
       </div>
     </div>
   );
@@ -184,7 +186,7 @@ function MetadataPreview({
   if (url) {
     if (loadingMetadata)
       return (
-        <div className="flex items-start gap-2 rounded-md bg-main-3 p-2 font-bold">
+        <div className="flex items-start gap-2 rounded-md bg-primary-accent p-2 font-bold">
           Loading Metadata...
         </div>
       );
@@ -192,7 +194,7 @@ function MetadataPreview({
       return (
         <Link
           href={metadata.og_url}
-          className="flex items-start gap-2 rounded-md bg-main-3 p-2"
+          className="flex items-start gap-2 rounded-md bg-primary-accent p-2"
         >
           {metadata?.og_image && (
             <Image
@@ -228,10 +230,10 @@ function TextInput({
   urls?: Substring[];
   canPost: boolean;
   send: () => Promise<void>;
-  setInput: Dispatch<SetStateAction<string>>;
+  setInput: (isLiked: string) => void;
 }) {
   return (
-    <div className="flex grow overflow-hidden text-clip">
+    <div className="flex h-[2em] grow overflow-hidden text-clip">
       <div className="relative flex h-10 w-full grow">
         <input
           placeholder="Type something!"
@@ -251,11 +253,6 @@ function TextInput({
         />
         <FormattedContent input={input} urls={urls} />
       </div>
-      {canPost && input !== "" && (
-        <button onClick={() => void send()} className="pl-2 font-bold">
-          Post
-        </button>
-      )}
     </div>
   );
 }

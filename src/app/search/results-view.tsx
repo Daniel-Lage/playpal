@@ -2,8 +2,8 @@
 
 import type { PostObject } from "~/models/post.model";
 import type { UserObject } from "~/models/user.model";
-import { PostView } from "../_components/post-view";
-import { UserView } from "../_components/user-view";
+import { PostView } from "~/components/post-view";
+import { UserView } from "~/components/user-view";
 import { useEffect, useRef, useState } from "react";
 
 export function ResultsView({
@@ -39,17 +39,30 @@ export function ResultsView({
 
     return () => clearInterval(interval);
   }, [refresh]);
+
+  if (users.length === 0 && posts.length === 0)
+    return (
+      <>
+        <div className="flex flex-col items-center justify-center gap-2">
+          <div className="text-xl text-secondary">No results found</div>
+        </div>
+      </>
+    );
+
   return (
     <>
-      <div className="rounded-md bg-secondary-1">
-        <div className="p-2 font-bold">Users</div>
-
-        <div className="flex gap-2 bg-secondary-2 p-2">
-          {users.map((user) => (
-            <UserView key={user.id} user={user} />
-          ))}
+      {users.length !== 0 && (
+        <div className="flex flex-col gap-2">
+          <div className="rounded-md bg-secondary">
+            <div className="p-2 font-bold">Users</div>
+          </div>
+          <div className="grid grid-cols-4 gap-2 rounded-b-md md:grid-cols-6">
+            {users.map((user) => (
+              <UserView key={user.id} user={user} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       {posts.map((post) => (
         <PostView key={post.id} post={post} sessionUserId={sessionUserId} />
       ))}

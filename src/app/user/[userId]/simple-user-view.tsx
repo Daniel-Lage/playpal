@@ -1,8 +1,16 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { SpotifyLink } from "../../_components/spotify-link";
+import { SpotifyLink } from "~/components/spotify-link";
 import type { UserObject } from "~/models/user.model";
 import { FollowButton } from "./follow-button";
+import { MenuView } from "~/components/menu-view";
+import { signOut } from "next-auth/react";
+import { LogOut, Trash } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { ShareButton } from "~/components/share-button";
+import { deleteUser } from "~/server/delete-user";
 
 export function SimpleUserView({
   user,
@@ -14,7 +22,7 @@ export function SimpleUserView({
   if (!user?.name || !user.image) return;
 
   return (
-    <div className="flex flex-col gap-2 overflow-hidden bg-main-1">
+    <div className="flex flex-col gap-2 overflow-hidden bg-primary">
       <div className="flex items-center gap-2 p-2">
         <Link className="flex grow items-center" href={`/user/${user.id}`}>
           <Image
@@ -29,8 +37,25 @@ export function SimpleUserView({
 
         <FollowButton sessionUserId={sessionUserId} user={user} />
 
+        <MenuView>
+          {user.id === sessionUserId ? (
+            <>
+              <Button size="select" onClick={() => signOut()}>
+                Log out
+                <LogOut />
+              </Button>
+              <Button size="select" onClick={() => deleteUser(sessionUserId)}>
+                Delete profile
+                <Trash />
+              </Button>
+            </>
+          ) : (
+            <></>
+          )}
+          <ShareButton path={`/user/${user.id}`} title={"profile"} />
+        </MenuView>
+
         <SpotifyLink
-          size={32}
           external_url={`https://open.spotify.com/user/${user.id}`}
         />
       </div>

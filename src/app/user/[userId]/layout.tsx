@@ -19,11 +19,11 @@ export default async function ProfileLayout({
 
   if (!user)
     // no profile
-    return <div className="self-center text-xl text-red-500">Error</div>;
+    return <div className="self-center text-xl text-secondary">Error</div>;
 
   return (
     <>
-      <div className="flex flex-col gap-2 overflow-hidden rounded-md bg-main-1">
+      <div className="flex flex-col gap-2 overflow-hidden rounded-md bg-primary">
         <SimpleUserView user={user} sessionUserId={session?.user.id} />
 
         <ProfileTabs userId={userId} />

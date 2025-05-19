@@ -1,5 +1,5 @@
 import { getUsersFollowers } from "~/server/get-users-followers";
-import { UserView } from "~/app/_components/user-view";
+import { UserView } from "~/components/user-view";
 
 export default async function FollowersPage({
   params: { userId },

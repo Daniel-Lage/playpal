@@ -4,9 +4,9 @@ import type { Metadata } from "next";
 import { getPost } from "~/server/get-post";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
-import { PostView } from "~/app/_components/post-view";
+import { PostView } from "~/components/post-view";
 import type { IMetadata, Substring } from "~/models/post.model";
-import { PostCreator } from "~/app/_components/post-creator";
+import { PostCreator } from "~/components/post-creator";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
 import { Thread } from "./thread";
@@ -52,12 +52,16 @@ export default async function PostPage({
   const session = await getServerSession(authOptions);
   const post = await getPost(postId);
 
+  console.log(post);
+
   if (!post)
-    return <div className="self-center text-xl text-red-500">Error</div>;
+    return (
+      <div className="self-center text-xl text-secondary">Post Not Found</div>
+    );
 
   return (
     <>
-      <div className="flex flex-col rounded-md bg-secondary-1">
+      <div className="flex flex-col rounded-md bg-secondary">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
             <div>

@@ -59,7 +59,7 @@ export default async function LikesPage({
   return (
     <PostsView
       posts={posts}
-      sessionUserId={session?.user.id}
+      sessionUser={session?.user}
       lastQueried={new Date()}
       refresh={async (lastQueried: Date) => {
         "use server";

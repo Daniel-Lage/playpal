@@ -25,8 +25,8 @@ declare module "next-auth" {
     user: User;
   }
   interface User {
-    access_token: string | undefined;
-    expires_at: number | undefined;
+    access_token: string | null;
+    expires_at: number | null;
   }
 }
 

@@ -73,17 +73,17 @@ export default function PlaylistsView({
         sortingColumn={sortingColumn}
         reversed={reversed}
         filter={filter}
-        sortColumn={(e) => {
-          setSortingColumn(e.target.value as PlaylistsSortingColumn);
-        }}
+        sortColumn={(value: string) =>
+          setSortingColumn(value as PlaylistsSortingColumn)
+        }
         reverse={() => {
           setReversed((prev) => !prev);
         }}
         filterPlaylists={(e) => setFilter(e.target.value)}
         length={playlists.length}
-        changeStyle={(e) => {
-          setFeedStyle(e.target.value as PlaylistFeedStyle);
-        }}
+        changeStyle={(value: string) =>
+          setFeedStyle(value as PlaylistFeedStyle)
+        }
       />
 
       <PlaylistFeed

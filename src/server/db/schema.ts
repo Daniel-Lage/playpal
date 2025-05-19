@@ -114,39 +114,63 @@ export const postsTable = createTable("post", {
   urlMetadata: jsonb("urlMetadata").$type<IMetadata>(),
 });
 
-export const repliesTable = createTable("reply", {
-  replierId: text("replierId")
-    .notNull()
-    .references(() => postsTable.id, { onDelete: "cascade" }),
-  replieeId: text("replieeId").references(() => postsTable.id, {
-    onDelete: "set null",
+export const repliesTable = createTable(
+  "reply",
+  {
+    replierId: text("replierId")
+      .notNull()
+      .references(() => postsTable.id, { onDelete: "cascade" }),
+    replieeId: text("replieeId")
+      .notNull()
+      .references(() => postsTable.id, { onDelete: "cascade" }),
+    separation: integer("separation").notNull(),
+  },
+  (reply) => ({
+    compoundKey: primaryKey({
+      columns: [reply.replieeId, reply.replierId],
+    }),
   }),
-  separation: integer("separation").notNull(),
-});
+);
 
-export const likesTable = createTable("like", {
-  postId: text("postId")
-    .notNull()
-    .references(() => postsTable.id, { onDelete: "cascade" }),
-  userId: text("userId")
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-});
+export const likesTable = createTable(
+  "like",
+  {
+    postId: text("postId")
+      .notNull()
+      .references(() => postsTable.id, { onDelete: "cascade" }),
+    userId: text("userId")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (like) => ({
+    compoundKey: primaryKey({
+      columns: [like.postId, like.userId],
+    }),
+  }),
+);
 
-export const followsTable = createTable("follow", {
-  followerId: text("followerId")
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  followeeId: text("followeeId")
-    .notNull()
-    .references(() => usersTable.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
-});
+export const followsTable = createTable(
+  "follow",
+  {
+    followerId: text("followerId")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    followeeId: text("followeeId")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (follow) => ({
+    compoundKey: primaryKey({
+      columns: [follow.followeeId, follow.followerId],
+    }),
+  }),
+);
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
   posts: many(postsTable, { relationName: "author" }),

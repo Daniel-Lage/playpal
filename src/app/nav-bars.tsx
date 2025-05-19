@@ -1,19 +1,18 @@
 "use client";
 
+import { Bell, House, LogIn, Search, UserRound } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import type { LinkParams } from "~/models/link.model";
+import { usePathname } from "next/navigation";
+import { Button } from "~/components/ui/button";
+import { cn } from "~/lib/utils";
 
 export function StartNav({ profileURL }: { profileURL?: string }) {
-  const navTabs: LinkParams[] = [
-    { title: "Profile", path: profileURL, icon: "/profile.png" },
-    { title: "Home", path: "/", icon: "/home.png" },
-    { title: "Search", path: "/search", icon: "/search.png" },
-  ];
+  const pathname = usePathname();
 
   return (
-    <div className="flex h-16 w-screen shrink-0 gap-6 bg-nav font-bold md:h-screen md:w-[19vw] md:flex-col md:pl-10 md:pt-4">
+    <div className="flex h-16 w-screen min-w-56 shrink-0 gap-6 bg-terciary font-bold md:h-svh md:w-[19vw] md:flex-col md:p-10">
       <div className="absolute w-0 md:relative md:w-auto">
         <Image
           className="rounded-md"
@@ -24,30 +23,84 @@ export function StartNav({ profileURL }: { profileURL?: string }) {
           priority
         />
       </div>
-      {navTabs.map(({ title, path, icon }) => (
-        <div
-          className="flex w-full items-center justify-center md:justify-start"
-          key={title}
+      <Link
+        href={"/"}
+        role="button"
+        className="flex w-full items-center justify-center"
+        key={"Home"}
+      >
+        <Button
+          size="nav"
+          className={cn(pathname === "/" ? "bg-terciary-accent font-bold" : "")}
         >
-          {path ? (
-            <Link href={path} className="flex items-end gap-2" role="button">
-              <Image height={32} width={32} src={icon ?? ""} alt={icon ?? ""} />
-              <div className="hidden md:block">{title}</div>
-            </Link>
-          ) : (
-            <button
-              onClick={() => signIn("spotify", { callbackUrl: "/user" })}
-              className="flex items-end gap-2"
-              role="button"
-            >
-              <Image height={32} width={32} src={icon ?? ""} alt={icon ?? ""} />
-              <div className="hidden md:block">{title}</div>
-            </button>
+          <StartNavIcon title={"Home"} active={pathname === "/"} />
+          <div className="hidden text-lg md:block">{"Home"}</div>
+        </Button>
+      </Link>
+      <Link
+        href={profileURL ?? ""}
+        role="button"
+        className="flex w-full items-center justify-center"
+      >
+        <Button
+          size="nav"
+          onClick={() =>
+            profileURL ?? signIn("spotify", { callbackUrl: "/user" })
+          }
+          className={cn(
+            pathname === profileURL ? "bg-terciary-accent font-bold" : "",
           )}
-        </div>
-      ))}
+        >
+          <StartNavIcon title="Profile" active={pathname === profileURL} />
+          <div className="hidden text-lg md:block">{"Profile"}</div>
+        </Button>
+      </Link>
+
+      <Link
+        href={"/search"}
+        role="button"
+        className="flex w-full items-center justify-center"
+        key={"Search"}
+      >
+        <Button
+          size="nav"
+          className={cn(
+            pathname === "/search" ? "bg-terciary-accent font-bold" : "",
+          )}
+        >
+          <StartNavIcon title={"Search"} active={pathname === "/search"} />
+          <div className="hidden text-lg md:block">{"Search"}</div>
+        </Button>
+      </Link>
+
+      <Link
+        href={"/notifications"}
+        role="button"
+        className="flex w-full items-center justify-center"
+        key={"Notifications"}
+      >
+        <Button
+          size="nav"
+          className={cn(
+            pathname === "/notifications" ? "bg-terciary-accent font-bold" : "",
+          )}
+        >
+          <StartNavIcon
+            title={"Notifications"}
+            active={pathname === "/notifications"}
+          />
+          <div className="hidden text-lg md:block">{"Notifications"}</div>
+        </Button>
+      </Link>
     </div>
   );
+}
+
+function StartNavIcon({ title, active }: { title: string; active: boolean }) {
+  if (title === "Profile") return <UserRound strokeWidth={active ? 3 : 2} />;
+  if (title === "Home") return <House strokeWidth={active ? 3 : 2} />;
+  if (title === "Search") return <Search strokeWidth={active ? 3 : 2} />;
+  if (title === "Notifications") return <Bell strokeWidth={active ? 3 : 2} />;
 }
 
 export function EndNav({
@@ -56,33 +109,29 @@ export function EndNav({
   sessionUserImage: string | null | undefined;
 }) {
   return (
-    <div className="flex h-14 w-screen shrink-0 flex-col justify-center gap-6 bg-nav p-2 font-bold md:h-screen md:w-[19vw] md:justify-normal md:p-4">
-      <div className="absolute w-auto self-start md:absolute md:w-0">
+    <div className="flex h-14 w-screen shrink-0 flex-col justify-center gap-6 bg-terciary p-2 font-bold md:h-svh md:w-[19vw] md:justify-normal md:p-4">
+      {sessionUserImage && (
         <Image
-          className="aspect-square rounded-md"
-          width={40}
-          height={40}
-          src="/favicon.ico"
-          alt="playpal logo"
-          priority
-        />
-      </div>
-      {sessionUserImage ? (
-        <Image
-          className="aspect-square self-center rounded-full md:hidden"
+          className="absolute aspect-square self-center rounded-full md:hidden"
           height={40}
           width={40}
           src={sessionUserImage}
           alt="your image"
         />
-      ) : (
-        <button
-          onClick={() => signIn("spotify")}
-          className="flex items-center justify-center gap-2 self-center rounded-full bg-main-3 p-2 md:w-full md:justify-start"
-        >
-          <Image height={32} width={32} src="/enter.png" alt="enter icon" />
-          <div className="hidden grow md:ml-[-18px] md:block">Sign In</div>
-        </button>
+      )}
+      <Image
+        className="aspect-square shrink-0 rounded-md md:hidden"
+        width={40}
+        height={40}
+        src="/favicon.ico"
+        alt="playpal logo"
+        priority
+      />
+      {!sessionUserImage && (
+        <Button onClick={() => signIn("spotify")} size="nav" variant="login">
+          <LogIn />
+          <div className="hidden text-lg font-bold md:block">Sign In</div>
+        </Button>
       )}
     </div>
   );

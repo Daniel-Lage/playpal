@@ -1,0 +1,178 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { PostView } from "~/components/post-view";
+import { formatTimelapse } from "~/helpers/format-timelapse";
+import { cn } from "~/lib/utils";
+import {
+  type NotificationObject,
+  NotificationType,
+  NotificationTypeOptions,
+} from "~/models/notifications.model";
+import type { PostObject } from "~/models/post.model";
+import type { UserObject } from "~/models/user.model";
+
+export default function NotificationsView({
+  notifications,
+  sessionUserId,
+}: {
+  notifications: NotificationObject[];
+  sessionUserId?: string | null | undefined;
+}) {
+  const [tab, setTab] = useState<NotificationType | undefined>();
+
+  return (
+    <>
+      <div className="flex flex-col rounded-md bg-primary p-2 text-xl">
+        <h1 className="p-2 text-xl font-bold">Notifications</h1>
+        <div className={"grid grid-cols-4 gap-1 font-bold"}>
+          <div
+            className={cn(
+              "justify-center rounded-md p-1 text-center text-xs hover:underline md:text-base",
+              tab === undefined ? "bg-primary-accent" : "bg-primary",
+            )}
+            role="button"
+            onClick={() => setTab(undefined)}
+          >
+            All
+          </div>
+          {NotificationTypeOptions.map((type) => (
+            <div
+              className={cn(
+                "justify-center rounded-md p-1 text-center text-xs hover:underline md:text-base",
+                tab === type ? "bg-primary-accent" : "bg-primary",
+              )}
+              role="button"
+              key={type}
+              onClick={() => setTab(type)}
+            >
+              {type.substring(0, 1).toUpperCase() + type.substring(1)}
+            </div>
+          ))}
+        </div>
+      </div>
+      {notifications
+        .filter((notification) =>
+          tab !== undefined ? notification.type === tab : true,
+        )
+        .map((notification) => (
+          <div
+            key={
+              notification.target
+                ? notification.notifierId + notification.target.id
+                : notification.notifierId
+            }
+            className="flex flex-col rounded-md bg-secondary"
+          >
+            <NotificationView
+              notification={notification}
+              timelapse={
+                formatTimelapse(
+                  Date.now() - notification.createdAt.getTime(),
+                ) ?? notification.createdAt.toUTCString()
+              }
+              sessionUserId={sessionUserId}
+            />
+          </div>
+        ))}
+    </>
+  );
+}
+
+function NotificationView({
+  notification,
+  timelapse,
+  sessionUserId,
+}: {
+  notification: NotificationObject;
+  timelapse: string;
+  sessionUserId?: string | null | undefined;
+}) {
+  if (notification.type === NotificationType.Reply)
+    return (
+      <PostView
+        post={notification.notifier as PostObject}
+        sessionUserId={sessionUserId}
+        isMainPost={false}
+      />
+    );
+
+  if (notification.type === NotificationType.Follow)
+    return (
+      <NFollowView
+        notifier={notification.notifier as UserObject}
+        timelapse={timelapse}
+      />
+    );
+
+  if (notification.type === NotificationType.Like)
+    return (
+      <NLikeView
+        notifier={notification.notifier as UserObject}
+        timelapse={timelapse}
+        target={notification.target!}
+      />
+    );
+}
+
+function NFollowView({
+  notifier,
+  timelapse,
+}: {
+  notifier: UserObject;
+  timelapse: string;
+}) {
+  return (
+    <Link className="flex items-center gap-2 p-2" href={`/user/${notifier.id}`}>
+      <Image
+        width={32}
+        height={32}
+        className="aspect-square shrink-0 grow-0 rounded-full"
+        src={notifier.image ?? ""}
+        alt={notifier.name ?? ""}
+      />
+
+      <div>
+        <span className="font-bold">{notifier.name}</span> followed you
+        {" " + timelapse}
+      </div>
+    </Link>
+  );
+}
+
+function NLikeView({
+  notifier,
+  timelapse,
+  target,
+}: {
+  notifier: UserObject;
+  timelapse: string;
+  target: PostObject;
+}) {
+  return (
+    <>
+      <Link
+        className="flex items-center gap-2 p-2"
+        href={`/user/${notifier.id}`}
+      >
+        <Image
+          width={32}
+          height={32}
+          className="aspect-square shrink-0 grow-0 rounded-full"
+          src={notifier.image ?? ""}
+          alt={notifier.name ?? ""}
+        />
+
+        <div>
+          <span className="font-bold">{notifier.name}</span> liked your post
+          {" " + timelapse}
+        </div>
+      </Link>
+      <Link className="flex items-center p-2" href={`/post/${target.id}`}>
+        <div className="text-gray-500">{target.content}</div>
+      </Link>
+    </>
+  );
+}

@@ -6,7 +6,10 @@ import type { Playlist } from "~/models/playlist.model";
 import { getTokens } from "./get-tokens";
 import { getProviderAccountId } from "~/server/get-provider-account-id";
 
-export async function getUsersPlaylists(userId: string, accessToken?: string) {
+export async function getUsersPlaylists(
+  userId: string,
+  accessToken?: string | null,
+) {
   if (!accessToken) {
     if (process.env.FALLBACK_REFRESH_TOKEN === undefined)
       throw new Error("FALLBACK_REFRESH_TOKEN is not defined in env");

@@ -1,6 +1,6 @@
 import { getServerSession } from "next-auth";
-import { PostView } from "~/app/_components/post-view";
-import { UserView } from "~/app/_components/user-view";
+import { PostView } from "~/components/post-view";
+import { UserView } from "~/components/user-view";
 import { authOptions } from "~/lib/auth";
 import { getPostLikes } from "~/server/get-post-likes";
 
@@ -13,11 +13,11 @@ export default async function PostLikesPage({
   const post = await getPostLikes(postId);
 
   if (!post)
-    return <div className="self-center text-xl text-red-500">Error</div>;
+    return <div className="self-center text-xl text-secondary">Error</div>;
 
   return (
     <>
-      <div className="flex flex-col gap-1 rounded-md bg-main-1">
+      <div className="flex flex-col gap-1 rounded-md bg-primary">
         <PostView
           post={post}
           sessionUserId={session?.user.id}

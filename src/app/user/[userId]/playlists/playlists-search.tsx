@@ -1,5 +1,7 @@
-import Image from "next/image";
 import type { ChangeEvent } from "react";
+import { SearchView } from "~/components/search-view";
+import { Select } from "~/components/select";
+import { Sorter } from "~/components/sorter";
 import {
   PlaylistFeedStyle,
   PlaylistFeedStyleOptions,
@@ -18,56 +20,34 @@ export function PlaylistsSearch({
   changeStyle,
 }: {
   sortingColumn: PlaylistsSortingColumn | undefined;
-  reversed: boolean | undefined;
+  reversed: boolean;
   filter: string;
   length: number;
-  sortColumn: (e: ChangeEvent<HTMLSelectElement>) => void;
+  sortColumn: (value: string) => void;
   reverse: () => void;
   filterPlaylists: (e: ChangeEvent<HTMLInputElement>) => void;
-  changeStyle: (e: ChangeEvent<HTMLSelectElement>) => void;
+  changeStyle: ((value: string) => void) | undefined;
 }) {
   return (
-    <div className="flex flex-col items-start gap-2 rounded-md bg-main-1 p-2 md:flex-row md:items-center">
+    <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center">
       {length} Playlists
-      <div className="flex items-center justify-center gap-2 rounded-md bg-main-3 p-2 text-center text-sm">
-        <div className="font-bold">Sorting column</div>
-        <select
-          onChange={sortColumn}
-          defaultValue={sortingColumn ?? PlaylistsSortingColumn.CreatedAt}
-        >
-          {PlaylistsSortingColumnOptions.map((sortingColumn) => (
-            <option key={sortingColumn}>{sortingColumn}</option>
-          ))}
-        </select>
-
-        <button onClick={reverse} className="my-[-10px]">
-          <Image
-            height={32}
-            width={32}
-            src="/direction.png"
-            alt="direction icon"
-            className={reversed ? "rotate-180" : ""}
-          />
-        </button>
-      </div>
-      <div className="flex items-center justify-center gap-2 rounded-md bg-main-3 p-2 text-center text-sm">
-        <div className="font-bold">Feed Style</div>
-        <select
-          onChange={changeStyle}
-          defaultValue={sortingColumn ?? PlaylistFeedStyle.Compact}
-        >
-          {PlaylistFeedStyleOptions.map((PlaylistFeedStyle) => (
-            <option key={PlaylistFeedStyle}>{PlaylistFeedStyle}</option>
-          ))}
-        </select>
-      </div>
-      <input
-        placeholder="Search something!"
-        className="grow bg-transparent placeholder-zinc-600 outline-none"
-        type="text"
-        value={filter}
-        onChange={filterPlaylists}
+      <Sorter
+        title="Sort by"
+        onSelect={sortColumn}
+        value={sortingColumn ?? PlaylistsSortingColumn.CreatedAt}
+        options={PlaylistsSortingColumnOptions}
+        reversed={reversed}
+        reverse={reverse}
       />
+      <div className="rounded-md border-2 border-primary-accent">
+        <Select
+          title="Feed Style"
+          onSelect={changeStyle}
+          value={sortingColumn ?? PlaylistFeedStyle.Compact}
+          options={PlaylistFeedStyleOptions}
+        />
+      </div>
+      <SearchView value={filter} onChange={filterPlaylists} />
     </div>
   );
 }

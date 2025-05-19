@@ -1,5 +1,9 @@
-import Image from "next/image";
+import { Play } from "lucide-react";
 import type { ChangeEvent } from "react";
+import { SearchView } from "~/components/search-view";
+import { Sorter } from "~/components/sorter";
+import { Button } from "~/components/ui/button";
+
 import {
   type PlaylistTrack,
   TracksSortingColumn,
@@ -17,51 +21,38 @@ export function PlaylistSearch({
   play,
 }: {
   sortingColumn: TracksSortingColumn | undefined;
-  reversed: boolean | undefined;
+  reversed: boolean;
   filter: string;
   disabled: boolean;
-  sortColumn: (e: ChangeEvent<HTMLSelectElement>) => void;
+  sortColumn: (value: string) => void;
   reverse: () => void;
   filterTracks: (e: ChangeEvent<HTMLInputElement>) => void;
   play: (start?: PlaylistTrack | undefined) => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-between gap-2 bg-main-2 p-2 md:flex-row">
-      <div className="flex gap-2">
-        <div className="flex items-center justify-center gap-2 rounded-md bg-main-3 pl-1 pr-3 text-center">
-          <div className="font-bold md:p-1">Sort by</div>
-          <select
-            onChange={sortColumn}
-            defaultValue={sortingColumn ?? TracksSortingColumn.AddedAt}
-          >
-            {TracksSortingColumnOptions.map((sortingColumn) => (
-              <option key={sortingColumn}>{sortingColumn}</option>
-            ))}
-          </select>
-        </div>
+    <div className="flex shrink-0 flex-col items-center justify-between gap-2 rounded-md bg-primary p-2 md:flex-row">
+      <div className="flex w-full items-center justify-between gap-2 md:w-fit">
+        <Button
+          disabled={disabled}
+          onClick={() => play()}
+          size="bigicon"
+          variant="play"
+        >
+          <Play fill="black" stroke="black" />
+        </Button>
 
-        <button onClick={reverse}>
-          <Image
-            height={32}
-            width={32}
-            src="/direction.png"
-            alt="direction icon"
-            className={reversed ? "rotate-180" : ""}
-          />
-        </button>
+        <Sorter
+          title="Sort by"
+          onSelect={sortColumn}
+          value={sortingColumn ?? TracksSortingColumn.AddedAt}
+          options={TracksSortingColumnOptions}
+          reversed={reversed}
+          reverse={reverse}
+        />
       </div>
-
-      <input
-        placeholder="Search something!"
-        className="w-32 grow bg-transparent placeholder-zinc-600 outline-none md:w-48"
-        type="text"
-        value={filter}
-        onChange={filterTracks}
-      />
-
-      <button disabled={disabled} onClick={() => play()}>
-        <Image height={32} width={32} src="/play.png" alt="play icon" />
-      </button>
+      <div className="flex w-full">
+        <SearchView value={filter} onChange={filterTracks} />
+      </div>
     </div>
   );
 }

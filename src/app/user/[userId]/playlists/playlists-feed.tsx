@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { SpotifyLink } from "~/app/_components/spotify-link";
+import { SpotifyLink } from "~/components/spotify-link";
 import { type Playlist, PlaylistFeedStyle } from "~/models/playlist.model";
 
 export function PlaylistFeed({
@@ -34,7 +34,7 @@ export function PlaylistFeed({
 
 function PlaylistGrid({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="flex flex-col items-end justify-between rounded-md bg-secondary-1 p-2">
+    <div className="flex flex-col items-end justify-between rounded-md bg-secondary p-2">
       <Link
         href={`/playlist/${playlist.id}`}
         className="grow"
@@ -43,21 +43,21 @@ function PlaylistGrid({ playlist }: { playlist: Playlist }) {
         <Image
           width={500}
           height={500}
-          className="aspect-square rounded-md"
+          className="aspect-square rounded-sm"
           src={playlist.images[0]?.url ?? ""}
           alt={playlist.name}
         />
 
         <div className="px-2 pt-2 text-center font-bold">{playlist.name}</div>
       </Link>
-      <SpotifyLink size={20} external_url={playlist.external_urls.spotify} />
+      <SpotifyLink external_url={playlist.external_urls.spotify} />
     </div>
   );
 }
 
 function PlaylistCompact({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="flex items-center gap-2 overflow-hidden rounded-md bg-secondary-1 p-1 font-bold">
+    <div className="flex items-center gap-2 overflow-hidden rounded-md bg-secondary p-1 font-bold">
       <Link
         href={`/playlist/${playlist.id}`}
         className="grow"
@@ -75,14 +75,14 @@ function PlaylistCompact({ playlist }: { playlist: Playlist }) {
         </div>
       </Link>
 
-      <SpotifyLink size={20} external_url={playlist.external_urls.spotify} />
+      <SpotifyLink external_url={playlist.external_urls.spotify} />
     </div>
   );
 }
 
 function PlaylistRow({ playlist }: { playlist: Playlist }) {
   return (
-    <div className="flex items-start gap-2 rounded-md bg-secondary-1 p-2 font-bold">
+    <div className="flex items-start gap-2 rounded-md bg-secondary p-2 font-bold">
       <Link
         href={`/playlist/${playlist.id}`}
         className="flex grow gap-2"
@@ -91,7 +91,7 @@ function PlaylistRow({ playlist }: { playlist: Playlist }) {
         <Image
           width={100}
           height={100}
-          className="aspect-square rounded-md"
+          className="aspect-square rounded-sm"
           src={playlist.images[0]?.url ?? ""}
           alt={playlist.name}
         />
@@ -109,7 +109,7 @@ function PlaylistRow({ playlist }: { playlist: Playlist }) {
         </div>
       </Link>
 
-      <SpotifyLink size={32} external_url={playlist.external_urls.spotify} />
+      <SpotifyLink external_url={playlist.external_urls.spotify} />
     </div>
   );
 }

@@ -1,6 +1,5 @@
 import { getServerSession } from "next-auth";
 
-import { PostCreator } from "~/app/_components/post-creator";
 import { getPosts } from "~/server/get-posts";
 import { authOptions } from "~/lib/auth";
 import type { IMetadata, Substring } from "~/models/post.model";
@@ -16,25 +15,23 @@ export default async function HomePage() {
 
   return (
     <>
-      {session?.user?.image && session?.user?.name && (
-        <PostCreator
-          send={async (
-            input: string,
-            urls: Substring[] | undefined,
-            metadata: IMetadata | undefined,
-          ) => {
-            "use server";
-            await postPost(input, session.user.id, urls, metadata);
-
-            revalidatePath("/");
-          }}
-          sessionUser={session.user}
-        />
-      )}
       <PostsView
         posts={posts}
-        sessionUserId={session?.user.id}
+        sessionUser={session?.user}
         lastQueried={new Date()}
+        send={async (
+          input: string,
+          urls: Substring[] | undefined,
+          metadata: IMetadata | undefined,
+        ) => {
+          "use server";
+
+          if (!session?.user) return;
+
+          await postPost(input, session.user.id, urls, metadata);
+
+          revalidatePath("/");
+        }}
         refresh={async (lastQueried: Date) => {
           "use server";
           return await getPosts(lastQueried);
