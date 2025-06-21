@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { PostView } from "~/components/post-view";
+import { Button } from "~/components/ui/button";
 import { formatTimelapse } from "~/helpers/format-timelapse";
 import { cn } from "~/lib/utils";
 import {
@@ -27,29 +28,24 @@ export default function NotificationsView({
     <>
       <div className="flex flex-col rounded-md bg-primary p-2 text-xl">
         <h1 className="p-2 text-xl font-bold">Notifications</h1>
-        <div className={"grid grid-cols-4 gap-1 font-bold"}>
-          <div
-            className={cn(
-              "justify-center rounded-md p-1 text-center text-xs hover:underline md:text-base",
-              tab === undefined ? "bg-primary-accent" : "bg-primary",
-            )}
-            role="button"
+        <div className="grid grid-cols-4 gap-1">
+          <Button
+            variant="link"
+            size="tab"
+            className={tab === undefined ? "bg-primary-accent" : "bg-primary"}
             onClick={() => setTab(undefined)}
           >
             All
-          </div>
+          </Button>
           {NotificationTypeOptions.map((type) => (
-            <div
-              className={cn(
-                "justify-center rounded-md p-1 text-center text-xs hover:underline md:text-base",
-                tab === type ? "bg-primary-accent" : "bg-primary",
-              )}
-              role="button"
-              key={type}
+            <Button
+              variant="link"
+              size="tab"
+              className={tab === type ? "bg-primary-accent" : "bg-primary"}
               onClick={() => setTab(type)}
             >
               {type.substring(0, 1).toUpperCase() + type.substring(1)}
-            </div>
+            </Button>
           ))}
         </div>
       </div>

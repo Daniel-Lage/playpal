@@ -28,7 +28,7 @@ export default async function HomePage() {
 
           if (!session?.user) return;
 
-          await postPost(input, session.user.id, urls, metadata);
+          await postPost(input, session?.user.id, urls, metadata);
 
           revalidatePath("/");
         }}

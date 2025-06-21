@@ -23,84 +23,63 @@ export function StartNav({ profileURL }: { profileURL?: string }) {
           priority
         />
       </div>
-      <Link
-        href={"/"}
-        role="button"
-        className="flex w-full items-center justify-center"
-        key={"Home"}
-      >
-        <Button
-          size="nav"
-          className={cn(pathname === "/" ? "bg-terciary-accent font-bold" : "")}
-        >
-          <StartNavIcon title={"Home"} active={pathname === "/"} />
-          <div className="hidden text-lg md:block">{"Home"}</div>
-        </Button>
-      </Link>
-      <Link
+
+      <StartNavButton title="Home" href="/" active={pathname === "/"} />
+
+      <StartNavButton
+        title="Profile"
         href={profileURL ?? ""}
-        role="button"
-        className="flex w-full items-center justify-center"
-      >
-        <Button
-          size="nav"
-          onClick={() =>
-            profileURL ?? signIn("spotify", { callbackUrl: "/user" })
-          }
-          className={cn(
-            pathname === profileURL ? "bg-terciary-accent font-bold" : "",
-          )}
-        >
-          <StartNavIcon title="Profile" active={pathname === profileURL} />
-          <div className="hidden text-lg md:block">{"Profile"}</div>
-        </Button>
-      </Link>
+        active={!!profileURL && pathname.startsWith(profileURL)}
+      />
 
-      <Link
-        href={"/search"}
-        role="button"
-        className="flex w-full items-center justify-center"
-        key={"Search"}
-      >
-        <Button
-          size="nav"
-          className={cn(
-            pathname === "/search" ? "bg-terciary-accent font-bold" : "",
-          )}
-        >
-          <StartNavIcon title={"Search"} active={pathname === "/search"} />
-          <div className="hidden text-lg md:block">{"Search"}</div>
-        </Button>
-      </Link>
+      <StartNavButton
+        title="Search"
+        href="/search"
+        active={pathname === "/search"}
+      />
 
-      <Link
-        href={"/notifications"}
-        role="button"
-        className="flex w-full items-center justify-center"
-        key={"Notifications"}
-      >
-        <Button
-          size="nav"
-          className={cn(
-            pathname === "/notifications" ? "bg-terciary-accent font-bold" : "",
-          )}
-        >
-          <StartNavIcon
-            title={"Notifications"}
-            active={pathname === "/notifications"}
-          />
-          <div className="hidden text-lg md:block">{"Notifications"}</div>
-        </Button>
-      </Link>
+      <StartNavButton
+        title="Notifications"
+        href="/notifications"
+        active={pathname === "/notifications"}
+      />
     </div>
   );
 }
 
-function StartNavIcon({ title, active }: { title: string; active: boolean }) {
-  if (title === "Profile") return <UserRound strokeWidth={active ? 3 : 2} />;
-  if (title === "Home") return <House strokeWidth={active ? 3 : 2} />;
-  if (title === "Search") return <Search strokeWidth={active ? 3 : 2} />;
-  if (title === "Notifications") return <Bell strokeWidth={active ? 3 : 2} />;
+function StartNavButton({
+  title,
+  active,
+  href,
+}: {
+  title: string;
+  active: boolean;
+  href: string;
+  onClick?: () => void;
+}) {
+  const icons = new Map<string, JSX.Element>([
+    ["Profile", <UserRound strokeWidth={active ? 3 : 2} />],
+    ["Home", <House strokeWidth={active ? 3 : 2} />],
+    ["Search", <Search strokeWidth={active ? 3 : 2} />],
+    ["Notifications", <Bell strokeWidth={active ? 3 : 2} />],
+  ]);
+
+  return (
+    <Link
+      href={href}
+      role="button"
+      className="flex w-full items-center justify-center"
+      key="Notifications"
+    >
+      <Button
+        size="nav"
+        className={cn(active ? "bg-terciary-accent font-bold" : "")}
+      >
+        {icons.get(title)}
+        <div className="hidden text-lg md:block">{title}</div>
+      </Button>
+    </Link>
+  );
 }
 
 export function EndNav({

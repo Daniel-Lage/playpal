@@ -52,7 +52,7 @@ export function SimpleUserView({
           ) : (
             <></>
           )}
-          <ShareButton path={`/user/${user.id}`} title={"profile"} />
+          <ShareButton path={`/user/${user.id}`} title="profile" />
         </MenuView>
 
         <SpotifyLink

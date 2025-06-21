@@ -7,6 +7,7 @@ import type { IMetadata, Substring } from "~/models/post.model";
 import { getMetadata } from "~/lib/get-metadata";
 import Image from "next/image";
 import type { User } from "next-auth";
+import { Button } from "./ui/button";
 
 export function PostCreator({
   send,
@@ -113,14 +114,14 @@ export function PostCreator({
           metadata={metadata}
           loadingMetadata={loadingMetadata}
         />
-        <button
+        <Button
+          variant="link"
           onClick={() => input !== "" && canPost && void handleSend()}
           className="cursor-pointer self-end pr-2 font-bold hover:underline"
-          role="button"
           disabled={input === "" || !canPost}
         >
           Post
-        </button>
+        </Button>
       </div>
     </div>
   );

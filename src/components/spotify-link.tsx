@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 
 export function SpotifyLink({ external_url }: { external_url: string }) {
   return (
-    <Button>
+    <Button size="icon">
       <Link href={external_url}>
         <Image
           height={24}

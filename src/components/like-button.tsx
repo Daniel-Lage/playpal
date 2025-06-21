@@ -19,11 +19,12 @@ export function LikeButton({
   setIsLiked: (newValue: boolean) => void;
 }) {
   return !sessionUserId ? (
-    <Button onClick={() => signIn("spotify")}>
+    <Button size="icon" onClick={() => signIn("spotify")}>
       <Heart />
     </Button>
   ) : isLiked ? (
     <Button
+      size="icon"
       onClick={() => {
         setIsLiked(false);
         unlikePost(post.id, sessionUserId)
@@ -40,6 +41,7 @@ export function LikeButton({
     </Button>
   ) : (
     <Button
+      size="icon"
       onClick={() => {
         setIsLiked(true);
         likePost(post.id, sessionUserId)

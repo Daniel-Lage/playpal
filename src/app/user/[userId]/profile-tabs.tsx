@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
 
 export function ProfileTabs({ userId }: { userId: string }) {
   const pathname = usePathname();
@@ -43,16 +43,14 @@ function ProfileTabLink({
   pathname: string;
 }) {
   return (
-    <Link
-      href={href}
-      className={cn(
-        "justify-center rounded-md p-1 text-center text-xs hover:underline md:text-base",
-        href === pathname ? "bg-primary-accent" : "bg-primary",
-      )}
-      role="button"
-      key={title}
-    >
-      {title}
+    <Link href={href} role="button" key={title}>
+      <Button
+        variant="link"
+        size="tab"
+        className={href === pathname ? "bg-primary-accent" : "bg-primary"}
+      >
+        {title}
+      </Button>
     </Link>
   );
 }

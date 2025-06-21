@@ -18,14 +18,14 @@ export function Sorter({
   reverse: () => void;
 }) {
   return (
-    <div className="border-primary-accent flex h-fit grow-0 items-center justify-center gap-2 rounded-md border-2 text-center text-sm">
+    <div className="flex h-fit grow-0 items-center justify-center gap-2 rounded-md border-2 border-primary-accent text-center text-sm">
       <Select
         title={title}
         onSelect={onSelect}
         value={value}
         options={options}
       />
-      <Button onClick={reverse}>
+      <Button size="icon" onClick={reverse}>
         {reversed ? <ChevronDown /> : <ChevronUp />}
       </Button>
     </div>

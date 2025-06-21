@@ -128,8 +128,8 @@ export function PostView({
           >
             {isCutoff ? (
               <>
-                <div className="absolute h-5 w-1 rounded-md bg-foreground"></div>
-                <div className="absolute h-1 w-5 rounded-md bg-foreground"></div>
+                <div className="absolute h-3 w-1 rounded-md bg-foreground"></div>
+                <div className="absolute h-1 w-3 rounded-md bg-foreground"></div>
               </>
             ) : (
               <>
@@ -170,7 +170,7 @@ export function PostView({
             </Link>
           )}
 
-          <div className="flex h-12 items-center justify-between font-bold">
+          <div className="grid h-12 grid-cols-3 items-center justify-between font-bold">
             <div className="flex items-center gap-2">
               <LikeButton {...{ post, sessionUserId, isLiked, setIsLiked }} />
               <Link href={`/post/${post.id}/likes`} className="hover:underline">
@@ -178,15 +178,17 @@ export function PostView({
               </Link>
             </div>
             <Link
-              className="flex items-center gap-2 hover:underline"
+              className="flex items-center justify-center gap-2 hover:underline"
               href={`/post/${post.id}`}
             >
-              <Button>
+              <Button size="icon">
                 <MessageSquare />
               </Button>
               <div>{post.replies?.length ?? 0}</div>
             </Link>
-            <ShareButton path={`/post/${post.id}`} />
+            <div className="flex items-center justify-end">
+              <ShareButton path={`/post/${post.id}`} />
+            </div>
           </div>
         </div>
       </div>

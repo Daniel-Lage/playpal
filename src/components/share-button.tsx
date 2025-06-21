@@ -36,7 +36,10 @@ export function ShareButton({ path, title }: { path: string; title?: string }) {
               {url}
             </div>
           </div>
-          <Button onClick={() => navigator.clipboard.writeText(url)}>
+          <Button
+            size="icon"
+            onClick={() => navigator.clipboard.writeText(url)}
+          >
             <span className="sr-only">Copy</span>
             <Copy />
           </Button>
