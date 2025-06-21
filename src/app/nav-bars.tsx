@@ -58,10 +58,13 @@ function StartNavButton({
   onClick?: () => void;
 }) {
   const icons = new Map<string, JSX.Element>([
-    ["Profile", <UserRound strokeWidth={active ? 3 : 2} />],
-    ["Home", <House strokeWidth={active ? 3 : 2} />],
-    ["Search", <Search strokeWidth={active ? 3 : 2} />],
-    ["Notifications", <Bell strokeWidth={active ? 3 : 2} />],
+    ["Profile", <UserRound key="Profile" strokeWidth={active ? 3 : 2} />],
+    ["Home", <House key="Home" strokeWidth={active ? 3 : 2} />],
+    ["Search", <Search key="Search" strokeWidth={active ? 3 : 2} />],
+    [
+      "Notifications",
+      <Bell key="Notifications" strokeWidth={active ? 3 : 2} />,
+    ],
   ]);
 
   return (
