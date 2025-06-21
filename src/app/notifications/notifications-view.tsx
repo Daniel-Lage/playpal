@@ -6,7 +6,6 @@ import { useState } from "react";
 import { PostView } from "~/components/post-view";
 import { Button } from "~/components/ui/button";
 import { formatTimelapse } from "~/helpers/format-timelapse";
-import { cn } from "~/lib/utils";
 import {
   type NotificationObject,
   NotificationType,
@@ -39,6 +38,7 @@ export default function NotificationsView({
           </Button>
           {NotificationTypeOptions.map((type) => (
             <Button
+              key={type}
               variant="link"
               size="tab"
               className={tab === type ? "bg-primary-accent" : "bg-primary"}
