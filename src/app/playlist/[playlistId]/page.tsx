@@ -9,7 +9,6 @@ import { getMySpotifyUser } from "~/api/get-my-spotify-user";
 import { getRandomSample } from "~/helpers/get-random-sample";
 import { playTracksStatus, type PlaylistTrack } from "~/models/track.model";
 import { playTracks } from "~/api/play-tracks";
-import { setFirstItem } from "~/helpers/set-first-item";
 import { revalidatePath } from "next/cache";
 
 export async function generateMetadata({
@@ -71,7 +70,8 @@ export default async function PlaylistPage({
       playlist={playlist}
       sessionUserId={session.user.id}
       expires_at={session.user.expires_at}
-      play={async (expired: boolean, start?: PlaylistTrack) => {
+      queue={queue}
+      play={async (expired: boolean, queue: PlaylistTrack[]) => {
         "use server";
 
         if (expired) {
@@ -79,16 +79,7 @@ export default async function PlaylistPage({
           return playTracksStatus.ServerError;
         }
 
-        return await playTracks(
-          start
-            ? setFirstItem(
-                queue,
-                start,
-                (other) => other.track.uri === start.track.uri,
-              )
-            : queue,
-          session.user.access_token,
-        );
+        return await playTracks(queue, session.user.access_token);
       }}
     />
   );

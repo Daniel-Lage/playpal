@@ -17,6 +17,7 @@ import { PlaylistTracks } from "./playlist-tracks";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import { signIn } from "next-auth/react";
 import { Check, SearchX, X } from "lucide-react";
+import { setFirstItem } from "~/helpers/set-first-item";
 
 export function PlaylistView({
   playlist,
@@ -24,11 +25,16 @@ export function PlaylistView({
   sessionUserId,
   play,
   expires_at,
+  queue,
 }: {
   // userId: string;
   playlist: Playlist;
+  queue?: PlaylistTrack[];
   sessionUserId?: string;
-  play?: (expired: boolean, start?: PlaylistTrack) => Promise<playTracksStatus>;
+  play?: (
+    expired: boolean,
+    queue: PlaylistTrack[],
+  ) => Promise<playTracksStatus>;
   expires_at?: number | null;
 }) {
   const [filter, setFilter] = useState("");
@@ -39,6 +45,14 @@ export function PlaylistView({
     useCallback((text) => text === "true", []),
     useCallback((value) => (value ? "true" : "false"), []),
   );
+
+  const [shuffled, setShuffled] = useLocalStorage<boolean>(
+    sessionUserId ? `${sessionUserId}:play_shuffled` : "play_shuffled",
+    true,
+    useCallback((text) => text === "true", []),
+    useCallback((value) => (value ? "true" : "false"), []),
+  );
+
   const [sortingColumn, setSortingColumn] =
     useLocalStorage<TracksSortingColumn>(
       sessionUserId
@@ -74,19 +88,41 @@ export function PlaylistView({
   const handlePlay = useCallback(
     async (start?: PlaylistTrack) => {
       if (!sessionUserId) return signIn("spotify");
-      if (!play || !expires_at) return;
+      if (!play || !expires_at || !queue) return;
 
       setStatus(playTracksStatus.Active);
 
-      setStatus(
-        await play(expires_at < Math.floor(new Date().getTime() / 1000), start),
-      );
-
+      if (shuffled)
+        setStatus(
+          await play(
+            expires_at < Math.floor(new Date().getTime() / 1000),
+            start
+              ? setFirstItem(
+                  queue,
+                  start,
+                  (other) => other.track.uri === start.track.uri,
+                )
+              : queue,
+          ),
+        );
+      else {
+        let newQueue = playlist.tracks.items.filter((track) => !track.is_local);
+        const startIndex = start
+          ? newQueue.findIndex((other) => other.track.uri === start.track.uri)
+          : 0;
+        newQueue = newQueue.slice(startIndex, startIndex + 99);
+        setStatus(
+          await play(
+            expires_at < Math.floor(new Date().getTime() / 1000),
+            newQueue,
+          ),
+        );
+      }
       setTimeout(() => {
         setStatus(playTracksStatus.Inactive);
       }, 4000);
     },
-    [expires_at, play, sessionUserId],
+    [expires_at, play, sessionUserId, shuffled, playlist, queue],
   );
 
   return (
@@ -103,6 +139,10 @@ export function PlaylistView({
         }
         reverse={() => {
           setReversed((prev) => !prev);
+        }}
+        shuffled={shuffled}
+        switchShuffled={() => {
+          setShuffled((prev) => !prev);
         }}
         filterTracks={(e) => setFilter(e.target.value)}
         play={handlePlay}

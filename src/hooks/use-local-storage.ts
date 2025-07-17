@@ -1,33 +1,36 @@
-import {
-  type Dispatch,
-  type SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useLocalStorage<T>(
   key: string,
   fallback: T,
   parse: (text: string | null) => T | null,
   stringify: (value: T) => string,
-): [T, Dispatch<SetStateAction<T>>] {
-  const firstRender = useRef(true);
+): [T, (value: T | ((prev: T) => T)) => void] {
   const [value, setValue] = useState<T>(fallback);
 
   useEffect(() => {
     if (localStorage !== undefined) {
-      setValue(parse(localStorage.getItem(key)) ?? fallback);
+      const newValue = localStorage.getItem(key);
+      if (newValue === null) setValue(fallback);
+      else setValue(parse(newValue) ?? fallback);
     }
   }, [fallback, key, parse]);
 
-  useEffect(() => {
-    if (firstRender.current) {
-      firstRender.current = false;
-    } else if (localStorage !== undefined) {
-      localStorage.setItem(key, stringify(value));
-    }
-  }, [value, key, stringify]);
+  const update = useCallback(
+    (value: T | ((prev: T) => T)) => {
+      if (typeof value === "function") {
+        setValue((prev) => {
+          const newValue = (value as (prev: T) => T)(prev);
+          localStorage.setItem(key, stringify(newValue));
+          return newValue;
+        });
+      } else {
+        setValue(value);
+        localStorage.setItem(key, stringify(value));
+      }
+    },
+    [key, stringify],
+  );
 
-  return [value, setValue];
+  return [value, update];
 }

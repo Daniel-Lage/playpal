@@ -1,4 +1,4 @@
-import { Play } from "lucide-react";
+import { Play, Shuffle } from "lucide-react";
 import type { ChangeEvent } from "react";
 import { SearchView } from "~/components/search-view";
 import { Sorter } from "~/components/sorter";
@@ -15,6 +15,8 @@ export function PlaylistSearch({
   reversed,
   filter,
   disabled,
+  shuffled,
+  switchShuffled,
   sortColumn,
   reverse,
   filterTracks,
@@ -24,11 +26,14 @@ export function PlaylistSearch({
   reversed: boolean;
   filter: string;
   disabled: boolean;
+  shuffled: boolean;
+  switchShuffled: () => void;
   sortColumn: (value: string) => void;
   reverse: () => void;
   filterTracks: (e: ChangeEvent<HTMLInputElement>) => void;
   play: (start?: PlaylistTrack | undefined) => void;
 }) {
+  const secondary_color = "hsl(170, 95%, 83%)";
   return (
     <div className="flex shrink-0 flex-col items-center justify-between gap-2 rounded-md bg-primary p-2 md:flex-row">
       <div className="flex w-full items-center justify-between gap-2 md:w-fit">
@@ -37,8 +42,16 @@ export function PlaylistSearch({
           onClick={() => play()}
           size="bigicon"
           variant="play"
+          className="drop-shadow-md"
         >
           <Play fill="black" stroke="black" />
+        </Button>
+
+        <Button onClick={switchShuffled} size="bigicon">
+          <Shuffle
+            stroke={shuffled ? secondary_color : "black"}
+            className="drop-shadow-md"
+          />
         </Button>
 
         <Sorter
