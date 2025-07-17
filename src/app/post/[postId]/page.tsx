@@ -4,12 +4,15 @@ import type { Metadata } from "next";
 import { getPost } from "~/server/get-post";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
-import { PostView } from "~/components/post-view";
-import type { IMetadata, Substring } from "~/models/post.model";
-import { PostCreator } from "~/components/post-creator";
+import {
+  postPostStatus,
+  type IMetadata,
+  type Substring,
+} from "~/models/post.model";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
-import { Thread } from "./thread";
+import { PostPageView } from "./post-page-view";
+import { getReplies } from "~/server/get-replies";
 
 export const dynamic = "force-dynamic";
 
@@ -52,62 +55,39 @@ export default async function PostPage({
   const session = await getServerSession(authOptions);
   const post = await getPost(postId);
 
-  console.log(post);
-
   if (!post)
     return (
       <div className="self-center text-xl text-secondary">Post Not Found</div>
     );
 
   return (
-    <>
-      <div className="flex flex-col rounded-md bg-secondary">
-        <div className="flex justify-stretch">
-          <div className="flex w-full flex-col items-stretch">
-            <div>
-              {post.thread && (
-                <Thread
-                  thread={post.thread.map(({ repliee }) => repliee)}
-                  sessionUserId={session?.user.id}
-                  isMainPost={true}
-                />
-              )}
-              <PostView
-                post={post}
-                sessionUserId={session?.user.id}
-                isMainPost={true}
-              />
-              {session?.user?.image && session?.user?.name && (
-                <PostCreator
-                  send={async (
-                    input: string,
-                    urls: Substring[] | undefined,
-                    metadata: IMetadata | undefined,
-                  ) => {
-                    "use server";
-                    await postPost(
-                      input,
-                      session.user.id,
-                      urls,
-                      metadata,
-                      post,
-                    );
-                    revalidatePath("/");
-                  }}
-                  sessionUser={session.user}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-      {post.replies?.map((thread) => (
-        <Thread
-          key={`${thread[0]?.replierId}:thread`}
-          thread={thread.map(({ replier }) => replier)}
-          sessionUserId={session?.user.id}
-        />
-      ))}
-    </>
+    <PostPageView
+      post={post}
+      sessionUser={session?.user}
+      lastQueried={new Date()}
+      send={async (
+        input: string,
+        urls: Substring[] | undefined,
+        metadata: IMetadata | undefined,
+      ) => {
+        "use server";
+
+        if (!session?.user) return postPostStatus.ServerError; // shouldn't be able to be called if not logged in
+
+        const result = await postPost(
+          input,
+          session?.user.id,
+          urls,
+          metadata,
+          post,
+        );
+        revalidatePath("/");
+        return result;
+      }}
+      refresh={async (lastQueried: Date) => {
+        "use server";
+        return await getReplies(postId, lastQueried);
+      }}
+    />
   );
 }

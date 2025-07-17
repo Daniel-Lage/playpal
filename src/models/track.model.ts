@@ -39,3 +39,11 @@ export enum TracksSortingColumn {
 }
 
 export const TracksSortingColumnOptions = Object.values(TracksSortingColumn);
+
+export enum playTracksStatus {
+  Inactive,
+  Active,
+  Sucess,
+  ServerError,
+  NoDevice,
+}

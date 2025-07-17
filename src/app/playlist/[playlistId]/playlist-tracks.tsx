@@ -42,10 +42,8 @@ export function PlaylistTracks({
           {track.track.artists.map((artist) => artist.name).join(", ")}
         </div>
       </div>
-      {!!track.track.external_urls?.spotify ? (
+      {!!track.track.external_urls?.spotify && (
         <SpotifyLink external_url={track.track.external_urls.spotify} />
-      ) : (
-        <div className="h-8 w-8"></div>
       )}
     </button>
   ));

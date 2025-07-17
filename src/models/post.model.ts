@@ -44,3 +44,10 @@ export enum PostsSortingColumn {
   Likes = "Likes",
 }
 export const PostsSortingColumnOptions = Object.values(PostsSortingColumn);
+
+export enum postPostStatus {
+  Inactive,
+  Active,
+  Sucess,
+  ServerError,
+}

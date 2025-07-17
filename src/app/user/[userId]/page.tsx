@@ -3,7 +3,11 @@ import type { Metadata } from "next";
 
 import { authOptions } from "~/lib/auth";
 
-import { type IMetadata, type Substring } from "~/models/post.model";
+import {
+  postPostStatus,
+  type IMetadata,
+  type Substring,
+} from "~/models/post.model";
 import { getUser } from "~/server/get-user";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
@@ -73,11 +77,17 @@ export default async function ProfilePage({
               ) => {
                 "use server";
 
-                if (!session?.user) return;
+                if (!session?.user) return postPostStatus.ServerError; // shouldn't be able to be called if not logged in
 
-                await postPost(input, session.user.id, urls, metadata);
+                const status = await postPost(
+                  input,
+                  session.user.id,
+                  urls,
+                  metadata,
+                );
 
                 revalidatePath("/");
+                return status;
               }
             : undefined
         }

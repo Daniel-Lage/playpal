@@ -110,12 +110,17 @@ function getTreatedPlaylists(
     .sort((playlistA, playlistB) => {
       const key = {
         [PlaylistsSortingColumn.CreatedAt]: () => 0, // default
-        [PlaylistsSortingColumn.Length]: (p: Playlist) => -p.tracks.total,
-        [PlaylistsSortingColumn.Name]: (p: Playlist) => p.name.toLowerCase(),
+        [PlaylistsSortingColumn.Length]: (playlist: Playlist) =>
+          -playlist.tracks.total,
+        [PlaylistsSortingColumn.Name]: (playlist: Playlist) =>
+          playlist.name.toLowerCase(),
       }[sortingColumn];
 
-      if (key(playlistA) < key(playlistB)) return -1;
-      if (key(playlistA) > key(playlistB)) return 1;
+      const keyA = key(playlistA);
+      const keyB = key(playlistB);
+
+      if (keyA > keyB) return -1;
+      if (keyA < keyB) return 1;
       return 0;
     });
 }

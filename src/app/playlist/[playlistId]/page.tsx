@@ -7,7 +7,7 @@ import { getPlaylist } from "~/api/get-playlist";
 import { PlaylistView } from "./playlist-view";
 import { getMySpotifyUser } from "~/api/get-my-spotify-user";
 import { getRandomSample } from "~/helpers/get-random-sample";
-import type { PlaylistTrack } from "~/models/track.model";
+import { playTracksStatus, type PlaylistTrack } from "~/models/track.model";
 import { playTracks } from "~/api/play-tracks";
 import { setFirstItem } from "~/helpers/set-first-item";
 import { revalidatePath } from "next/cache";
@@ -74,20 +74,21 @@ export default async function PlaylistPage({
       play={async (expired: boolean, start?: PlaylistTrack) => {
         "use server";
 
-        if (expired) return revalidatePath("/playlist", "page");
-
-        if (start) {
-          await playTracks(
-            setFirstItem(
-              queue,
-              start,
-              (other) => other.track.uri === start.track.uri,
-            ),
-            session.user.access_token,
-          );
-        } else {
-          await playTracks(queue, session.user.access_token);
+        if (expired) {
+          revalidatePath("/playlist", "page");
+          return playTracksStatus.ServerError;
         }
+
+        return await playTracks(
+          start
+            ? setFirstItem(
+                queue,
+                start,
+                (other) => other.track.uri === start.track.uri,
+              )
+            : queue,
+          session.user.access_token,
+        );
       }}
     />
   );

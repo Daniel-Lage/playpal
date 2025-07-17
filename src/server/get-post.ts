@@ -48,15 +48,16 @@ export async function getPost(
   if (!post) return undefined;
 
   if (post?.replies) {
-    const replies = post.replies
+    const replyThreads = post.replies
       .filter((reply) => reply.separation === 0)
       .map((reply) => [reply]);
 
-    for (const replyThread of replies) {
+    for (const replyThread of replyThreads) {
       await getReplyThread(replyThread, post.replies);
     }
 
-    return { ...post, replies } as MainPostObject;
+    return { ...post, replies: replyThreads } as MainPostObject;
   }
+
   return { ...post, replies: undefined } as MainPostObject;
 }

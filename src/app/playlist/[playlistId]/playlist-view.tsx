@@ -6,6 +6,7 @@ import {
   TracksSortingColumnOptions,
   TracksSortingColumn,
   type PlaylistTrack,
+  playTracksStatus,
 } from "~/models/track.model";
 
 import type { SimplifiedArtist } from "~/models/artist.model";
@@ -15,6 +16,7 @@ import { PlaylistSearch } from "./playlist-search";
 import { PlaylistTracks } from "./playlist-tracks";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import { signIn } from "next-auth/react";
+import { Check, SearchX, X } from "lucide-react";
 
 export function PlaylistView({
   playlist,
@@ -26,11 +28,9 @@ export function PlaylistView({
   // userId: string;
   playlist: Playlist;
   sessionUserId?: string;
-  play?: (expired: boolean, start?: PlaylistTrack) => Promise<void>;
+  play?: (expired: boolean, start?: PlaylistTrack) => Promise<playTracksStatus>;
   expires_at?: number | null;
 }) {
-  const [disabled, setDisabled] = useState(false);
-
   const [filter, setFilter] = useState("");
 
   const [reversed, setReversed] = useLocalStorage<boolean>(
@@ -67,16 +67,24 @@ export function PlaylistView({
     return temp;
   }, [playlist, filter, sortingColumn, reversed]);
 
+  const [status, setStatus] = useState<playTracksStatus>(
+    playTracksStatus.Inactive,
+  );
+
   const handlePlay = useCallback(
     async (start?: PlaylistTrack) => {
       if (!sessionUserId) return signIn("spotify");
       if (!play || !expires_at) return;
 
-      setDisabled(true);
+      setStatus(playTracksStatus.Active);
 
-      await play(expires_at < Math.floor(new Date().getTime() / 1000), start);
+      setStatus(
+        await play(expires_at < Math.floor(new Date().getTime() / 1000), start),
+      );
 
-      setDisabled(false);
+      setTimeout(() => {
+        setStatus(playTracksStatus.Inactive);
+      }, 4000);
     },
     [expires_at, play, sessionUserId],
   );
@@ -89,7 +97,7 @@ export function PlaylistView({
         sortingColumn={sortingColumn}
         reversed={reversed}
         filter={filter}
-        disabled={disabled}
+        disabled={status === playTracksStatus.Active}
         sortColumn={(value: string) =>
           setSortingColumn(value as TracksSortingColumn)
         }
@@ -102,9 +110,14 @@ export function PlaylistView({
 
       <PlaylistTracks
         treatedTracks={treatedTracks}
-        disabled={disabled}
+        disabled={status === playTracksStatus.Active}
         playTrack={handlePlay}
       />
+
+      {status !== playTracksStatus.Active &&
+        status !== playTracksStatus.Inactive && (
+          <StatusMessage status={status} />
+        )}
     </>
   );
 }
@@ -128,24 +141,59 @@ function getTreatedTracks(
         artistA: SimplifiedArtist,
         artistB: SimplifiedArtist,
       ) {
-        const keyA = artistA.name.toLowerCase();
-        const keyB = artistB.name.toLowerCase();
+        const key = (artist: SimplifiedArtist) => artist.name.toLowerCase();
+        const keyA = key(artistA);
+        const keyB = key(artistB);
         if (keyA < keyB) return -1;
         if (keyA > keyB) return 1;
         return 0;
       }
       const key = {
         [TracksSortingColumn.AddedAt]: () => 0, // default
-        [TracksSortingColumn.Album]: (t: PlaylistTrack) =>
-          t.track.album.name.toLowerCase(),
-        [TracksSortingColumn.Artists]: (t: PlaylistTrack) =>
-          t.track.artists.sort(sortArtists)[0]?.name.toLowerCase() ?? 0,
-        [TracksSortingColumn.Name]: (t: PlaylistTrack) =>
-          t.track.name.toLowerCase(),
+        [TracksSortingColumn.Album]: (track: PlaylistTrack) =>
+          track.track.album.name.toLowerCase(),
+        [TracksSortingColumn.Artists]: (track: PlaylistTrack) =>
+          track.track.artists.sort(sortArtists)[0]?.name.toLowerCase() ?? 0,
+        [TracksSortingColumn.Name]: (track: PlaylistTrack) =>
+          track.track.name.toLowerCase(),
       }[sortingColumn];
 
-      if (key(trackA) < key(trackB)) return -1;
-      if (key(trackA) > key(trackB)) return 1;
+      const keyA = key(trackA);
+      const keyB = key(trackB);
+
+      if (keyA > keyB) return -1;
+      if (keyA < keyB) return 1;
       return 0;
     });
+}
+
+function StatusMessage({ status }: { status: playTracksStatus }) {
+  if (status === playTracksStatus.Sucess)
+    return (
+      <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
+        <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">
+          <Check size={40} />
+          Playing Tracks Successfully
+        </div>
+      </div>
+    );
+
+  if (status === playTracksStatus.NoDevice)
+    return (
+      <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
+        <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-yellow-500 px-4 py-8 md:w-fit">
+          <SearchX size={40} />
+          Spotify Device Not Found
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
+      <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-red-500 px-4 py-8 md:w-fit">
+        <X size={40} />
+        Internal Server Error
+      </div>
+    </div>
+  );
 }

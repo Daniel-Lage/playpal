@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   type IMetadata,
   type PostObject,
+  postPostStatus,
   PostsSortingColumn,
   PostsSortingColumnOptions,
   type Substring,
@@ -13,6 +14,7 @@ import { useLocalStorage } from "~/hooks/use-local-storage";
 import { Sorter } from "~/components/sorter";
 import type { User } from "next-auth";
 import { PostCreator } from "~/components/post-creator";
+import { Check, X } from "lucide-react";
 
 export function PostsView({
   posts: postsProp,
@@ -29,7 +31,7 @@ export function PostsView({
     input: string,
     urls: Substring[] | undefined,
     metadata: IMetadata | undefined,
-  ) => Promise<void>;
+  ) => Promise<postPostStatus>;
 }) {
   const [posts, setPosts] = useState(postsProp);
 
@@ -84,8 +86,38 @@ export function PostsView({
     return temp;
   }, [posts, sortingColumn, reversed]);
 
+  const [status, setStatus] = useState(postPostStatus.Inactive);
+
+  const handleSend = useCallback(
+    async (
+      input: string,
+      urls: Substring[] | undefined,
+      metadata: IMetadata | undefined,
+    ) => {
+      if (!send) return;
+
+      setStatus(postPostStatus.Active);
+
+      setStatus(await send(input, urls, metadata));
+
+      setTimeout(() => {
+        setStatus(postPostStatus.Inactive);
+      }, 4000);
+    },
+    [send],
+  );
+
   return (
     <>
+      {sessionUser?.image && sessionUser?.name && send && (
+        <PostCreator
+          send={handleSend}
+          sessionUser={sessionUser}
+          disabled={status === postPostStatus.Active}
+          setStatus={setStatus}
+        />
+      )}
+
       <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center md:justify-between">
         {posts.length} Posts
         <Sorter
@@ -102,13 +134,12 @@ export function PostsView({
         />
       </div>
 
-      {sessionUser?.image && sessionUser?.name && send && (
-        <PostCreator send={send} sessionUser={sessionUser} />
-      )}
-
       {treatedPosts.map((post) => (
         <PostView key={post.id} post={post} sessionUserId={sessionUser?.id} />
       ))}
+
+      {status !== postPostStatus.Active &&
+        status !== postPostStatus.Inactive && <StatusMessage status={status} />}
     </>
   );
 }
@@ -119,13 +150,37 @@ function getTreatedPosts(
 ) {
   return posts.sort((postA, postB) => {
     const key = {
-      [PostsSortingColumn.Likes]: (p: PostObject) => p.likes.length,
-      [PostsSortingColumn.Replies]: (p: PostObject) => p.replies.length,
-      [PostsSortingColumn.CreatedAt]: (p: PostObject) => p.createdAt,
+      [PostsSortingColumn.Likes]: (post: PostObject) => post.likes.length,
+      [PostsSortingColumn.Replies]: (post: PostObject) => post.replies.length,
+      [PostsSortingColumn.CreatedAt]: (post: PostObject) => post.createdAt,
     }[sortingColumn];
 
-    if (key(postA) > key(postB)) return -1;
-    if (key(postA) < key(postB)) return 1;
+    const keyA = key(postA);
+    const keyB = key(postB);
+
+    if (keyA > keyB) return -1;
+    if (keyA < keyB) return 1;
     return 0;
   });
+}
+
+function StatusMessage({ status }: { status: postPostStatus }) {
+  if (status === postPostStatus.Sucess)
+    return (
+      <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
+        <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">
+          <Check size={40} />
+          Post Sent Sucessfully
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
+      <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-red-500 px-4 py-8 md:w-fit">
+        <X size={40} />
+        Internal Server Error
+      </div>
+    </div>
+  );
 }

@@ -1,8 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import type { IMetadata, Substring } from "~/models/post.model";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  postPostStatus,
+  type IMetadata,
+  type Substring,
+} from "~/models/post.model";
 
 import { getMetadata } from "~/lib/get-metadata";
 import Image from "next/image";
@@ -12,6 +16,8 @@ import { Button } from "./ui/button";
 export function PostCreator({
   send,
   sessionUser,
+  disabled,
+  setStatus,
 }: {
   send: (
     input: string,
@@ -19,12 +25,15 @@ export function PostCreator({
     metadata: IMetadata | undefined,
   ) => Promise<void>;
   sessionUser: User;
+  disabled: boolean;
+  setStatus: (
+    value: postPostStatus | ((prevState: postPostStatus) => postPostStatus),
+  ) => void;
 }) {
   const [input, setInput] = useState("");
-  const [canPost, setCanPost] = useState(true);
 
   const urls = useMemo(() => {
-    setCanPost(false);
+    setStatus(postPostStatus.Active);
 
     const pattern = new RegExp(
       "(^|[ \t\r\n])((ftp|http|https|gopher|mailto|news|nntp|telnet|wais|file|prospero|aim|webcal):(([A-Za-z0-9$_.+!*(),;/?:@&~=-])|%[A-Fa-f0-9]{2}){2,}(#([a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;/?:@&~=%-]*))?([A-Za-z0-9$_+!*();/?:~-]))",
@@ -39,10 +48,10 @@ export function PostCreator({
       urls.push({ start: url.index, length: url[0].length });
     }
 
-    setCanPost(true);
+    setStatus(postPostStatus.Inactive);
     if (urls.length === 0) return;
     return urls as Substring[];
-  }, [input]);
+  }, [input, setStatus]);
 
   const urlForMetadata = useMemo(() => {
     if (!urls) {
@@ -66,26 +75,24 @@ export function PostCreator({
 
   useEffect(() => {
     if (urlForMetadata) {
-      setCanPost(false);
+      setStatus(postPostStatus.Active);
       setLoadingMetadata(true);
       getMetadata(urlForMetadata)
         .then((value) => {
           setMetadata(value);
           setLoadingMetadata(false);
-          setCanPost(true);
+          setStatus(postPostStatus.Inactive);
         })
         .catch(console.error);
     }
-  }, [urlForMetadata]);
+  }, [urlForMetadata, setStatus]);
 
-  async function handleSend() {
-    setCanPost(false);
-
-    await send(input, urls, metadata);
-
-    setCanPost(true);
+  const handleSend = useCallback(() => {
+    if (input === "") return;
+    if (disabled) return;
     setInput("");
-  }
+    void send(input, urls, metadata);
+  }, [input, disabled, send, metadata, urls]);
 
   return (
     <div className="flex flex-col gap-2 rounded-md bg-primary p-2">
@@ -106,7 +113,6 @@ export function PostCreator({
           input={input}
           urls={urls}
           send={handleSend}
-          canPost={canPost}
           setInput={setInput}
         />
         <MetadataPreview
@@ -116,9 +122,9 @@ export function PostCreator({
         />
         <Button
           variant="link"
-          onClick={() => input !== "" && canPost && void handleSend()}
+          onClick={handleSend}
           className="cursor-pointer self-end pr-2 font-bold hover:underline"
-          disabled={input === "" || !canPost}
+          disabled={input === "" || disabled}
         >
           Post
         </Button>
@@ -223,14 +229,12 @@ function MetadataPreview({
 function TextInput({
   input,
   urls,
-  canPost,
   send,
   setInput,
 }: {
   input: string;
   urls?: Substring[];
-  canPost: boolean;
-  send: () => Promise<void>;
+  send: () => void;
   setInput: (isLiked: string) => void;
 }) {
   return (
@@ -246,9 +250,7 @@ function TextInput({
             if (e.key === "Enter") {
               e.preventDefault();
 
-              if (input !== "" && canPost) {
-                void send();
-              }
+              send();
             }
           }}
         />

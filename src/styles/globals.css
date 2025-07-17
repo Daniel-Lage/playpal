@@ -57,3 +57,22 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.popup {
+  animation: popup-in-out 3s forwards;
+}
+
+@keyframes popup-in-out {
+  0% {
+    transform: translateY(400px);
+  }
+  10% {
+    transform: translateY(0);
+  }
+  90% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(400px);
+  }
+}

@@ -4,6 +4,7 @@ import {
   type IMetadata,
   PostType,
   type MainPostObject,
+  postPostStatus,
 } from "~/models/post.model";
 import { db } from "./db";
 import { postsTable, repliesTable } from "./db/schema";
@@ -14,9 +15,9 @@ export async function postPost(
   urls: Substring[] | undefined,
   metadata: IMetadata | undefined,
   parent?: MainPostObject,
-) {
+): Promise<postPostStatus> {
   if (parent) {
-    const posts = await db
+    const result = await db
       .insert(postsTable)
       .values({
         content,
@@ -26,30 +27,29 @@ export async function postPost(
         urlMetadata: metadata,
       })
       .returning();
+    const post = result[0];
 
-    const postId = posts[0]?.id;
+    if (!post) return postPostStatus.ServerError;
 
-    if (postId) {
-      await db
-        .insert(repliesTable)
-        .values({ replierId: postId, replieeId: parent.id, separation: 0 });
+    await db
+      .insert(repliesTable)
+      .values({ replierId: post.id, replieeId: parent.id, separation: 0 });
 
-      if (parent.thread) {
-        const newThread = [...parent.thread];
-        newThread.reverse();
-        for (let index = 0; index <= newThread.length; index++) {
-          const replieeId = newThread[index]?.replieeId;
-          if (replieeId)
-            await db.insert(repliesTable).values({
-              replierId: postId,
-              replieeId,
-              separation: index + 1,
-            });
-        }
+    if (parent.thread) {
+      const newThread = [...parent.thread];
+      newThread.reverse();
+      for (let index = 0; index <= newThread.length; index++) {
+        const replieeId = newThread[index]?.replieeId;
+        if (replieeId)
+          await db.insert(repliesTable).values({
+            replierId: post.id,
+            replieeId,
+            separation: index + 1,
+          });
       }
     }
-  } else
-    await db
+  } else {
+    const result = await db
       .insert(postsTable)
       .values({
         content,
@@ -59,4 +59,11 @@ export async function postPost(
         urlMetadata: metadata,
       })
       .returning();
+
+    const post = result[0];
+
+    if (!post) return postPostStatus.ServerError;
+  }
+
+  return postPostStatus.Sucess;
 }

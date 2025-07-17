@@ -2,7 +2,11 @@ import { getServerSession } from "next-auth";
 
 import { getPosts } from "~/server/get-posts";
 import { authOptions } from "~/lib/auth";
-import type { IMetadata, Substring } from "~/models/post.model";
+import {
+  postPostStatus,
+  type IMetadata,
+  type Substring,
+} from "~/models/post.model";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
 import { PostsView } from "./posts-view";
@@ -26,11 +30,18 @@ export default async function HomePage() {
         ) => {
           "use server";
 
-          if (!session?.user) return;
+          if (!session?.user) return postPostStatus.ServerError; // shouldn't be able to be called if not logged in
 
-          await postPost(input, session?.user.id, urls, metadata);
+          const status = await postPost(
+            input,
+            session?.user.id,
+            urls,
+            metadata,
+          );
 
           revalidatePath("/");
+
+          return status;
         }}
         refresh={async (lastQueried: Date) => {
           "use server";

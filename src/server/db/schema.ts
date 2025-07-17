@@ -124,6 +124,9 @@ export const repliesTable = createTable(
       .notNull()
       .references(() => postsTable.id, { onDelete: "cascade" }),
     separation: integer("separation").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
   },
   (reply) => ({
     compoundKey: primaryKey({
