@@ -3,10 +3,12 @@
 import { Check, X } from "lucide-react";
 import type { User } from "next-auth";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { PlaylistView } from "~/components/playlist-view";
 import { PostCreator } from "~/components/post-creator";
 import { PostView } from "~/components/post-view";
 import { Sorter } from "~/components/sorter";
 import { useLocalStorage } from "~/hooks/use-local-storage";
+import { cn } from "~/lib/utils";
 
 import type {
   IMetadata,
@@ -40,7 +42,7 @@ export function PostPageView({
     metadata: IMetadata | undefined,
   ) => Promise<postPostStatus>;
 }) {
-  const [replies, setReplies] = useState(post.replies ?? []);
+  const [replies, setReplies] = useState(post.replyThreads ?? []);
 
   const lastQueried = useRef(lastQueriedProp);
 
@@ -112,10 +114,21 @@ export function PostPageView({
 
   return (
     <>
-      <div className="flex flex-col rounded-md bg-secondary">
+      <div className="flex flex-col rounded-md bg-primary">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
             <div>
+              {!!post.playlist && (
+                <>
+                  <PlaylistView
+                    playlist={post.playlist}
+                    focused={true}
+                    sessionUserId={sessionUser?.id}
+                  />
+                  <div className="mx-4 h-1 self-center rounded-sm bg-secondary-foreground"></div>
+                </>
+              )}
+
               {post.thread && (
                 <Thread
                   thread={post.thread.map(({ repliee }) => repliee)}
@@ -142,7 +155,7 @@ export function PostPageView({
         </div>
       </div>
       <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center md:justify-between">
-        {post.replies?.length ?? 0} Replies
+        {post.replyThreads?.length ?? 0} Replies
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>
@@ -171,7 +184,7 @@ export function PostPageView({
   );
 }
 
-function Thread({
+export function Thread({
   thread,
   sessionUserId,
   isMainPost = false,
@@ -183,12 +196,18 @@ function Thread({
   const [cutoff, setCutoff] = useState(thread.length - 1);
 
   return (
-    <div className="flex flex-col justify-stretch rounded-md bg-secondary">
+    <div
+      className={cn(
+        "flex flex-col justify-stretch rounded-md",
+        isMainPost ? "bg-primary" : "bg-secondary",
+      )}
+    >
       {thread.map(
         (post, index) =>
           post &&
           index <= cutoff && (
             <PostView
+              isMainPost={isMainPost}
               key={post.id}
               post={post}
               sessionUserId={sessionUserId}
@@ -204,6 +223,7 @@ function Thread({
     </div>
   );
 }
+
 function getTreatedReplies(
   replies: ReplyObject[][],
   sortingColumn: PostsSortingColumn,
@@ -212,7 +232,7 @@ function getTreatedReplies(
     const key = {
       // compares first post of thread
       [PostsSortingColumn.Likes]: (thread: ReplyObject[]) =>
-        thread[0]?.replier?.likes.length,
+        thread[0]?.replier?.likes?.length,
       [PostsSortingColumn.Replies]: (thread: ReplyObject[]) =>
         thread[0]?.replier?.replies.length,
       [PostsSortingColumn.CreatedAt]: (thread: ReplyObject[]) =>

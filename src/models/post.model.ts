@@ -2,6 +2,7 @@ import type { User } from "next-auth";
 import type { postsTable } from "~/server/db/schema";
 import type { ReplyObject } from "./reply.model";
 import type { LikeObject } from "./like.model";
+import type { PlaylistObject } from "./playlist.model";
 
 export interface Substring {
   start: number;
@@ -20,21 +21,22 @@ export interface IMetadata {
   og_image?: string;
 } // meta tags
 
-interface postRelations {
+interface pr {
   author: User;
-  likes: LikeObject[];
-  replies: ReplyObject[];
+  likes?: LikeObject[];
   thread?: ReplyObject[];
+  playlist?: PlaylistObject;
 }
+
+type postRelations = {
+  replies: ReplyObject[];
+} & pr;
 
 export type PostObject = typeof postsTable.$inferSelect & postRelations;
 
-interface mainPostRelations {
-  author: User;
-  likes?: LikeObject[];
-  replies?: ReplyObject[][];
-  thread?: ReplyObject[];
-}
+type mainPostRelations = {
+  replyThreads?: ReplyObject[][];
+} & pr;
 
 export type MainPostObject = typeof postsTable.$inferSelect & mainPostRelations;
 

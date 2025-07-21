@@ -25,7 +25,7 @@ export default async function PostLikesPage({
         />
         <div className="text-center font-bold">Liked By</div>
       </div>
-      {post.likes.map(
+      {post.likes?.map(
         (like) =>
           like?.liker && <UserView key={like.userId} user={like.liker} />,
       )}

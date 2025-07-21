@@ -1,7 +1,11 @@
+import type { playlistsTable } from "~/server/db/schema";
 import type { Image } from "./image.model";
 import type { Paging } from "./paging.model";
 import type { PlaylistTrack } from "./track.model";
 import type { SimplifiedUser } from "./user.model";
+import type { User } from "next-auth";
+import type { PlaylistLikeObject } from "./like.model";
+import type { PostObject } from "./post.model";
 
 export interface Playlist {
   collaborative: boolean;
@@ -40,4 +44,20 @@ export enum PlayerStatus {
   Disabled = "Disabled",
   Ready = "Ready",
   Busy = "Busy",
+}
+
+interface playlistRelations {
+  owner: User;
+  likes?: PlaylistLikeObject[];
+  replies?: PostObject[];
+  replyThreads?: PostObject[][];
+}
+
+export type PlaylistObject = typeof playlistsTable.$inferSelect &
+  playlistRelations;
+
+export enum PlaylistTab {
+  Tracks,
+  Likes,
+  Replies,
 }

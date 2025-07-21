@@ -3,7 +3,8 @@ import { eq, desc } from "drizzle-orm";
 import type { MainPostObject, PostObject } from "~/models/post.model";
 import { db } from "./db";
 import { postsTable, repliesTable } from "./db/schema";
-import { getReplyThread } from "./get-reply-thread";
+import { Threadify } from "../helpers/get-reply-thread";
+import type { ReplyObject } from "~/models/reply.model";
 
 export async function getPost(
   postId: string,
@@ -13,6 +14,7 @@ export async function getPost(
     with: {
       author: true,
       likes: true,
+      playlist: { with: { owner: true } },
       thread: {
         orderBy: [desc(repliesTable.separation)],
         with: {
@@ -53,10 +55,16 @@ export async function getPost(
       .map((reply) => [reply]);
 
     for (const replyThread of replyThreads) {
-      await getReplyThread(replyThread, post.replies);
+      Threadify<ReplyObject>(
+        replyThread,
+        post.replies,
+        (value, leaf) =>
+          value.replierId === leaf?.replier?.replies?.[0]?.replierId,
+        (value) => !!value?.replier?.replies,
+      );
     }
 
-    return { ...post, replies: replyThreads } as MainPostObject;
+    return { ...post, replyThreads } as MainPostObject;
   }
 
   return { ...post, replies: undefined } as MainPostObject;

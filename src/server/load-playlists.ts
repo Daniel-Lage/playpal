@@ -3,30 +3,12 @@
 import type { ApiError } from "~/models/error.model";
 import type { Paging } from "~/models/paging.model";
 import type { Playlist } from "~/models/playlist.model";
-import { getTokens } from "./get-tokens";
-import { getProviderAccountId } from "~/server/get-provider-account-id";
+import { db } from "./db";
+import { playlistsTable } from "./db/schema";
 
-export async function getUsersPlaylists(
-  userId: string,
-  accessToken?: string | null,
-) {
-  if (!accessToken) {
-    if (process.env.FALLBACK_REFRESH_TOKEN === undefined)
-      throw new Error("FALLBACK_REFRESH_TOKEN is not defined in env");
-
-    const { access_token } = await getTokens(
-      process.env.FALLBACK_REFRESH_TOKEN,
-    );
-
-    if (access_token) accessToken = access_token;
-  }
-
-  if (!accessToken) throw new Error("acessToken is undefined");
-
-  const providerAccountId = await getProviderAccountId(userId);
-
+export async function loadPlaylists(accessToken: string, userId: string) {
   const response = await fetch(
-    `https://api.spotify.com/v1/users/${providerAccountId}/playlists?limit=50`,
+    "https://api.spotify.com/v1/me/playlists?limit=50",
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,
@@ -71,5 +53,27 @@ export async function getUsersPlaylists(
     });
   }
 
-  return playlists.items;
+  await db
+    .insert(playlistsTable)
+    .values(
+      playlists.items.map(
+        ({
+          id,
+          images,
+          name,
+          external_urls: { spotify },
+          tracks: { total },
+          description,
+        }) => ({
+          id,
+          userId,
+          name,
+          image: images[0]?.url ?? "",
+          totalTracks: total,
+          externalUrl: spotify,
+          description,
+        }),
+      ),
+    )
+    .onConflictDoNothing();
 }

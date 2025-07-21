@@ -1,10 +1,7 @@
 import type { ChangeEvent } from "react";
 import { SearchView } from "~/components/search-view";
-import { Select } from "~/components/select";
 import { Sorter } from "~/components/sorter";
 import {
-  PlaylistFeedStyle,
-  PlaylistFeedStyleOptions,
   PlaylistsSortingColumn,
   PlaylistsSortingColumnOptions,
 } from "~/models/playlist.model";
@@ -17,7 +14,6 @@ export function PlaylistsSearch({
   sortColumn,
   reverse,
   filterPlaylists,
-  changeStyle,
 }: {
   sortingColumn: PlaylistsSortingColumn | undefined;
   reversed: boolean;
@@ -26,7 +22,6 @@ export function PlaylistsSearch({
   sortColumn: (value: string) => void;
   reverse: () => void;
   filterPlaylists: (e: ChangeEvent<HTMLInputElement>) => void;
-  changeStyle: ((value: string) => void) | undefined;
 }) {
   return (
     <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center">
@@ -39,14 +34,6 @@ export function PlaylistsSearch({
         reversed={reversed}
         reverse={reverse}
       />
-      <div className="rounded-md border-2 border-primary-accent">
-        <Select
-          title="Feed Style"
-          onSelect={changeStyle}
-          value={sortingColumn ?? PlaylistFeedStyle.Compact}
-          options={PlaylistFeedStyleOptions}
-        />
-      </div>
       <SearchView value={filter} onChange={filterPlaylists} />
     </div>
   );

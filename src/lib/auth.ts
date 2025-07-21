@@ -6,6 +6,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "~/server/db";
 import * as schema from "~/server/db/schema";
 import { refreshTokens } from "~/api/refresh-tokens";
+import { loadPlaylists } from "~/server/load-playlists";
 
 const spotifyAuthUrl = new URL("https://accounts.spotify.com/authorize");
 
@@ -33,6 +34,8 @@ export const authOptions: NextAuthOptions = {
       const tokens = await refreshTokens(user.id);
 
       if (!tokens) return session;
+
+      await loadPlaylists(tokens.access_token, user.id);
 
       session.user.access_token = tokens.access_token;
       session.user.expires_at = tokens.expires_at;

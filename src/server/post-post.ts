@@ -16,21 +16,22 @@ export async function postPost(
   metadata: IMetadata | undefined,
   parent?: MainPostObject,
 ): Promise<postPostStatus> {
+  const result = await db
+    .insert(postsTable)
+    .values({
+      content,
+      userId,
+      type: parent ? PostType.Reply : PostType.Post,
+      urls,
+      urlMetadata: metadata,
+      playlistId: parent?.playlistId,
+    })
+    .returning();
+  const post = result[0];
+
+  if (!post) return postPostStatus.ServerError;
+
   if (parent) {
-    const result = await db
-      .insert(postsTable)
-      .values({
-        content,
-        userId,
-        type: PostType.Reply,
-        urls,
-        urlMetadata: metadata,
-      })
-      .returning();
-    const post = result[0];
-
-    if (!post) return postPostStatus.ServerError;
-
     await db
       .insert(repliesTable)
       .values({ replierId: post.id, replieeId: parent.id, separation: 0 });
@@ -48,21 +49,6 @@ export async function postPost(
           });
       }
     }
-  } else {
-    const result = await db
-      .insert(postsTable)
-      .values({
-        content,
-        userId,
-        type: PostType.Post,
-        urls,
-        urlMetadata: metadata,
-      })
-      .returning();
-
-    const post = result[0];
-
-    if (!post) return postPostStatus.ServerError;
   }
 
   return postPostStatus.Sucess;

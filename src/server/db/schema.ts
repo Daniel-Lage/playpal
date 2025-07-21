@@ -112,6 +112,9 @@ export const postsTable = createTable("post", {
   type: varchar("type").$type<PostType>().notNull(),
   urls: jsonb("urls").$type<Substring[]>(),
   urlMetadata: jsonb("urlMetadata").$type<IMetadata>(),
+  playlistId: text("playlistId").references(() => playlistsTable.id, {
+    onDelete: "cascade",
+  }),
 });
 
 export const repliesTable = createTable(
@@ -177,6 +180,7 @@ export const followsTable = createTable(
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
   posts: many(postsTable, { relationName: "author" }),
+  playlists: many(playlistsTable, { relationName: "owner" }),
   likes: many(likesTable, {
     relationName: "liker",
   }),
@@ -193,6 +197,11 @@ export const postsTableRelations = relations(postsTable, ({ one, many }) => ({
     fields: [postsTable.userId],
     references: [usersTable.id],
     relationName: "author",
+  }),
+  playlist: one(playlistsTable, {
+    fields: [postsTable.playlistId],
+    references: [playlistsTable.id],
+    relationName: "playlist",
   }),
   thread: many(repliesTable, {
     relationName: "replier",
@@ -244,3 +253,73 @@ export const followsTableRelations = relations(followsTable, ({ one }) => ({
     relationName: "followee",
   }),
 }));
+
+export const playlistsTable = createTable("playlist", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text("name").notNull(),
+  userId: text("userId")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  image: text("image").notNull(),
+  totalTracks: integer("totalTracks").notNull(),
+  createdAt: timestamp("createdAt", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  externalUrl: text("externalUrl").notNull(),
+  description: text("description"),
+});
+
+export const playlistLikesTable = createTable(
+  "playlist-like",
+  {
+    playlistId: text("playlistId")
+      .notNull()
+      .references(() => playlistsTable.id, { onDelete: "cascade" }),
+    userId: text("userId")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+  },
+  (like) => ({
+    compoundKey: primaryKey({
+      columns: [like.playlistId, like.userId],
+    }),
+  }),
+);
+
+export const playlistsTableRelations = relations(
+  playlistsTable,
+  ({ one, many }) => ({
+    owner: one(usersTable, {
+      fields: [playlistsTable.userId],
+      references: [usersTable.id],
+      relationName: "owner",
+    }),
+    replies: many(postsTable, {
+      relationName: "playlist",
+    }),
+    likes: many(playlistLikesTable, {
+      relationName: "likee",
+    }),
+  }),
+);
+
+export const playlistLikesTableRelations = relations(
+  playlistLikesTable,
+  ({ one }) => ({
+    likee: one(playlistsTable, {
+      fields: [playlistLikesTable.playlistId],
+      references: [playlistsTable.id],
+      relationName: "likee",
+    }),
+    liker: one(usersTable, {
+      fields: [playlistLikesTable.userId],
+      references: [usersTable.id],
+      relationName: "liker",
+    }),
+  }),
+);

@@ -2,7 +2,7 @@
 import type { ApiError } from "~/models/error.model";
 import type { SpotifyUser } from "~/models/user.model";
 
-export async function getMySpotifyUser(accessToken?: string | null) {
+export async function isPremiumUser(accessToken?: string | null) {
   if (!accessToken) throw new Error("acessToken is undefined");
 
   const response = await fetch("https://api.spotify.com/v1/me", {
@@ -21,5 +21,5 @@ export async function getMySpotifyUser(accessToken?: string | null) {
 
   const user = (await response.json()) as SpotifyUser;
 
-  return user;
+  return user.product === "premium";
 }

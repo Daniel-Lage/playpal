@@ -2,21 +2,20 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useLocalStorage } from "~/hooks/use-local-storage";
+import type { PlaylistObject } from "~/models/playlist.model";
 import {
-  type Playlist,
-  PlaylistFeedStyle,
-  PlaylistFeedStyleOptions,
   PlaylistsSortingColumn,
   PlaylistsSortingColumnOptions,
 } from "~/models/playlist.model";
-import { PlaylistFeed } from "./playlists-feed";
-import { PlaylistsSearch } from "./playlists-search";
+import { PlaylistView } from "../../../../components/playlist-view";
+import { Sorter } from "~/components/sorter";
+import { SearchView } from "~/components/search-view";
 
 export default function PlaylistsView({
   playlists,
   sessionUserId,
 }: {
-  playlists: Playlist[];
+  playlists: PlaylistObject[];
   sessionUserId?: string;
 }) {
   const [filter, setFilter] = useState("");
@@ -28,19 +27,6 @@ export default function PlaylistsView({
     false,
     useCallback((text) => text === "true", []),
     useCallback((value) => (value ? "true" : "false"), []),
-  );
-
-  const [feedStyle, setFeedStyle] = useLocalStorage<PlaylistFeedStyle>(
-    sessionUserId
-      ? `${sessionUserId}:playlists_feed_style`
-      : "playlists_feed_style",
-    PlaylistFeedStyle.Grid,
-    useCallback((text) => {
-      if (PlaylistFeedStyleOptions.some((pfso) => pfso === text))
-        return text as PlaylistFeedStyle;
-      return null;
-    }, []),
-    useCallback((pfs) => pfs, []), // already is text so no conversion is needed
   );
 
   const [sortingColumn, setSortingColumn] =
@@ -69,33 +55,39 @@ export default function PlaylistsView({
 
   return (
     <>
-      <PlaylistsSearch
-        sortingColumn={sortingColumn}
-        reversed={reversed}
-        filter={filter}
-        sortColumn={(value: string) =>
-          setSortingColumn(value as PlaylistsSortingColumn)
-        }
-        reverse={() => {
-          setReversed((prev) => !prev);
-        }}
-        filterPlaylists={(e) => setFilter(e.target.value)}
-        length={playlists.length}
-        changeStyle={(value: string) =>
-          setFeedStyle(value as PlaylistFeedStyle)
-        }
-      />
+      <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center">
+        {length} Playlists
+        <Sorter
+          title="Sort by"
+          onSelect={(value: string) =>
+            setSortingColumn(value as PlaylistsSortingColumn)
+          }
+          value={sortingColumn ?? PlaylistsSortingColumn.CreatedAt}
+          options={PlaylistsSortingColumnOptions}
+          reversed={reversed}
+          reverse={() => {
+            setReversed((prev) => !prev);
+          }}
+        />
+        <SearchView
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+        />
+      </div>
 
-      <PlaylistFeed
-        treatedPlaylists={treatedPlaylists}
-        style={feedStyle ?? PlaylistFeedStyle.Grid}
-      />
+      {treatedPlaylists.map((playlist) => (
+        <PlaylistView
+          key={playlist.id}
+          playlist={playlist}
+          sessionUserId={sessionUserId}
+        />
+      ))}
     </>
   );
 }
 
 function getTreatedPlaylists(
-  playlists: Playlist[],
+  playlists: PlaylistObject[],
   sortingColumn: PlaylistsSortingColumn,
   filter: string,
 ) {
@@ -103,16 +95,14 @@ function getTreatedPlaylists(
     .filter(
       (playlist) =>
         playlist.name.toLowerCase().includes(filter.toLowerCase()) ||
-        playlist.owner.display_name
-          .toLowerCase()
-          .includes(filter.toLowerCase()),
+        playlist.owner.name?.toLowerCase().includes(filter.toLowerCase()),
     )
     .sort((playlistA, playlistB) => {
       const key = {
         [PlaylistsSortingColumn.CreatedAt]: () => 0, // default
-        [PlaylistsSortingColumn.Length]: (playlist: Playlist) =>
-          -playlist.tracks.total,
-        [PlaylistsSortingColumn.Name]: (playlist: Playlist) =>
+        [PlaylistsSortingColumn.Length]: (playlist: PlaylistObject) =>
+          -playlist.totalTracks,
+        [PlaylistsSortingColumn.Name]: (playlist: PlaylistObject) =>
           playlist.name.toLowerCase(),
       }[sortingColumn];
 

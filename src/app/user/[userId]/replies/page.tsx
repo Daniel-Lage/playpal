@@ -4,8 +4,8 @@ import type { Metadata } from "next";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
-import { getUsersPosts } from "~/server/get-users-posts";
 import { PostsView } from "~/app/posts-view";
+import { getPosts } from "~/server/get-posts";
 
 export async function generateMetadata({
   params: { userId },
@@ -43,7 +43,7 @@ export default async function RepliesPage({
 }) {
   const session = await getServerSession(authOptions);
 
-  const posts = await getUsersPosts(userId, true);
+  const posts = await getPosts({ userIds: [userId], replies: true });
 
   return (
     <>
@@ -53,7 +53,11 @@ export default async function RepliesPage({
         lastQueried={new Date()}
         refresh={async (lastQueried: Date) => {
           "use server";
-          return await getUsersPosts(userId, true, lastQueried);
+          return await getPosts({
+            userIds: [userId],
+            replies: true,
+            lastQueried,
+          });
         }}
       />
     </>

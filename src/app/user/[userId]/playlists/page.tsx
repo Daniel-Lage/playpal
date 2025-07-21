@@ -4,9 +4,8 @@ import type { Metadata } from "next";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
-import { getMyPlaylists } from "~/api/get-my-playlists";
-import { getUsersPlaylists } from "~/api/get-users-playlists";
 import PlaylistsView from "./playlists-view";
+import { getPlaylists } from "~/server/get-playlists";
 
 export async function generateMetadata({
   params: { userId },
@@ -55,10 +54,7 @@ export default async function PlaylistsPage({
 }) {
   const session = await getServerSession(authOptions);
 
-  const playlists =
-    session?.user.id === userId
-      ? await getMyPlaylists(session.user.access_token)
-      : await getUsersPlaylists(userId, session?.user.access_token);
+  const playlists = await getPlaylists({ userIds: [userId] });
 
   return (
     <PlaylistsView playlists={playlists} sessionUserId={session?.user.id} />

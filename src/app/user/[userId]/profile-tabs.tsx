@@ -8,25 +8,20 @@ export function ProfileTabs({ userId }: { userId: string }) {
   const pathname = usePathname();
 
   return (
-    <div className="grid grid-cols-4 gap-1 p-2 font-bold">
+    <div className="grid grid-cols-3 gap-1 p-2 font-bold">
       <ProfileTabLink
         href={`/user/${userId}`}
-        title="Posts"
+        title="Main"
         pathname={pathname}
       />
       <ProfileTabLink
-        href={`/user/${userId}/with_replies`}
-        title="Posts and Replies"
+        href={`/user/${userId}/replies`}
+        title="Replies"
         pathname={pathname}
       />
       <ProfileTabLink
         href={`/user/${userId}/likes`}
         title="Likes"
-        pathname={pathname}
-      />
-      <ProfileTabLink
-        href={`/user/${userId}/playlists`}
-        title="Playlists"
         pathname={pathname}
       />
     </div>

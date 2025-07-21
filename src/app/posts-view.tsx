@@ -150,7 +150,7 @@ function getTreatedPosts(
 ) {
   return posts.sort((postA, postB) => {
     const key = {
-      [PostsSortingColumn.Likes]: (post: PostObject) => post.likes.length,
+      [PostsSortingColumn.Likes]: (post: PostObject) => post.likes?.length ?? 0,
       [PostsSortingColumn.Replies]: (post: PostObject) => post.replies.length,
       [PostsSortingColumn.CreatedAt]: (post: PostObject) => post.createdAt,
     }[sortingColumn];

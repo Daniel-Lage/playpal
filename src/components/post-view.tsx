@@ -11,16 +11,17 @@ import Link from "next/link";
 import { LikeButton } from "./like-button";
 import { formatTimelapse } from "~/helpers/format-timelapse";
 import { Button } from "./ui/button";
-import { useEffect, useState } from "react";
-import type { LikeObject } from "~/models/like.model";
 import { ShareButton } from "./share-button";
 import { MessageSquare, Trash } from "lucide-react";
 import { MenuView } from "./menu-view";
 import { useRouter } from "next/navigation";
 import { deletePost } from "~/server/delete-post";
+import { unlikePost } from "~/server/unlike-post";
+import { likePost } from "~/server/like-post";
+import { cn } from "~/lib/utils";
 
 export function PostView({
-  post: postProp,
+  post,
   sessionUserId,
   isCutoff,
   isLastPost = true,
@@ -36,48 +37,13 @@ export function PostView({
 }) {
   const router = useRouter();
 
-  const [post, setPost] = useState(postProp);
-
-  useEffect(() => {
-    setPost(postProp);
-  }, [postProp]);
-
-  const [isLiked, setIsLiked] = useState(
-    post.likes?.some((like) => like.userId === sessionUserId),
-  );
-
-  useEffect(() => {
-    const like = post.likes?.findIndex((like) => like.userId === sessionUserId);
-
-    if (isLiked && like === -1)
-      setPost((prev) =>
-        prev.likes
-          ? {
-              ...prev,
-              likes: [
-                ...prev.likes,
-                {
-                  userId: sessionUserId,
-                  createdAt: new Date(),
-                  postId: prev.id,
-                } as LikeObject,
-              ],
-            }
-          : prev,
-      );
-    else if (!isLiked && like !== -1)
-      setPost((prev) =>
-        prev.likes
-          ? {
-              ...prev,
-              likes: prev.likes.filter((_, i) => i !== like),
-            }
-          : prev,
-      );
-  }, [isLiked, sessionUserId, post.likes]);
-
   return (
-    <div className="flex flex-col rounded-md bg-secondary px-2">
+    <div
+      className={cn(
+        "flex flex-col rounded-md bg-secondary px-2",
+        isMainPost ? "bg-primary" : "bg-secondary",
+      )}
+    >
       <div className="flex h-12 items-center">
         <Link
           href={`/user/${post.author.id}`}
@@ -171,12 +137,16 @@ export function PostView({
           )}
 
           <div className="grid h-12 grid-cols-3 items-center justify-between font-bold">
-            <div className="flex items-center gap-2">
-              <LikeButton {...{ post, sessionUserId, isLiked, setIsLiked }} />
-              <Link href={`/post/${post.id}/likes`} className="hover:underline">
-                {post.likes?.length ?? 0}
-              </Link>
-            </div>
+            <LikeButton
+              hasLike={
+                !!post.likes?.some((like) => like.userId === sessionUserId)
+              }
+              count={post.likes?.length ?? 0}
+              sessionUserId={sessionUserId}
+              href={`/post/${post.id}/likes`}
+              unlike={(suid: string) => unlikePost(post.id, suid)}
+              like={(suid: string) => likePost(post.id, suid)}
+            />
             <Link
               className="flex items-center justify-center gap-2 hover:underline"
               href={`/post/${post.id}`}
@@ -184,7 +154,13 @@ export function PostView({
               <Button size="icon">
                 <MessageSquare />
               </Button>
-              <div>{post.replies?.length ?? 0}</div>
+              <div>
+                {"replyThreads" in post
+                  ? post.replyThreads?.length
+                  : "replies" in post
+                    ? (post.replies.length ?? 0)
+                    : 0}
+              </div>
             </Link>
             <div className="flex items-center justify-end">
               <ShareButton path={`/post/${post.id}`} />

@@ -5,7 +5,7 @@ import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
 import { getUsersLikes } from "~/server/get-users-likes";
-import { PostsView } from "~/app/posts-view";
+import { FeedView } from "../feed-view";
 
 export async function generateMetadata({
   params: { userId },
@@ -54,17 +54,19 @@ export default async function LikesPage({
 }) {
   const session = await getServerSession(authOptions);
 
-  const posts = await getUsersLikes(userId);
+  const { posts, playlists } = await getUsersLikes(userId);
 
   return (
-    <PostsView
+    <FeedView
       posts={posts}
       sessionUser={session?.user}
       lastQueried={new Date()}
       refresh={async (lastQueried: Date) => {
         "use server";
-        return await getUsersLikes(userId, lastQueried);
+        const { posts } = await getUsersLikes(userId, lastQueried);
+        return posts;
       }}
+      playlists={playlists}
     />
   );
 }

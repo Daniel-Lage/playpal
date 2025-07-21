@@ -1,41 +1,50 @@
 "use server";
-import type { Devices } from "~/models/device.model";
+import type { Device, Devices } from "~/models/device.model";
 import type { ApiError } from "~/models/error.model";
 import { type PlaylistTrack, playTracksStatus } from "~/models/track.model";
 
 export async function playTracks(
   tracks: PlaylistTrack[],
   accessToken?: string | null,
-): Promise<playTracksStatus> {
+  device?: Device,
+): Promise<playTracksStatus | Device[]> {
   if (!accessToken) {
     console.error("Error: acessToken is undefined");
     return playTracksStatus.ServerError;
   }
-
-  const response = await fetch("https://api.spotify.com/v1/me/player/devices", {
-    headers: {
-      Authorization: `Bearer  ${accessToken}`,
-    },
-  });
-
-  if (!response.ok) {
-    const { error } = (await response.json()) as ApiError;
-
-    console.error(
-      `Status: ${response.statusText}; Description: ${error?.message};`,
+  if (!device) {
+    const response = await fetch(
+      "https://api.spotify.com/v1/me/player/devices",
+      {
+        headers: {
+          Authorization: `Bearer  ${accessToken}`,
+        },
+      },
     );
-    return playTracksStatus.ServerError;
+
+    if (!response.ok) {
+      const { error } = (await response.json()) as ApiError;
+
+      console.error(
+        `Status: ${response.statusText}; Description: ${error?.message};`,
+      );
+      return playTracksStatus.ServerError;
+    }
+
+    const devices = (await response.json()) as Devices;
+
+    if (devices.devices.length > 1) {
+      return devices.devices;
+    }
+
+    device = devices.devices[0];
   }
 
-  const devices = (await response.json()) as Devices;
-
-  if (!devices.devices[0]?.id) {
+  if (!device?.id) {
     console.error("Error: No available spotify device");
 
     return playTracksStatus.NoDevice;
   }
-
-  const deviceId = devices.devices[0].id;
 
   const firstTrack = tracks.shift();
 
@@ -51,7 +60,7 @@ export async function playTracks(
     "https://api.spotify.com/v1/me/player/queue?" +
       new URLSearchParams({
         uri: firstTrack.track.uri,
-        device_id: deviceId,
+        device_id: device.id,
       }).toString(),
     {
       method: "POST",
@@ -69,7 +78,7 @@ export async function playTracks(
   const skipped = await fetch(
     "https://api.spotify.com/v1/me/player/next?" +
       new URLSearchParams({
-        device_id: deviceId,
+        device_id: device.id,
       }).toString(),
     {
       method: "POST",
@@ -96,7 +105,7 @@ export async function playTracks(
             "https://api.spotify.com/v1/me/player/queue?" +
               new URLSearchParams({
                 uri: track.track.uri,
-                device_id: deviceId,
+                device_id: device.id,
               }).toString(),
             {
               method: "POST",

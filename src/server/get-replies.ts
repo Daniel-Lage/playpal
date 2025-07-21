@@ -3,7 +3,7 @@ import { eq, and, sql } from "drizzle-orm";
 import { db } from "./db";
 import { repliesTable, postsTable } from "./db/schema";
 import type { ReplyObject } from "~/models/reply.model";
-import { getReplyThread } from "./get-reply-thread";
+import { Threadify } from "../helpers/get-reply-thread";
 
 export async function getReplies(postId: string, lastQueried?: Date) {
   console.log("getting replies");
@@ -33,7 +33,13 @@ export async function getReplies(postId: string, lastQueried?: Date) {
     .map((reply) => [reply]);
 
   for (const replyThread of replyThreads) {
-    await getReplyThread(replyThread, replies);
+    Threadify<ReplyObject>(
+      replyThread,
+      replies,
+      (value, leaf) =>
+        value.replierId === leaf?.replier?.replies?.[0]?.replierId,
+      (value) => !!value?.replier?.replies,
+    );
   }
 
   return replyThreads;
