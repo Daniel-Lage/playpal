@@ -33,8 +33,6 @@ export function PostCreator({
   const [input, setInput] = useState("");
 
   const urls = useMemo(() => {
-    setStatus(postPostStatus.Active);
-
     const pattern = new RegExp(
       "(^|[ \t\r\n])((ftp|http|https|gopher|mailto|news|nntp|telnet|wais|file|prospero|aim|webcal):(([A-Za-z0-9$_.+!*(),;/?:@&~=-])|%[A-Fa-f0-9]{2}){2,}(#([a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;/?:@&~=%-]*))?([A-Za-z0-9$_+!*();/?:~-]))",
       "g",
@@ -48,10 +46,9 @@ export function PostCreator({
       urls.push({ start: url.index, length: url[0].length });
     }
 
-    setStatus(postPostStatus.Inactive);
     if (urls.length === 0) return;
     return urls as Substring[];
-  }, [input, setStatus]);
+  }, [input]);
 
   const urlForMetadata = useMemo(() => {
     if (!urls) {

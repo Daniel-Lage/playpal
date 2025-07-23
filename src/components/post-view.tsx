@@ -44,10 +44,10 @@ export function PostView({
         isMainPost ? "bg-primary" : "bg-secondary",
       )}
     >
-      <div className="flex h-12 items-center">
+      <div className="flex h-12 items-center text-xs md:text-base">
         <Link
           href={`/user/${post.author.id}`}
-          className="flex h-12 w-12 items-center justify-center"
+          className="flex h-12 w-12 shrink-0 items-center justify-center"
         >
           <Image
             width={32}
@@ -58,19 +58,41 @@ export function PostView({
           />
         </Link>
         <Link
-          className="inline items-center font-bold hover:underline"
+          className="inline items-center text-base font-bold hover:underline"
           href={`/user/${post.author.id}`}
         >
           {post.author?.name}
         </Link>
         <div className="whitespace-pre"> · </div>
         <Link
-          className="inline grow items-center hover:underline"
+          className={cn(
+            "inline items-center text-nowrap hover:underline",
+            !post.likes || (post.likes.length === 0 && "grow"),
+          )}
           href={`/post/${post.id}`}
         >
           {formatTimelapse(Date.now() - post.createdAt.getTime()) ??
             post.createdAt.toUTCString()}
         </Link>
+
+        {post.likes && post.likes.length !== 0 && (
+          <>
+            <div className="whitespace-pre"> · </div>
+            <Link
+              className="inline grow items-center overflow-hidden text-ellipsis text-nowrap hover:underline"
+              href={`/post/${post.id}/likes`}
+            >
+              Liked by{" "}
+              {post.likes
+                .slice(0, 2)
+                .map((like) =>
+                  like.liker?.id === sessionUserId ? "You" : like.liker?.name,
+                )
+                .join(", ")}{" "}
+              {post.likes.length > 2 && `and ${post.likes.length - 1} more...`}
+            </Link>
+          </>
+        )}
         <MenuView>
           <Button
             size="select"

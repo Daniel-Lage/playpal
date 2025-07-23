@@ -27,14 +27,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={GeistSans.variable}>
-      <body className="flex h-svh flex-col-reverse overflow-hidden md:flex-row">
+      <body className="overflow-x-hidden">
         <StartNav
           profileURL={session ? `/user/${session?.user.id}` : undefined}
         />
-        <main className="grow overflow-scroll overflow-x-hidden md:h-svh">
-          <div className="flex h-max grow flex-col gap-2 p-2 md:gap-4 md:p-4">
-            {children}
-          </div>
+        <main className="my-12 mr-[10px] flex h-max grow flex-col gap-2 p-2 md:my-0 md:ml-[19vw] md:mr-[calc(19vw+10px)] md:gap-4 md:p-4">
+          {children}
         </main>
         <EndNav sessionUserImage={session?.user?.image} />
       </body>

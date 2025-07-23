@@ -19,7 +19,7 @@ const buttonVariants = cva(
         default: "w-auto px-4",
         select:
           "w-[200px] h-9 justify-between font-bold [&_svg]:size-6 p-0 px-2",
-        nav: "h-12 w-12 justify-center p-0 md:h-14 md:w-full md:pl-4 [&_svg]:size-8 md:justify-start",
+        nav: "h-9 w-9 justify-center p-0 md:h-14 md:w-full md:pl-4 [&_svg]:size-6 md:justify-start",
         icon: "h-9 w-9 justify-center p-0 [&_svg]:size-6 shrink-0",
         bigicon: "h-12 w-12 justify-center p-0 [&_svg]:size-8 shrink-0",
         tab: "w-full justify-center rounded-md p-1 text-center text-xs md:text-base",

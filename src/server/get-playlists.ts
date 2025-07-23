@@ -14,7 +14,7 @@ export async function getPlaylists({
   const playlists = await db.query.playlistsTable.findMany({
     with: {
       owner: true,
-      likes: true,
+      likes: { with: { liker: true } },
       replies: {
         with: {
           author: true,

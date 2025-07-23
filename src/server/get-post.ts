@@ -13,7 +13,7 @@ export async function getPost(
     where: eq(postsTable.id, postId),
     with: {
       author: true,
-      likes: true,
+      likes: { with: { liker: true } },
       playlist: { with: { owner: true } },
       thread: {
         orderBy: [desc(repliesTable.separation)],

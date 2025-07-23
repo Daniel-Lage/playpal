@@ -1,7 +1,12 @@
 "use server";
-import { eq, desc, and, sql } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { db } from "./db";
-import { repliesTable, postsTable, followsTable } from "./db/schema";
+import {
+  repliesTable,
+  postsTable,
+  followsTable,
+  playlistsTable,
+} from "./db/schema";
 import type { FollowObject } from "~/models/follow.model";
 import {
   NotificationType,
@@ -21,7 +26,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
           replier: {
             with: {
               author: true,
-              likes: true,
+              likes: { with: { liker: true } },
               replies: {
                 // only gets direct replies
                 where: eq(repliesTable.separation, 0),
@@ -32,10 +37,35 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
         where: eq(repliesTable.separation, 0),
       },
     },
-    orderBy: [desc(postsTable.createdAt)],
     where: and(
       eq(postsTable.userId, userId),
       lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new posts
+    ),
+    limit: 100,
+  });
+
+  const playlists = await db.query.playlistsTable.findMany({
+    with: {
+      owner: true,
+      likes: { with: { liker: true } },
+      replies: {
+        with: {
+          author: true,
+          likes: {
+            with: {
+              liker: true,
+            },
+          },
+          replies: {
+            // only gets direct replies
+            where: eq(repliesTable.separation, 0),
+          },
+        },
+      },
+    },
+    where: and(
+      eq(playlistsTable.userId, userId),
+      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new playlists
     ),
     limit: 100,
   });
@@ -86,5 +116,34 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
     }
   });
 
+  playlists.forEach((playlist) => {
+    if (playlist.replies) {
+      playlist.replies.forEach((reply) => {
+        if (reply.author.id === userId) return; // don't notify if the user is the author of the reply
+
+        notifications.push({
+          type: NotificationType.Reply,
+          createdAt: reply.createdAt,
+          notifier: reply,
+          notifierId: reply.id,
+          target: playlist,
+        });
+      });
+    }
+
+    if (playlist.likes) {
+      playlist.likes.forEach((like) => {
+        if (like.userId === userId) return; // don't notify if the user is the one who liked the playlist
+
+        notifications.push({
+          type: NotificationType.Like,
+          createdAt: like.createdAt,
+          notifier: like.liker as UserObject,
+          notifierId: like.liker.id,
+          target: playlist,
+        });
+      });
+    }
+  });
   return notifications;
 }

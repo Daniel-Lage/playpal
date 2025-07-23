@@ -35,14 +35,34 @@ export function PlaylistView({
           <Image
             width={100}
             height={100}
-            className="aspect-square rounded-sm"
+            className="inline aspect-square h-[100px] w-[100px] shrink-0 grow-0 rounded-sm"
             src={playlist.image}
             alt={playlist.name}
           />
 
           <div className="flex h-full grow flex-col items-start gap-1 truncate">
-            <div className="flex items-start justify-between text-wrap text-3xl font-bold">
+            <div className="flex items-center justify-between text-wrap text-3xl font-bold">
               {playlist.name}
+
+              {playlist.likes && playlist.likes.length !== 0 && (
+                <>
+                  <div className="whitespace-pre text-base font-normal">
+                    {" · "}
+                  </div>
+                  <Link
+                    className="inline grow items-center text-base font-normal hover:underline"
+                    href={`/post/${playlist.id}`}
+                  >
+                    Liked by{" "}
+                    {playlist.likes
+                      .slice(0, 2)
+                      .map((like) => like.liker?.name)
+                      .join(", ")}{" "}
+                    {playlist.likes.length > 2 &&
+                      `and ${playlist.likes.length - 1} more...`}
+                  </Link>
+                </>
+              )}
             </div>
             {!!playlist.description && (
               <div className="text-wrap font-light">{playlist.description}</div>

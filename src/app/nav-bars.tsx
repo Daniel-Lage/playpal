@@ -5,14 +5,40 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 
 export function StartNav({ profileURL }: { profileURL?: string }) {
   const pathname = usePathname();
 
+  const scrollY = useRef(0);
+  const [faded, setFaded] = useState(false);
+
+  useEffect(() => {
+    window.onscroll = () => {
+      if (window.scrollY - 10 > scrollY.current) {
+        scrollY.current = window.scrollY;
+        setFaded(true);
+      }
+      if (window.scrollY + 10 < scrollY.current) {
+        scrollY.current = window.scrollY;
+        setFaded(false);
+      }
+
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
+        setFaded(false);
+      }
+    };
+  }, []);
+
   return (
-    <div className="flex h-16 w-screen min-w-56 shrink-0 gap-6 bg-terciary font-bold md:h-svh md:w-[19vw] md:flex-col md:p-10">
+    <div
+      className={cn(
+        "fixed bottom-0 left-0 flex h-12 w-screen min-w-56 shrink-0 gap-6 bg-terciary font-bold transition-opacity md:h-svh md:w-[19vw] md:flex-col md:p-10",
+        faded && "opacity-40 md:opacity-100",
+      )}
+    >
       <div className="absolute w-0 md:relative md:w-auto">
         <Image
           className="rounded-md"
@@ -91,20 +117,20 @@ export function EndNav({
   sessionUserImage: string | null | undefined;
 }) {
   return (
-    <div className="flex h-14 w-screen shrink-0 flex-col justify-center gap-6 bg-terciary p-2 font-bold md:h-svh md:w-[19vw] md:justify-normal md:p-4">
+    <div className="fixed right-0 top-0 flex h-12 w-screen shrink-0 flex-col justify-center gap-6 bg-terciary p-2 font-bold md:h-svh md:w-[19vw] md:justify-normal md:p-4">
       {sessionUserImage && (
         <Image
-          className="absolute aspect-square self-center rounded-full md:hidden"
-          height={40}
-          width={40}
+          className="absolute aspect-square h-9 w-9 shrink-0 grow-0 self-center rounded-full md:hidden"
+          height={36}
+          width={36}
           src={sessionUserImage}
           alt="your image"
         />
       )}
       <Image
-        className="aspect-square shrink-0 rounded-md md:hidden"
-        width={40}
-        height={40}
+        className="aspect-square h-9 w-9 shrink-0 grow-0 rounded-md md:hidden"
+        width={36}
+        height={36}
         src="/favicon.ico"
         alt="playpal logo"
         priority

@@ -30,14 +30,23 @@ export default async function HomePage() {
   const posts = await getPosts({ userIds });
   const playlists = await getPlaylists({ userIds });
 
+  const postIds = new Set(posts.map((post) => post.id));
+  const playlistIds = new Set(posts.map((post) => post.id));
+
   if (userIds)
     for (const userId of userIds) {
       const { posts: userPostLikes, playlists: userPlaylistsLikes } =
         await getUsersLikes(userId);
       posts.push(
-        ...userPostLikes.filter((post) => post.type === PostType.Post),
+        ...userPostLikes.filter(
+          (post) => post.type === PostType.Post && !postIds.has(post.id),
+        ),
       );
-      playlists.push(...userPlaylistsLikes);
+      playlists.push(
+        ...userPlaylistsLikes.filter(
+          (playlist) => !playlistIds.has(playlist.id),
+        ),
+      );
     }
 
   return (

@@ -17,7 +17,7 @@ export async function getPosts({
   const posts = await db.query.postsTable.findMany({
     with: {
       author: true,
-      likes: true,
+      likes: { with: { liker: true } },
       replies: {
         // only gets direct replies
         where: eq(repliesTable.separation, 0),

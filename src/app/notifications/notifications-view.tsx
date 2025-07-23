@@ -11,6 +11,7 @@ import {
   NotificationType,
   NotificationTypeOptions,
 } from "~/models/notifications.model";
+import type { PlaylistObject } from "~/models/playlist.model";
 import type { PostObject } from "~/models/post.model";
 import type { UserObject } from "~/models/user.model";
 
@@ -44,7 +45,7 @@ export default function NotificationsView({
               className={tab === type ? "bg-primary-accent" : "bg-primary"}
               onClick={() => setTab(type)}
             >
-              {type.substring(0, 1).toUpperCase() + type.substring(1)}
+              {type}
             </Button>
           ))}
         </div>
@@ -125,7 +126,7 @@ function NFollowView({
       <Image
         width={32}
         height={32}
-        className="aspect-square shrink-0 grow-0 rounded-full"
+        className="aspect-square h-8 w-8 shrink-0 grow-0 rounded-full"
         src={notifier.image ?? ""}
         alt={notifier.name ?? ""}
       />
@@ -145,7 +146,7 @@ function NLikeView({
 }: {
   notifier: UserObject;
   timelapse: string;
-  target: PostObject;
+  target: PostObject | PlaylistObject;
 }) {
   return (
     <>
@@ -156,18 +157,21 @@ function NLikeView({
         <Image
           width={32}
           height={32}
-          className="aspect-square shrink-0 grow-0 rounded-full"
+          className="aspect-square h-8 w-8 shrink-0 grow-0 rounded-full"
           src={notifier.image ?? ""}
           alt={notifier.name ?? ""}
         />
 
         <div>
-          <span className="font-bold">{notifier.name}</span> liked your post
+          <span className="font-bold">{notifier.name}</span> liked your{" "}
+          {"content" in target ? "post" : "playlist"}
           {" " + timelapse}
         </div>
       </Link>
       <Link className="flex items-center p-2" href={`/post/${target.id}`}>
-        <div className="text-gray-500">{target.content}</div>
+        <div className="text-gray-500">
+          {"content" in target ? target.content : target.name}
+        </div>
       </Link>
     </>
   );
