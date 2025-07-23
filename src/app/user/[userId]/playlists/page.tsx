@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
-import PlaylistsView from "./playlists-view";
+import PlaylistsView from "~/components/playlists-view";
 import { getPlaylists } from "~/server/get-playlists";
 
 export async function generateMetadata({

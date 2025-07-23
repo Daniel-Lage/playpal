@@ -39,7 +39,11 @@ export async function getUsersLikes(
       likee: {
         with: {
           owner: true,
-          likes: true,
+          likes: {
+            with: {
+              liker: true,
+            },
+          },
           replies: {
             with: {
               author: true,

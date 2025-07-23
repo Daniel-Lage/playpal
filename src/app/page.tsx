@@ -11,7 +11,7 @@ import {
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
 import { getPlaylists } from "~/server/get-playlists";
-import { FeedView } from "./user/[userId]/feed-view";
+import { FeedView } from "~/components/feed-view";
 import { getUsersFollowing } from "~/server/get-users-following";
 import { getUsersLikes } from "~/server/get-users-likes";
 
@@ -30,21 +30,20 @@ export default async function HomePage() {
   const posts = await getPosts({ userIds });
   const playlists = await getPlaylists({ userIds });
 
-  const postIds = new Set(posts.map((post) => post.id));
-  const playlistIds = new Set(posts.map((post) => post.id));
-
   if (userIds)
     for (const userId of userIds) {
       const { posts: userPostLikes, playlists: userPlaylistsLikes } =
         await getUsersLikes(userId);
       posts.push(
         ...userPostLikes.filter(
-          (post) => post.type === PostType.Post && !postIds.has(post.id),
+          (post) =>
+            post.type === PostType.Post &&
+            !posts.some((value) => value.id === post.id),
         ),
       );
       playlists.push(
         ...userPlaylistsLikes.filter(
-          (playlist) => !playlistIds.has(playlist.id),
+          (playlist) => !playlists.some((value) => value.id === playlist.id),
         ),
       );
     }

@@ -3,7 +3,7 @@ import { eq, desc } from "drizzle-orm";
 import type { MainPostObject, PostObject } from "~/models/post.model";
 import { db } from "./db";
 import { postsTable, repliesTable } from "./db/schema";
-import { Threadify } from "../helpers/get-reply-thread";
+import { Threadify } from "~/helpers/get-reply-thread";
 import type { ReplyObject } from "~/models/reply.model";
 
 export async function getPost(

@@ -1,4 +1,4 @@
-import type { usersTable } from "./../server/db/schema";
+import type { usersTable } from "~/server/db/schema";
 import type { FollowObject } from "./follow.model";
 import type { LikeObject } from "./like.model";
 import type { PostObject } from "./post.model";

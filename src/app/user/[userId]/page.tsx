@@ -12,7 +12,7 @@ import { getUser } from "~/server/get-user";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
 import { getPlaylists } from "~/server/get-playlists";
-import { FeedView } from "./feed-view";
+import { FeedView } from "~/components/feed-view";
 import { getPosts } from "~/server/get-posts";
 
 export async function generateMetadata({

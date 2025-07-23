@@ -7,7 +7,7 @@ import {
   PlaylistsSortingColumn,
   PlaylistsSortingColumnOptions,
 } from "~/models/playlist.model";
-import { PlaylistView } from "../../../../components/playlist-view";
+import { PlaylistView } from "./playlist-view";
 import { Sorter } from "~/components/sorter";
 import { SearchView } from "~/components/search-view";
 
@@ -104,6 +104,10 @@ function getTreatedPlaylists(
           -playlist.totalTracks,
         [PlaylistsSortingColumn.Name]: (playlist: PlaylistObject) =>
           playlist.name.toLowerCase(),
+        [PlaylistsSortingColumn.Likes]: (playlist: PlaylistObject) =>
+          playlist.likes ?? 0,
+        [PlaylistsSortingColumn.Replies]: (playlist: PlaylistObject) =>
+          playlist.replies ?? 0,
       }[sortingColumn];
 
       const keyA = key(playlistA);

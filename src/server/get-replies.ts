@@ -3,7 +3,7 @@ import { eq, and, sql } from "drizzle-orm";
 import { db } from "./db";
 import { repliesTable, postsTable } from "./db/schema";
 import type { ReplyObject } from "~/models/reply.model";
-import { Threadify } from "../helpers/get-reply-thread";
+import { Threadify } from "~/helpers/get-reply-thread";
 
 export async function getReplies(postId: string, lastQueried?: Date) {
   console.log("getting replies");

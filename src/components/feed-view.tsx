@@ -8,7 +8,7 @@ import type {
   postPostStatus,
   Substring,
 } from "~/models/post.model";
-import PlaylistsView from "./playlists/playlists-view";
+import PlaylistsView from "./playlists-view";
 import type { PlaylistObject } from "~/models/playlist.model";
 import { Button } from "~/components/ui/button";
 import { useState } from "react";

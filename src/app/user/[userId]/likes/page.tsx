@@ -5,7 +5,7 @@ import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
 import { getUsersLikes } from "~/server/get-users-likes";
-import { FeedView } from "../feed-view";
+import { FeedView } from "~/components/feed-view";
 
 export async function generateMetadata({
   params: { userId },

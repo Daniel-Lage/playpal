@@ -28,6 +28,8 @@ export enum PlaylistsSortingColumn {
   CreatedAt = "Created at",
   Name = "Name",
   Length = "Length",
+  Likes = "Likes",
+  Replies = "Replies",
 }
 export const PlaylistsSortingColumnOptions = Object.values(
   PlaylistsSortingColumn,

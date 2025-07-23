@@ -4,7 +4,7 @@ import type { PostObject } from "~/models/post.model";
 import { db } from "./db";
 import { playlistsTable, repliesTable } from "./db/schema";
 import type { PlaylistObject } from "~/models/playlist.model";
-import { Threadify } from "../helpers/get-reply-thread";
+import { Threadify } from "~/helpers/get-reply-thread";
 
 export async function getPlaylist(playlistId: string) {
   const playlist = (await db.query.playlistsTable.findFirst({
