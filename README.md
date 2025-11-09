@@ -21,3 +21,5 @@ Drizzle ORM with PostgreSQL (Vercel Storage)
 Authentication with NextAuth
 
 Spotify Api
+
+File storing with uploadthing
