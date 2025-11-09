@@ -37,7 +37,7 @@ export function UserProfileView({
           <FollowButton sessionUserId={sessionUserId} user={user} />
         </div>
 
-        {!user.spotify_id ? (
+        {user.spotify_id ? (
           <SpotifyLink
             external_url={`https://open.spotify.com/user/${user.spotify_id}`}
           />
