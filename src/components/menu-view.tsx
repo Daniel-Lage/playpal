@@ -16,7 +16,7 @@ export function MenuView({ children }: { children: React.ReactNode }) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button role="combobox" aria-expanded={open} size="icon">
+        <Button aria-expanded={open} className="w-8 justify-center">
           <Ellipsis />
         </Button>
       </PopoverTrigger>

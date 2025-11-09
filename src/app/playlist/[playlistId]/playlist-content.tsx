@@ -3,10 +3,11 @@
 import { MessageSquare, Play, Shuffle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { LikeButton } from "~/components/like-button";
-import { ShareButton } from "~/components/share-button";
+import { IconButton } from "~/components/buttons/icon-button";
+import { LikeButton } from "~/components/buttons/like-button";
+import { PlayButton } from "~/components/buttons/play-button";
+import { ShareButton } from "~/components/buttons/share-button";
 import { SpotifyLink } from "~/components/spotify-link";
-import { Button } from "~/components/ui/button";
 import type { PlaylistObject } from "~/models/playlist.model";
 import { PlaylistTab } from "~/models/playlist.model";
 import type { PlaylistTrack } from "~/models/track.model";
@@ -65,22 +66,15 @@ export function PlaylistContent({
         </div>
       </div>
       <div className="flex grow items-end gap-4 rounded-md">
-        <Button
-          disabled={disabled}
-          onClick={() => play()}
-          size="icon"
-          variant="play"
-          className="drop-shadow-md"
-        >
+        <PlayButton disabled={disabled} onClick={() => play()}>
           <Play fill="black" stroke="black" />
-        </Button>
-        <Button
+        </PlayButton>
+        <IconButton
           onClick={switchShuffled}
-          size="icon"
           className={shuffled ? "[&_svg]:stroke-secondary" : ""}
         >
           <Shuffle className="drop-shadow-md" />
-        </Button>
+        </IconButton>
         <div className="grid w-full grid-cols-2">
           <LikeButton
             hasLike={
@@ -105,9 +99,9 @@ export function PlaylistContent({
                 : setTab(PlaylistTab.Replies)
             }
           >
-            <Button size="icon">
+            <IconButton>
               <MessageSquare />
-            </Button>
+            </IconButton>
             <div>{playlist.replies?.length ?? 0}</div>
           </div>
         </div>

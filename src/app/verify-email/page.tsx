@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "~/components/ui/button";
+import { LinkButton } from "~/components/buttons/link-button";
 
 export default async function VerifyEmailPage() {
   return (
@@ -7,9 +7,9 @@ export default async function VerifyEmailPage() {
       <div className="flex w-96 flex-col gap-4 rounded-md bg-primary p-8">
         <h1 className="p-2 text-xl font-bold">Check your email</h1>A sign in
         link has been sent to your email address.
-        <Button variant={"link"}>
-          <Link href={"/"}>Return</Link>
-        </Button>
+        <Link href="/">
+          <LinkButton>Return</LinkButton>
+        </Link>
       </div>
     </div>
   );

@@ -1,10 +1,10 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Button } from "~/components/ui/button";
 import { Heart } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import { IconButton } from "./icon-button";
 
 export function LikeButton({
   hasLike,
@@ -28,29 +28,27 @@ export function LikeButton({
   return (
     <div className="flex items-center gap-2">
       {!sessionUserId ? (
-        <Button size="icon" onClick={() => signIn()}>
+        <IconButton onClick={() => signIn()}>
           <Heart />
-        </Button>
+        </IconButton>
       ) : isLiked ? (
-        <Button
-          size="icon"
+        <IconButton
           onClick={() => {
             setIsLiked(false);
             unlike(sessionUserId).catch(() => setIsLiked(true));
           }}
         >
           <Heart fill="red" color="red" />
-        </Button>
+        </IconButton>
       ) : (
-        <Button
-          size="icon"
+        <IconButton
           onClick={() => {
             setIsLiked(true);
             like(sessionUserId).catch(() => setIsLiked(false));
           }}
         >
           <Heart />
-        </Button>
+        </IconButton>
       )}
       {href ? (
         <Link href={href} className="hover:underline">

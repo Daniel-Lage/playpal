@@ -7,12 +7,13 @@ import { FollowButton } from "./follow-button";
 import { MenuView } from "~/components/menu-view";
 import { signIn, signOut } from "next-auth/react";
 import { Edit, LogOut, Trash } from "lucide-react";
-import { Button } from "~/components/ui/button";
-import { ShareButton } from "~/components/share-button";
+import { ShareButton } from "~/components/buttons/share-button";
 import { deleteUser } from "~/server/delete-user";
 import { UserImage } from "~/components/user-image";
 import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "~/components/confirm-dialog";
+import { MenuButton } from "~/components/buttons/menu-button";
+import { LinkButton } from "~/components/buttons/link-button";
 
 export function UserProfileView({
   user,
@@ -36,27 +37,27 @@ export function UserProfileView({
           <FollowButton sessionUserId={sessionUserId} user={user} />
         </div>
 
-        {user.spotify_id ? (
+        {!user.spotify_id ? (
           <SpotifyLink
             external_url={`https://open.spotify.com/user/${user.spotify_id}`}
           />
         ) : (
-          <Button size="default" onClick={() => signIn("spotify")}>
+          <LinkButton onClick={() => signIn("spotify")}>
             Connect Spotify Account
-          </Button>
+          </LinkButton>
         )}
 
         <MenuView>
           {user.id === sessionUserId ? (
             <>
-              <Button size="select" onClick={() => signOut()}>
-                Log out
+              <MenuButton onClick={() => signOut()}>
                 <LogOut />
-              </Button>
-              <Button size="select" onClick={() => router.push("/setup")}>
-                Edit profile
+                Log out
+              </MenuButton>
+              <MenuButton onClick={() => router.push("/setup")}>
                 <Edit />
-              </Button>
+                Edit profile
+              </MenuButton>
               <ConfirmDialog
                 onConfirm={() => {
                   void deleteUser(sessionUserId).then(() => router.push("/"));
@@ -64,10 +65,10 @@ export function UserProfileView({
                 title="Delete Profile?"
                 description="This action cannot be undone. This will permanently delete your account and remove your data from our servers."
               >
-                <Button size="select">
-                  Delete profile
+                <MenuButton>
                   <Trash />
-                </Button>
+                  Delete profile
+                </MenuButton>
               </ConfirmDialog>
             </>
           ) : (

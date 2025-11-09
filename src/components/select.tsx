@@ -35,7 +35,11 @@ export function Select({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild disabled={disabled}>
-        <Button role="combobox" aria-expanded={open} size="select">
+        <Button
+          role="combobox"
+          aria-expanded={open}
+          className="w-40 justify-between"
+        >
           {title}
           <Menu />
         </Button>

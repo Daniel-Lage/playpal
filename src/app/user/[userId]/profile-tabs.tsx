@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "~/components/ui/button";
+import { TabLinkButton } from "~/components/buttons/tab-link-button";
 
 export function ProfileTabs({ userId }: { userId: string }) {
   const pathname = usePathname();
@@ -39,13 +39,11 @@ function ProfileTabLink({
 }) {
   return (
     <Link href={href} role="button" key={title}>
-      <Button
-        variant="link"
-        size="tab"
+      <TabLinkButton
         className={href === pathname ? "bg-primary-accent" : "bg-primary"}
       >
         {title}
-      </Button>
+      </TabLinkButton>
     </Link>
   );
 }

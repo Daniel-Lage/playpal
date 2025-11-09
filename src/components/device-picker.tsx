@@ -2,7 +2,6 @@
 
 import { BoomBox, Computer, Smartphone } from "lucide-react";
 
-import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +9,7 @@ import {
   DialogTitle,
 } from "~/components/ui/dialog";
 import type { Device } from "~/models/device.model";
+import { MenuButton } from "./buttons/menu-button";
 
 export function DevicePicker({
   pickDevice,
@@ -26,14 +26,10 @@ export function DevicePicker({
         </DialogHeader>
         <div className="flex flex-col items-center gap-2 space-x-2">
           {devices?.map((value) => (
-            <Button
-              key={value.id}
-              size="select"
-              onClick={() => pickDevice(value)}
-            >
+            <MenuButton key={value.id} onClick={() => pickDevice(value)}>
               {value.name}
               <DeviceIcon type={value.type} />
-            </Button>
+            </MenuButton>
           ))}
         </div>
       </DialogContent>

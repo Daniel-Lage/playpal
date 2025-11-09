@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import type { User } from "next-auth";
-import { Button } from "~/components/ui/button";
 import { ArrowBigRight, Check, Edit, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -13,6 +12,8 @@ import { UserImage } from "~/components/user-image";
 import { Input } from "~/components/ui/input";
 import { uploadFiles } from "~/helpers/uploadthing";
 import { ActionStatus } from "~/models/status.model";
+import { IconButton } from "~/components/buttons/icon-button";
+import { FormButton } from "~/components/buttons/form-button";
 
 export function SetUpView({
   user,
@@ -32,7 +33,7 @@ export function SetUpView({
   return (
     <>
       <div className="grid h-screen w-full place-items-center">
-        <div className="flex w-96 flex-col gap-4 rounded-md bg-primary p-8">
+        <div className="relative flex w-96 flex-col gap-4 rounded-md bg-primary p-8">
           <h1 className="p-2 text-xl font-bold">
             {user.name ? "Edit Profile" : "Finish Setting Up"}
           </h1>
@@ -66,6 +67,7 @@ export function SetUpView({
               }}
               accept="image/*"
             />
+
             <div className="relative w-40">
               {imageStatus === ActionStatus.Active && (
                 <div className="absolute flex h-40 w-40 items-center justify-center rounded-full backdrop-brightness-50">
@@ -79,19 +81,19 @@ export function SetUpView({
               />
 
               <div className="absolute bottom-0 right-0">
-                <Button
+                <IconButton
                   onClick={() => fileInputRef.current?.click()}
-                  size="icon"
                   className="bg-secondary"
                 >
                   <Edit />
-                </Button>
+                </IconButton>
               </div>
             </div>
           </div>
 
           <Input
             type="text"
+            className="w-full"
             placeholder="User Name"
             value={name ?? user.name ?? ""}
             onChange={(e) => {
@@ -99,9 +101,7 @@ export function SetUpView({
             }}
           />
 
-          <Button
-            size="nav"
-            variant="login"
+          <FormButton
             onClick={() => {
               const updates = [];
               if (image) updates.push(updateImage(user.id, image, user?.image));
@@ -119,7 +119,7 @@ export function SetUpView({
           >
             <ArrowBigRight />
             <div className="text-lg font-bold">Continue</div>
-          </Button>
+          </FormButton>
         </div>
       </div>
       {imageStatus !== ActionStatus.Active &&

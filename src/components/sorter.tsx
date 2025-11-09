@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Select } from "./select";
-import { Button } from "./ui/button";
+import { IconButton } from "./buttons/icon-button";
 
 export function Sorter({
   title,
@@ -25,9 +25,9 @@ export function Sorter({
         value={value}
         options={options}
       />
-      <Button size="icon" onClick={reverse}>
+      <IconButton onClick={reverse}>
         {reversed ? <ChevronDown /> : <ChevronUp />}
-      </Button>
+      </IconButton>
     </div>
   );
 }

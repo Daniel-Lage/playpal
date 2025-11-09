@@ -8,11 +8,11 @@ import {
   type Substring,
 } from "~/models/post.model";
 import Link from "next/link";
-import { LikeButton } from "./like-button";
+import { LikeButton } from "./buttons/like-button";
 import { formatTimelapse } from "~/helpers/format-timelapse";
-import { Button } from "./ui/button";
-import { ShareButton } from "./share-button";
-import { MessageSquare, Trash } from "lucide-react";
+
+import { ShareButton } from "./buttons/share-button";
+import { MessageSquare, Trash, UserRound } from "lucide-react";
 import { MenuView } from "./menu-view";
 import { useRouter } from "next/navigation";
 import { deletePost } from "~/server/delete-post";
@@ -21,6 +21,8 @@ import { likePost } from "~/server/like-post";
 import { cn } from "~/lib/utils";
 import { UserImage } from "./user-image";
 import { ConfirmDialog } from "./confirm-dialog";
+import { IconButton } from "./buttons/icon-button";
+import { MenuButton } from "./buttons/menu-button";
 
 export function PostView({
   post,
@@ -94,20 +96,28 @@ export function PostView({
           </>
         )}
         <MenuView>
-          <ConfirmDialog
-            onConfirm={() => {
-              if (isMainPost) router.back();
+          {sessionUserId === post.author.id && (
+            <ConfirmDialog
+              onConfirm={() => {
+                if (isMainPost) router.back();
 
-              void deletePost(post.id);
-            }}
-            title="Delete Post?"
-            description="This action cannot be undone."
-          >
-            <Button size="select">
-              Delete post
-              <Trash />
-            </Button>
-          </ConfirmDialog>
+                void deletePost(post.id);
+              }}
+              title="Delete Post?"
+              description="This action cannot be undone."
+            >
+              <MenuButton>
+                <Trash />
+                Delete post
+              </MenuButton>
+            </ConfirmDialog>
+          )}
+          <Link href={`/user/${post.author.id}`}>
+            <MenuButton>
+              <UserRound />
+              Visit users page
+            </MenuButton>
+          </Link>
         </MenuView>
       </div>
 
@@ -176,9 +186,9 @@ export function PostView({
               className="flex items-center justify-center gap-2 hover:underline"
               href={`/post/${post.id}`}
             >
-              <Button size="icon">
+              <IconButton>
                 <MessageSquare />
-              </Button>
+              </IconButton>
               <div>
                 {"replyThreads" in post
                   ? post.replyThreads?.length

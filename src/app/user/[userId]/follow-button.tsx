@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Button } from "~/components/ui/button";
+import { LinkButton } from "~/components/buttons/link-button";
 import type { UserObject } from "~/models/user.model";
 import { followUser } from "~/server/follow-user";
 import { unfollowUser } from "~/server/unfollow-user";
@@ -20,24 +20,22 @@ export function FollowButton({
     user.followers.some((follow) => follow.followerId === sessionUserId)
   )
     return (
-      <Button
+      <LinkButton
+        className="self-end"
         onClick={() => unfollowUser(sessionUserId, user.id)}
-        variant="link"
-        size="default"
       >
         Unfollow
-      </Button>
+      </LinkButton>
     );
 
   return (
-    <Button
-      variant="login"
-      size="default"
+    <LinkButton
+      className="self-end"
       onClick={() =>
         sessionUserId ? followUser(sessionUserId, user.id) : signIn()
       }
     >
       Follow
-    </Button>
+    </LinkButton>
   );
 }

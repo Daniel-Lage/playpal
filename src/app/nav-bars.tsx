@@ -14,7 +14,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "~/components/ui/button";
+import { NavButton } from "~/components/buttons/nav-button";
 import { UserImage } from "~/components/user-image";
 import { cn } from "~/lib/utils";
 
@@ -107,15 +107,11 @@ function StartNavButton({
       href={href}
       role="button"
       className="flex w-full items-center justify-center"
-      key="Notifications"
     >
-      <Button
-        size="nav"
-        className={cn(active ? "bg-terciary-accent font-bold" : "")}
-      >
+      <NavButton className={cn(active ? "bg-terciary-accent font-bold" : "")}>
         {icons.get(title)}
         <div className="hidden text-lg md:block">{title}</div>
-      </Button>
+      </NavButton>
     </Link>
   );
 }
@@ -123,10 +119,29 @@ function StartNavButton({
 export function EndNav({ sessionUser }: { sessionUser: User | undefined }) {
   return (
     <div className="fixed right-0 top-0 flex h-12 w-screen shrink-0 flex-col justify-center gap-6 bg-terciary p-2 font-bold md:h-svh md:w-[19vw] md:justify-normal md:p-4">
-      {sessionUser?.image && (
-        <div className="md:hidden">
+      {sessionUser?.image ? (
+        <Link
+          href={`/user/${sessionUser.id}`}
+          className="absolute self-center md:hidden"
+        >
           <UserImage size={36} image={sessionUser?.image} name={"You"} />
-        </div>
+        </Link>
+      ) : (
+        <NavButton onClick={() => signIn()} className="absolute md:relative">
+          {sessionUser ? (
+            <>
+              <ArrowBigRight />
+              <div className="hidden text-lg font-bold md:block">
+                Finish Setting Up
+              </div>
+            </>
+          ) : (
+            <>
+              <LogIn />
+              <div className="hidden text-lg font-bold md:block">Sign In</div>
+            </>
+          )}
+        </NavButton>
       )}
       <Image
         className="aspect-square h-9 w-9 shrink-0 grow-0 rounded-md md:hidden"
@@ -136,21 +151,6 @@ export function EndNav({ sessionUser }: { sessionUser: User | undefined }) {
         alt="playpal logo"
         priority
       />
-      {!sessionUser?.image && (
-        <Button onClick={() => signIn()} size="nav" variant="login">
-          {sessionUser ? (
-            <>
-              <ArrowBigRight />
-              <div className="text-lg font-bold">Finish Setting Up</div>
-            </>
-          ) : (
-            <>
-              <LogIn />
-              <div className="hidden text-lg font-bold md:block">Sign In</div>
-            </>
-          )}
-        </Button>
-      )}
     </div>
   );
 }

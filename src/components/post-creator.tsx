@@ -7,9 +7,9 @@ import { type IMetadata, type Substring } from "~/models/post.model";
 import { getMetadata } from "~/lib/get-metadata";
 import Image from "next/image";
 import type { User } from "next-auth";
-import { Button } from "./ui/button";
 import { UserImage } from "./user-image";
 import { ActionStatus } from "~/models/status.model";
+import { LinkButton } from "./buttons/link-button";
 
 export function PostCreator({
   send,
@@ -113,14 +113,13 @@ export function PostCreator({
           metadata={metadata}
           loadingMetadata={loadingMetadata}
         />
-        <Button
-          variant="link"
-          onClick={handleSend}
-          className="cursor-pointer self-end pr-2 font-bold hover:underline"
+        <LinkButton
+          className="self-end"
           disabled={input === "" || disabled}
+          onClick={handleSend}
         >
           Post
-        </Button>
+        </LinkButton>
       </div>
     </div>
   );

@@ -5,9 +5,9 @@ import { PostsView } from "~/app/posts-view";
 import type { IMetadata, PostObject, Substring } from "~/models/post.model";
 import PlaylistsView from "./playlists-view";
 import type { PlaylistObject } from "~/models/playlist.model";
-import { Button } from "~/components/ui/button";
 import { useState } from "react";
 import type { ActionStatus } from "~/models/status.model";
+import { TabLinkButton } from "./buttons/tab-link-button";
 
 export function FeedView({
   posts,
@@ -34,22 +34,19 @@ export function FeedView({
     <>
       <div className="flex flex-col gap-2 overflow-hidden rounded-md bg-primary">
         <div className="grid grid-cols-2 gap-1 p-2 font-bold">
-          <Button
-            variant="link"
-            size="tab"
-            onClick={() => setShowPlaylists(false)}
+          <TabLinkButton
             className={showPlaylists ? "bg-primary" : "bg-primary-accent"}
+            onClick={() => setShowPlaylists(false)}
           >
             Posts
-          </Button>
-          <Button
-            variant="link"
+          </TabLinkButton>
+
+          <TabLinkButton
+            className={!showPlaylists ? "bg-primary" : "bg-primary-accent"}
             onClick={() => setShowPlaylists(true)}
-            size="tab"
-            className={showPlaylists ? "bg-primary-accent" : "bg-primary"}
           >
             Playlists
-          </Button>
+          </TabLinkButton>
         </div>
       </div>
       {showPlaylists ? (

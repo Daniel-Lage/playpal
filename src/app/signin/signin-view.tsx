@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import { LogIn } from "lucide-react";
-import { Button } from "~/components/ui/button";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { Input } from "~/components/ui/input";
+import { FormButton } from "~/components/buttons/form-button";
 
 export function SignInView() {
   const [email, setEmail] = useState("");
@@ -23,14 +23,10 @@ export function SignInView() {
           }}
         />
 
-        <Button
-          size="nav"
-          variant="login"
-          onClick={() => signIn("email", { email })}
-        >
+        <FormButton onClick={() => signIn("email", { email })}>
           <LogIn />
           <div className="text-lg font-bold">Sign in with Email</div>
-        </Button>
+        </FormButton>
 
         <div className="relative my-4 h-[2px] w-full bg-black text-center">
           <span className="absolute top-[-0.7rem] self-center bg-primary px-1">
@@ -38,7 +34,7 @@ export function SignInView() {
           </span>
         </div>
 
-        <Button size="nav" variant="login" onClick={() => signIn("spotify")}>
+        <FormButton onClick={() => signIn("spotify")}>
           <Image
             height={24}
             width={24}
@@ -46,7 +42,7 @@ export function SignInView() {
             alt="spotify icon"
           />
           <div className="text-lg font-bold">Sign In with Spotify</div>
-        </Button>
+        </FormButton>
       </div>
     </div>
   );

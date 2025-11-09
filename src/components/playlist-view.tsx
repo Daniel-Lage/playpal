@@ -3,12 +3,12 @@ import Link from "next/link";
 import { SpotifyLink } from "~/components/spotify-link";
 import { cn } from "~/lib/utils";
 import type { PlaylistObject } from "~/models/playlist.model";
-import { Button } from "./ui/button";
 import { MessageSquare } from "lucide-react";
-import { LikeButton } from "./like-button";
+import { LikeButton } from "./buttons/like-button";
 import { unlikePlaylist } from "~/server/unlike-playlist";
 import { likePlaylist } from "~/server/like-playlist";
-import { ShareButton } from "./share-button";
+import { ShareButton } from "./buttons/share-button";
+import { IconButton } from "./buttons/icon-button";
 
 export function PlaylistView({
   playlist,
@@ -92,9 +92,9 @@ export function PlaylistView({
             className="flex cursor-pointer items-center gap-2 hover:underline"
             href={`/playlist/${playlist.id}`}
           >
-            <Button size="icon">
+            <IconButton>
               <MessageSquare />
-            </Button>
+            </IconButton>
             <div>{playlist.replies?.length ?? 0}</div>
           </Link>
         </div>

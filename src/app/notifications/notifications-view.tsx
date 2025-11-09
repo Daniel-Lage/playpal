@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { TabLinkButton } from "~/components/buttons/tab-link-button";
 import { PostView } from "~/components/post-view";
-import { Button } from "~/components/ui/button";
 import { UserImage } from "~/components/user-image";
 import { formatTimelapse } from "~/helpers/format-timelapse";
 import {
@@ -29,24 +29,20 @@ export default function NotificationsView({
       <div className="flex flex-col rounded-md bg-primary p-2 text-xl">
         <h1 className="p-2 text-xl font-bold">Notifications</h1>
         <div className="grid grid-cols-4 gap-1">
-          <Button
-            variant="link"
-            size="tab"
+          <TabLinkButton
             className={tab === undefined ? "bg-primary-accent" : "bg-primary"}
             onClick={() => setTab(undefined)}
           >
             All
-          </Button>
+          </TabLinkButton>
           {NotificationTypeOptions.map((type) => (
-            <Button
-              key={type}
-              variant="link"
-              size="tab"
+            <TabLinkButton
               className={tab === type ? "bg-primary-accent" : "bg-primary"}
               onClick={() => setTab(type)}
+              key={type}
             >
               {type}
-            </Button>
+            </TabLinkButton>
           ))}
         </div>
       </div>
