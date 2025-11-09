@@ -3,17 +3,14 @@ import type { Metadata } from "next";
 
 import { authOptions } from "~/lib/auth";
 
-import {
-  postPostStatus,
-  type IMetadata,
-  type Substring,
-} from "~/models/post.model";
+import { type IMetadata, type Substring } from "~/models/post.model";
 import { getUser } from "~/server/get-user";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
 import { getPlaylists } from "~/server/get-playlists";
 import { FeedView } from "~/components/feed-view";
 import { getPosts } from "~/server/get-posts";
+import { ActionStatus } from "~/models/status.model";
 
 export async function generateMetadata({
   params: { userId },
@@ -77,7 +74,7 @@ export default async function ProfilePage({
             ) => {
               "use server";
 
-              if (!session?.user) return postPostStatus.ServerError; // shouldn't be able to be called if not logged in
+              if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
 
               const status = await postPost(
                 input,

@@ -27,14 +27,15 @@ declare module "next-auth" {
   interface User {
     access_token: string | null;
     expires_at: number | null;
+    spotify_id: string | null;
   }
 }
 
-interface userRelations {
+interface UserRelations {
   posts: PostObject[];
   likes: LikeObject[];
   following: FollowObject[];
   followers: FollowObject[];
 }
 
-export type UserObject = typeof usersTable.$inferSelect & userRelations;
+export type UserObject = typeof usersTable.$inferSelect & UserRelations;

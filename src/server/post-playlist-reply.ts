@@ -1,12 +1,8 @@
 "use server";
-import {
-  type Substring,
-  type IMetadata,
-  PostType,
-  postPostStatus,
-} from "~/models/post.model";
+import { type Substring, type IMetadata, PostType } from "~/models/post.model";
 import { db } from "./db";
 import { postsTable } from "./db/schema";
+import { ActionStatus } from "~/models/status.model";
 
 export async function postPlaylistReply(
   content: string,
@@ -14,7 +10,7 @@ export async function postPlaylistReply(
   playlistId: string,
   urls: Substring[] | undefined,
   metadata: IMetadata | undefined,
-): Promise<postPostStatus> {
+): Promise<ActionStatus> {
   const result = await db
     .insert(postsTable)
     .values({
@@ -28,7 +24,7 @@ export async function postPlaylistReply(
     .returning();
   const post = result[0];
 
-  if (!post) return postPostStatus.ServerError;
+  if (!post) return ActionStatus.Failure;
 
-  return postPostStatus.Sucess;
+  return ActionStatus.Success;
 }

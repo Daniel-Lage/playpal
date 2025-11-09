@@ -4,7 +4,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   type IMetadata,
   type PostObject,
-  postPostStatus,
   PostsSortingColumn,
   PostsSortingColumnOptions,
   type Substring,
@@ -15,6 +14,7 @@ import { Sorter } from "~/components/sorter";
 import type { User } from "next-auth";
 import { PostCreator } from "~/components/post-creator";
 import { Check, X } from "lucide-react";
+import { ActionStatus } from "~/models/status.model";
 
 export function PostsView({
   posts: postsProp,
@@ -31,7 +31,7 @@ export function PostsView({
     input: string,
     urls: Substring[] | undefined,
     metadata: IMetadata | undefined,
-  ) => Promise<postPostStatus>;
+  ) => Promise<ActionStatus>;
 }) {
   const [posts, setPosts] = useState(postsProp);
 
@@ -74,7 +74,6 @@ export function PostsView({
         })
         .catch(console.error);
     }, 10000);
-
     return () => clearInterval(interval);
   }, [refresh]);
 
@@ -86,7 +85,7 @@ export function PostsView({
     return temp;
   }, [posts, sortingColumn, reversed]);
 
-  const [status, setStatus] = useState(postPostStatus.Inactive);
+  const [status, setStatus] = useState(ActionStatus.Inactive);
 
   const handleSend = useCallback(
     async (
@@ -96,12 +95,12 @@ export function PostsView({
     ) => {
       if (!send) return;
 
-      setStatus(postPostStatus.Active);
+      setStatus(ActionStatus.Active);
 
       setStatus(await send(input, urls, metadata));
 
       setTimeout(() => {
-        setStatus(postPostStatus.Inactive);
+        setStatus(ActionStatus.Inactive);
       }, 4000);
     },
     [send],
@@ -113,7 +112,7 @@ export function PostsView({
         <PostCreator
           send={handleSend}
           sessionUser={sessionUser}
-          disabled={status === postPostStatus.Active}
+          disabled={status === ActionStatus.Active}
           setStatus={setStatus}
         />
       )}
@@ -138,8 +137,9 @@ export function PostsView({
         <PostView key={post.id} post={post} sessionUserId={sessionUser?.id} />
       ))}
 
-      {status !== postPostStatus.Active &&
-        status !== postPostStatus.Inactive && <StatusMessage status={status} />}
+      {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
+        <StatusMessage status={status} />
+      )}
     </>
   );
 }
@@ -164,8 +164,8 @@ function getTreatedPosts(
   });
 }
 
-function StatusMessage({ status }: { status: postPostStatus }) {
-  if (status === postPostStatus.Sucess)
+function StatusMessage({ status }: { status: ActionStatus }) {
+  if (status === ActionStatus.Success)
     return (
       <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
         <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">

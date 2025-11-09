@@ -2,16 +2,14 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  postPostStatus,
-  type IMetadata,
-  type Substring,
-} from "~/models/post.model";
+import { type IMetadata, type Substring } from "~/models/post.model";
 
 import { getMetadata } from "~/lib/get-metadata";
 import Image from "next/image";
 import type { User } from "next-auth";
 import { Button } from "./ui/button";
+import { UserImage } from "./user-image";
+import { ActionStatus } from "~/models/status.model";
 
 export function PostCreator({
   send,
@@ -27,7 +25,7 @@ export function PostCreator({
   sessionUser: User;
   disabled: boolean;
   setStatus: (
-    value: postPostStatus | ((prevState: postPostStatus) => postPostStatus),
+    value: ActionStatus | ((prevState: ActionStatus) => ActionStatus),
   ) => void;
 }) {
   const [input, setInput] = useState("");
@@ -72,13 +70,13 @@ export function PostCreator({
 
   useEffect(() => {
     if (urlForMetadata) {
-      setStatus(postPostStatus.Active);
+      setStatus(ActionStatus.Active);
       setLoadingMetadata(true);
       getMetadata(urlForMetadata)
         .then((value) => {
           setMetadata(value);
           setLoadingMetadata(false);
-          setStatus(postPostStatus.Inactive);
+          setStatus(ActionStatus.Inactive);
         })
         .catch(console.error);
     }
@@ -95,12 +93,10 @@ export function PostCreator({
     <div className="flex flex-col gap-2 rounded-md bg-primary p-2">
       <div className="flex items-center justify-between">
         <Link className="flex items-center" href={`/user/${sessionUser.id}`}>
-          <Image
-            width={40}
-            height={40}
-            className="aspect-square rounded-full"
-            src={sessionUser.image ?? ""}
-            alt={sessionUser.name ?? ""}
+          <UserImage
+            size={40}
+            image={sessionUser.image}
+            name={sessionUser.name}
           />
           <div className="px-2 font-bold">{sessionUser.name}</div>
         </Link>

@@ -1,16 +1,17 @@
 "use server";
 import type { Device, Devices } from "~/models/device.model";
 import type { ApiError } from "~/models/error.model";
-import { type PlaylistTrack, playTracksStatus } from "~/models/track.model";
+import { PlayTracksStatus } from "~/models/status.model";
+import { type PlaylistTrack } from "~/models/track.model";
 
 export async function playTracks(
   tracks: PlaylistTrack[],
   accessToken?: string | null,
   device?: Device,
-): Promise<playTracksStatus | Device[]> {
+): Promise<PlayTracksStatus | Device[]> {
   if (!accessToken) {
     console.error("Error: acessToken is undefined");
-    return playTracksStatus.ServerError;
+    return PlayTracksStatus.Failure;
   }
   if (!device) {
     const response = await fetch(
@@ -28,7 +29,7 @@ export async function playTracks(
       console.error(
         `Status: ${response.statusText}; Description: ${error?.message};`,
       );
-      return playTracksStatus.ServerError;
+      return PlayTracksStatus.Failure;
     }
 
     const devices = (await response.json()) as Devices;
@@ -43,7 +44,7 @@ export async function playTracks(
   if (!device?.id) {
     console.error("Error: No available spotify device");
 
-    return playTracksStatus.NoDevice;
+    return PlayTracksStatus.NoDevice;
   }
 
   const firstTrack = tracks.shift();
@@ -53,7 +54,7 @@ export async function playTracks(
     console.error("Error: Shuffled Tracks: ", tracks);
 
     console.error("Empty Track Array");
-    return playTracksStatus.ServerError;
+    return PlayTracksStatus.Failure;
   }
 
   const addedToQueue = await fetch(
@@ -72,7 +73,7 @@ export async function playTracks(
 
   if (!addedToQueue.ok) {
     console.error("Error: Response: ", addedToQueue);
-    return playTracksStatus.ServerError;
+    return PlayTracksStatus.Failure;
   }
 
   const skipped = await fetch(
@@ -90,7 +91,7 @@ export async function playTracks(
 
   if (!skipped.ok) {
     console.error("Error: Response: ", skipped);
-    return playTracksStatus.ServerError;
+    return PlayTracksStatus.Failure;
   }
 
   const wait = new Promise((resolve) => {
@@ -127,5 +128,5 @@ export async function playTracks(
 
   await wait;
 
-  return playTracksStatus.Sucess;
+  return PlayTracksStatus.Success;
 }

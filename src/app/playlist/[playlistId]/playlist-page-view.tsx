@@ -6,7 +6,6 @@ import {
   TracksSortingColumnOptions,
   TracksSortingColumn,
   type PlaylistTrack,
-  playTracksStatus,
 } from "~/models/track.model";
 
 import type { SimplifiedArtist } from "~/models/artist.model";
@@ -27,12 +26,12 @@ import { PostCreator } from "~/components/post-creator";
 import { Sorter } from "~/components/sorter";
 import type { IMetadata, PostObject, Substring } from "~/models/post.model";
 import {
-  postPostStatus,
   PostsSortingColumn,
   PostsSortingColumnOptions,
 } from "~/models/post.model";
 import type { Device } from "~/models/device.model";
 import { DevicePicker } from "~/components/device-picker";
+import { ActionStatus, PlayTracksStatus } from "~/models/status.model";
 
 export function PlaylistPageView({
   playlist,
@@ -51,13 +50,13 @@ export function PlaylistPageView({
     expired: boolean,
     queue: PlaylistTrack[],
     device?: Device,
-  ) => Promise<playTracksStatus | Device[]>;
+  ) => Promise<PlayTracksStatus | Device[]>;
   expires_at?: number | null;
   send?: (
     input: string,
     urls: Substring[] | undefined,
     metadata: IMetadata | undefined,
-  ) => Promise<postPostStatus>;
+  ) => Promise<ActionStatus>;
 }) {
   const [shuffled, setShuffled] = useLocalStorage<boolean>(
     sessionUser?.id ? `${sessionUser?.id}:play_shuffled` : "play_shuffled",
@@ -66,19 +65,19 @@ export function PlaylistPageView({
     useCallback((value) => (value ? "true" : "false"), []),
   );
 
-  const [status, setStatus] = useState<playTracksStatus>(
-    playTracksStatus.Inactive,
+  const [status, setStatus] = useState<PlayTracksStatus>(
+    PlayTracksStatus.Inactive,
   );
 
   const handlePlay = useCallback(
     async (start?: PlaylistTrack, device?: Device) => {
       if (!sessionUser?.id) {
-        void signIn("spotify");
+        void signIn();
         return;
       }
       if (!play || !expires_at || !queue) return;
 
-      setStatus(playTracksStatus.Active);
+      setStatus(PlayTracksStatus.Active);
 
       let newQueue: PlaylistTrack[] = [];
 
@@ -110,7 +109,7 @@ export function PlaylistPageView({
         setStatus(result);
 
         setTimeout(() => {
-          setStatus(playTracksStatus.Inactive);
+          setStatus(PlayTracksStatus.Inactive);
         }, 4000);
       } else {
         setDevices(result);
@@ -129,7 +128,7 @@ export function PlaylistPageView({
     <>
       <PlaylistContent
         play={handlePlay}
-        disabled={status === playTracksStatus.Active}
+        disabled={status === PlayTracksStatus.Active}
         shuffled={shuffled}
         switchShuffled={() => {
           setShuffled((prev) => !prev);
@@ -219,8 +218,8 @@ function getTreatedTracks(
     });
 }
 
-function PlayStatusMessage({ status }: { status: playTracksStatus }) {
-  if (status === playTracksStatus.Sucess)
+function PlayStatusMessage({ status }: { status: PlayTracksStatus }) {
+  if (status === PlayTracksStatus.Success)
     return (
       <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
         <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">
@@ -230,7 +229,7 @@ function PlayStatusMessage({ status }: { status: playTracksStatus }) {
       </div>
     );
 
-  if (status === playTracksStatus.NoDevice)
+  if (status === PlayTracksStatus.NoDevice)
     return (
       <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
         <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-yellow-500 px-4 py-8 md:w-fit">
@@ -260,7 +259,7 @@ function PlaylistTracksView({
   playlist: PlaylistObject;
   tracks: PlaylistTrack[];
   sessionUserId?: string;
-  status: playTracksStatus;
+  status: PlayTracksStatus;
   playTrack: (track: PlaylistTrack) => void;
 }) {
   const [filter, setFilter] = useState("");
@@ -314,12 +313,12 @@ function PlaylistTracksView({
 
       <PlaylistTracks
         treatedTracks={treatedTracks}
-        disabled={status === playTracksStatus.Active}
+        disabled={status === PlayTracksStatus.Active}
         playTrack={playTrack}
       />
 
-      {status !== playTracksStatus.Active &&
-        status !== playTracksStatus.Inactive && (
+      {status !== PlayTracksStatus.Active &&
+        status !== PlayTracksStatus.Inactive && (
           <PlayStatusMessage status={status} />
         )}
     </>
@@ -343,7 +342,7 @@ function PlaylistRepliesView({
     input: string,
     urls: Substring[] | undefined,
     metadata: IMetadata | undefined,
-  ) => Promise<postPostStatus>;
+  ) => Promise<ActionStatus>;
 }) {
   const [reversed, setReversed] = useLocalStorage<boolean>(
     sessionUser?.id
@@ -380,7 +379,7 @@ function PlaylistRepliesView({
     return temp;
   }, [playlist.replyThreads, sortingColumn, reversed]);
 
-  const [status, setStatus] = useState(postPostStatus.Inactive);
+  const [status, setStatus] = useState(ActionStatus.Inactive);
 
   const handleSend = useCallback(
     async (
@@ -390,12 +389,12 @@ function PlaylistRepliesView({
     ) => {
       if (!send) return;
 
-      setStatus(postPostStatus.Active);
+      setStatus(ActionStatus.Active);
 
       setStatus(await send(input, urls, metadata));
 
       setTimeout(() => {
-        setStatus(postPostStatus.Inactive);
+        setStatus(ActionStatus.Inactive);
       }, 4000);
     },
     [send],
@@ -407,7 +406,7 @@ function PlaylistRepliesView({
         <PostCreator
           send={handleSend}
           sessionUser={sessionUser}
-          disabled={status === postPostStatus.Active}
+          disabled={status === ActionStatus.Active}
           setStatus={setStatus}
         />
       )}
@@ -436,10 +435,9 @@ function PlaylistRepliesView({
         />
       ))}
 
-      {status !== postPostStatus.Active &&
-        status !== postPostStatus.Inactive && (
-          <SendStatusMessage status={status} />
-        )}
+      {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
+        <SendStatusMessage status={status} />
+      )}
     </>
   );
 }
@@ -469,8 +467,8 @@ function getTreatedReplies(
   });
 }
 
-function SendStatusMessage({ status }: { status: postPostStatus }) {
-  if (status === postPostStatus.Sucess)
+function SendStatusMessage({ status }: { status: ActionStatus }) {
+  if (status === ActionStatus.Success)
     return (
       <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
         <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">

@@ -2,16 +2,12 @@
 
 import type { User } from "next-auth";
 import { PostsView } from "~/app/posts-view";
-import type {
-  IMetadata,
-  PostObject,
-  postPostStatus,
-  Substring,
-} from "~/models/post.model";
+import type { IMetadata, PostObject, Substring } from "~/models/post.model";
 import PlaylistsView from "./playlists-view";
 import type { PlaylistObject } from "~/models/playlist.model";
 import { Button } from "~/components/ui/button";
 import { useState } from "react";
+import type { ActionStatus } from "~/models/status.model";
 
 export function FeedView({
   posts,
@@ -29,7 +25,7 @@ export function FeedView({
     input: string,
     urls: Substring[] | undefined,
     metadata: IMetadata | undefined,
-  ) => Promise<postPostStatus>;
+  ) => Promise<ActionStatus>;
   playlists: PlaylistObject[];
 }) {
   const [showPlaylists, setShowPlaylists] = useState(false);

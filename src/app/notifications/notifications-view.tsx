@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { PostView } from "~/components/post-view";
 import { Button } from "~/components/ui/button";
+import { UserImage } from "~/components/user-image";
 import { formatTimelapse } from "~/helpers/format-timelapse";
 import {
   type NotificationObject,
@@ -123,13 +123,7 @@ function NFollowView({
 }) {
   return (
     <Link className="flex items-center gap-2 p-2" href={`/user/${notifier.id}`}>
-      <Image
-        width={32}
-        height={32}
-        className="aspect-square h-8 w-8 shrink-0 grow-0 rounded-full"
-        src={notifier.image ?? ""}
-        alt={notifier.name ?? ""}
-      />
+      <UserImage size={32} image={notifier.image} name={notifier.name} />
 
       <div>
         <span className="font-bold">{notifier.name}</span> followed you
@@ -154,14 +148,7 @@ function NLikeView({
         className="flex items-center gap-2 p-2"
         href={`/user/${notifier.id}`}
       >
-        <Image
-          width={32}
-          height={32}
-          className="aspect-square h-8 w-8 shrink-0 grow-0 rounded-full"
-          src={notifier.image ?? ""}
-          alt={notifier.name ?? ""}
-        />
-
+        <UserImage size={32} image={notifier.image} name={notifier.name} />
         <div>
           <span className="font-bold">{notifier.name}</span> liked your{" "}
           {"content" in target ? "post" : "playlist"}

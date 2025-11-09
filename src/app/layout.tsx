@@ -34,7 +34,7 @@ export default async function RootLayout({
         <main className="my-12 mr-[10px] flex h-max grow flex-col gap-2 p-2 md:my-0 md:ml-[19vw] md:mr-[calc(19vw+10px)] md:gap-4 md:p-4">
           {children}
         </main>
-        <EndNav sessionUserImage={session?.user?.image} />
+        <EndNav sessionUser={session?.user} />
       </body>
     </html>
   );

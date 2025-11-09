@@ -19,6 +19,8 @@ import { deletePost } from "~/server/delete-post";
 import { unlikePost } from "~/server/unlike-post";
 import { likePost } from "~/server/like-post";
 import { cn } from "~/lib/utils";
+import { UserImage } from "./user-image";
+import { ConfirmDialog } from "./confirm-dialog";
 
 export function PostView({
   post,
@@ -49,12 +51,10 @@ export function PostView({
           href={`/user/${post.author.id}`}
           className="flex h-12 w-12 shrink-0 items-center justify-center"
         >
-          <Image
-            width={32}
-            height={32}
-            className="aspect-square rounded-full"
-            src={post.author?.image ?? ""}
-            alt={post.author?.name ?? ""}
+          <UserImage
+            size={32}
+            image={post.author.image}
+            name={post.author.name}
           />
         </Link>
         <Link
@@ -94,17 +94,20 @@ export function PostView({
           </>
         )}
         <MenuView>
-          <Button
-            size="select"
-            onClick={() => {
+          <ConfirmDialog
+            onConfirm={() => {
               if (isMainPost) router.back();
 
               void deletePost(post.id);
             }}
+            title="Delete Post?"
+            description="This action cannot be undone."
           >
-            Delete post
-            <Trash />
-          </Button>
+            <Button size="select">
+              Delete post
+              <Trash />
+            </Button>
+          </ConfirmDialog>
         </MenuView>
       </div>
 

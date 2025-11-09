@@ -20,25 +20,25 @@ body {
     --background: hsl(215, 28%, 17%); /* only used by me */
     --foreground: hsl(0, 0%, 0%); /* text */
     --card: hsl(0, 0%, 100%); /* idk */
-    --card-foreground: hsl(0, 0%, 4%); /* idk */
+    --card-foreground: hsl(0, 0%, 0%); /* text */
     --popover: hsl(270, 97%, 87%); /* menu */
-    --popover-foreground: hsl(0, 0%, 0%); /* idk */
+    --popover-foreground: hsl(0, 0%, 0%); /* text */
     --primary: hsl(270, 97%, 85%); /* only used by me */
-    --primary-accent: hsl(270, 95%, 75%); /* only used by me */
-    --primary-foreground: hsl(0, 0%, 98%); /* idk */
+    --primary-accent: hsl(270, 95%, 75%);
+    --primary-foreground: hsl(0, 0%, 0%); /* text */
     --secondary: hsl(170, 95%, 83%); /* only used by me */
-    --secondary-foreground: hsl(0, 0%, 9%); /* idk */
+    --secondary-foreground: hsl(0, 0%, 0%); /* text */
     --secondary-accent: hsl(170, 50%, 60%); /* only used by me */
     --terciary: hsl(210, 95%, 83%); /* only used by me */
     --terciary-accent: hsl(210, 70%, 70%); /* only used by me */
     --muted: hsl(0, 0%, 96%); /* idk */
-    --muted-foreground: hsl(0, 0%, 45.1%); /* idk */
+    --muted-foreground: hsl(0, 0%, 0%); /* text */
     --accent: hsl(249, 66%, 37%); /* selected option */
-    --accent-foreground: hsl(0, 100%, 50%); /* text on selected option */
+    --accent-foreground: hsl(0, 0%, 0%); /* text */
     --destructive: hsl(0, 84% 60%); /* idk */
-    --destructive-foreground: hsl(0, 0%, 98%); /* idk */
+    --destructive-foreground: hsl(0, 0%, 0%); /* text */
     --border: hsl(0, 0%, 89.8%); /* idk */
-    --input: hsl(0, 0%, 89.8%); /* idk */
+    --input: hsl(0, 0%, 35%); /* text input */
     --ring: hsl(0, 0%, 3.9%); /* idk */
     --chart-1: hsl(12, 76%, 61%); /* idk */
     --chart-2: hsl(173, 58%, 39%); /* idk */

@@ -6,15 +6,15 @@ import type { Metadata } from "next";
 import { PlaylistPageView } from "./playlist-page-view";
 import { isPremiumUser } from "~/api/is-premium-user";
 import { getRandomSample } from "~/helpers/get-random-sample";
-import { playTracksStatus, type PlaylistTrack } from "~/models/track.model";
+import { type PlaylistTrack } from "~/models/track.model";
 import { playTracks } from "~/api/play-tracks";
 import { revalidatePath } from "next/cache";
 import { getPlaylist } from "~/server/get-playlist";
 import { getTracks } from "~/api/get-tracks";
 import type { IMetadata, Substring } from "~/models/post.model";
-import { postPostStatus } from "~/models/post.model";
 import { postPlaylistReply } from "~/server/post-playlist-reply";
 import type { Device } from "~/models/device.model";
+import { ActionStatus, PlayTracksStatus } from "~/models/status.model";
 
 export async function generateMetadata({
   params: { playlistId },
@@ -74,7 +74,7 @@ export default async function PlaylistPage({
   ) => {
     "use server";
 
-    if (!session?.user) return postPostStatus.ServerError; // shouldn't be able to be called if not logged in
+    if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
 
     const result = await postPlaylistReply(
       input,
@@ -118,10 +118,14 @@ export default async function PlaylistPage({
 
         if (expired) {
           revalidatePath("/playlist", "page");
-          return playTracksStatus.ServerError;
+          return PlayTracksStatus.Failure;
         }
 
-        return await playTracks(queue, session.user.access_token, device);
+        return (await playTracks(
+          queue,
+          session.user.access_token,
+          device,
+        )) as PlayTracksStatus;
       }}
       send={send}
     />

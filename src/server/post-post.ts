@@ -4,10 +4,10 @@ import {
   type IMetadata,
   PostType,
   type MainPostObject,
-  postPostStatus,
 } from "~/models/post.model";
 import { db } from "./db";
 import { postsTable, repliesTable } from "./db/schema";
+import { ActionStatus } from "~/models/status.model";
 
 export async function postPost(
   content: string,
@@ -15,7 +15,7 @@ export async function postPost(
   urls: Substring[] | undefined,
   metadata: IMetadata | undefined,
   parent?: MainPostObject,
-): Promise<postPostStatus> {
+): Promise<ActionStatus> {
   const result = await db
     .insert(postsTable)
     .values({
@@ -29,7 +29,7 @@ export async function postPost(
     .returning();
   const post = result[0];
 
-  if (!post) return postPostStatus.ServerError;
+  if (!post) return ActionStatus.Failure;
 
   if (parent) {
     await db
@@ -51,5 +51,5 @@ export async function postPost(
     }
   }
 
-  return postPostStatus.Sucess;
+  return ActionStatus.Success;
 }

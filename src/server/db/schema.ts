@@ -10,8 +10,6 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
-// import type { AdapterAccountType } from "next-auth/adapters" <- not here
-import type { AdapterAccountType } from ".pnpm/@auth+core@0.34.2/node_modules/@auth/core/adapters";
 import type { PostType, IMetadata, Substring } from "~/models/post.model";
 
 export const createTable = pgTableCreator((name) => `playpal_${name}`);
@@ -24,6 +22,7 @@ export const usersTable = createTable("user", {
   email: text("email").unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
   image: text("image"),
+  spotify_id: text("spotify_id"),
   access_token: text("acess_token"),
   expires_at: integer("expires_at"),
 });
@@ -34,7 +33,7 @@ export const accountsTable = createTable(
     userId: text("userId")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
-    type: text("type").$type<AdapterAccountType>().notNull(),
+    type: text("type").notNull(),
     provider: text("provider").notNull(),
     providerAccountId: text("providerAccountId").notNull(),
     refresh_token: text("refresh_token"),

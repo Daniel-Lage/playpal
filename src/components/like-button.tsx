@@ -28,7 +28,7 @@ export function LikeButton({
   return (
     <div className="flex items-center gap-2">
       {!sessionUserId ? (
-        <Button size="icon" onClick={() => signIn("spotify")}>
+        <Button size="icon" onClick={() => signIn()}>
           <Heart />
         </Button>
       ) : isLiked ? (

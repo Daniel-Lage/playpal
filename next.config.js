@@ -17,6 +17,11 @@ const config = {
         hostname: "**.spotifycdn.com",
       },
       { protocol: "https", hostname: "**.ytimg.com" },
+      {
+        protocol: "https",
+        hostname: process.env.UPLOADTHING_APP_ID + ".ufs.sh",
+        pathname: "/f/*",
+      },
     ],
   },
 };

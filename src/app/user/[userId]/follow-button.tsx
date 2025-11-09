@@ -34,7 +34,7 @@ export function FollowButton({
       variant="login"
       size="default"
       onClick={() =>
-        sessionUserId ? followUser(sessionUserId, user.id) : signIn("spotify")
+        sessionUserId ? followUser(sessionUserId, user.id) : signIn()
       }
     >
       Follow

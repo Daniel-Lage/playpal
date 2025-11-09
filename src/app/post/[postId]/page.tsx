@@ -4,15 +4,12 @@ import type { Metadata } from "next";
 import { getPost } from "~/server/get-post";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
-import {
-  postPostStatus,
-  type IMetadata,
-  type Substring,
-} from "~/models/post.model";
+import { type IMetadata, type Substring } from "~/models/post.model";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
 import { PostPageView } from "./post-page-view";
 import { getReplies } from "~/server/get-replies";
+import { ActionStatus } from "~/models/status.model";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +69,7 @@ export default async function PostPage({
       ) => {
         "use server";
 
-        if (!session?.user) return postPostStatus.ServerError; // shouldn't be able to be called if not logged in
+        if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
 
         const result = await postPost(
           input,

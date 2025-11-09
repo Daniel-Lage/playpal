@@ -5,17 +5,18 @@ import { db } from "./db";
 import { usersTable } from "./db/schema";
 import { utapi } from "./uploadthing";
 
-export async function deleteUser(userId: string) {
-  const result = await db
-    .delete(usersTable)
-    .where(eq(usersTable.id, userId))
-    .returning();
-
-  if (result[0]?.image) {
+export async function updateImage(
+  userId: string,
+  image: string,
+  previousImage?: string | null,
+) {
+  if (previousImage) {
     // previous image is in url form, we need to extract the key
-    const previousImageKey = result[0]?.image.split("/").pop();
+    const previousImageKey = previousImage.split("/").pop();
     void utapi.deleteFiles(previousImageKey!);
   }
+
+  await db.update(usersTable).set({ image }).where(eq(usersTable.id, userId));
 
   revalidatePath("/");
 }

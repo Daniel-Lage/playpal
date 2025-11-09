@@ -18,12 +18,12 @@ import type {
 } from "~/models/post.model";
 
 import {
-  postPostStatus,
   PostsSortingColumn,
   PostsSortingColumnOptions,
 } from "~/models/post.model";
 
 import type { ReplyObject } from "~/models/reply.model";
+import { ActionStatus } from "~/models/status.model";
 
 export function PostPageView({
   post,
@@ -40,7 +40,7 @@ export function PostPageView({
     input: string,
     urls: Substring[] | undefined,
     metadata: IMetadata | undefined,
-  ) => Promise<postPostStatus>;
+  ) => Promise<ActionStatus>;
 }) {
   const [replies, setReplies] = useState(post.replyThreads ?? []);
 
@@ -91,7 +91,7 @@ export function PostPageView({
     return temp;
   }, [replies, sortingColumn, reversed]);
 
-  const [status, setStatus] = useState(postPostStatus.Inactive);
+  const [status, setStatus] = useState(ActionStatus.Inactive);
 
   const handleSend = useCallback(
     async (
@@ -101,12 +101,12 @@ export function PostPageView({
     ) => {
       if (!send) return;
 
-      setStatus(postPostStatus.Active);
+      setStatus(ActionStatus.Active);
 
       setStatus(await send(input, urls, metadata));
 
       setTimeout(() => {
-        setStatus(postPostStatus.Inactive);
+        setStatus(ActionStatus.Inactive);
       }, 4000);
     },
     [send],
@@ -146,7 +146,7 @@ export function PostPageView({
                 <PostCreator
                   send={handleSend}
                   sessionUser={sessionUser}
-                  disabled={status === postPostStatus.Active}
+                  disabled={status === ActionStatus.Active}
                   setStatus={setStatus}
                 />
               )}
@@ -178,8 +178,9 @@ export function PostPageView({
         />
       ))}
 
-      {status !== postPostStatus.Active &&
-        status !== postPostStatus.Inactive && <StatusMessage status={status} />}
+      {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
+        <StatusMessage status={status} />
+      )}
     </>
   );
 }
@@ -249,8 +250,8 @@ function getTreatedReplies(
   });
 }
 
-function StatusMessage({ status }: { status: postPostStatus }) {
-  if (status === postPostStatus.Sucess)
+function StatusMessage({ status }: { status: ActionStatus }) {
+  if (status === ActionStatus.Success)
     return (
       <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
         <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">

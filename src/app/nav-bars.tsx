@@ -1,12 +1,21 @@
 "use client";
 
-import { Bell, House, LogIn, Search, UserRound } from "lucide-react";
+import {
+  ArrowBigRight,
+  Bell,
+  House,
+  LogIn,
+  Search,
+  UserRound,
+} from "lucide-react";
+import type { User } from "next-auth";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
+import { UserImage } from "~/components/user-image";
 import { cn } from "~/lib/utils";
 
 export function StartNav({ profileURL }: { profileURL?: string }) {
@@ -111,21 +120,13 @@ function StartNavButton({
   );
 }
 
-export function EndNav({
-  sessionUserImage,
-}: {
-  sessionUserImage: string | null | undefined;
-}) {
+export function EndNav({ sessionUser }: { sessionUser: User | undefined }) {
   return (
     <div className="fixed right-0 top-0 flex h-12 w-screen shrink-0 flex-col justify-center gap-6 bg-terciary p-2 font-bold md:h-svh md:w-[19vw] md:justify-normal md:p-4">
-      {sessionUserImage && (
-        <Image
-          className="absolute aspect-square h-9 w-9 shrink-0 grow-0 self-center rounded-full md:hidden"
-          height={36}
-          width={36}
-          src={sessionUserImage}
-          alt="your image"
-        />
+      {sessionUser?.image && (
+        <div className="md:hidden">
+          <UserImage size={36} image={sessionUser?.image} name={"You"} />
+        </div>
       )}
       <Image
         className="aspect-square h-9 w-9 shrink-0 grow-0 rounded-md md:hidden"
@@ -135,10 +136,19 @@ export function EndNav({
         alt="playpal logo"
         priority
       />
-      {!sessionUserImage && (
-        <Button onClick={() => signIn("spotify")} size="nav" variant="login">
-          <LogIn />
-          <div className="hidden text-lg font-bold md:block">Sign In</div>
+      {!sessionUser?.image && (
+        <Button onClick={() => signIn()} size="nav" variant="login">
+          {sessionUser ? (
+            <>
+              <ArrowBigRight />
+              <div className="text-lg font-bold">Finish Setting Up</div>
+            </>
+          ) : (
+            <>
+              <LogIn />
+              <div className="hidden text-lg font-bold md:block">Sign In</div>
+            </>
+          )}
         </Button>
       )}
     </div>
