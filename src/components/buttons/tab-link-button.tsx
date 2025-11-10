@@ -13,7 +13,7 @@ export function TabLinkButton({
     <button
       className={cn(
         className,
-        "h-12 w-full justify-center rounded-md p-0 font-bold underline-offset-4 hover:underline md:pl-4 [&_svg]:size-6",
+        "h-10 w-full justify-center rounded-md font-bold underline-offset-4 hover:underline md:pl-4 [&_svg]:size-6",
       )}
       onClick={onClick}
     >

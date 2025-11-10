@@ -90,7 +90,7 @@ export function PostCreator({
   }, [input, disabled, send, metadata, urls]);
 
   return (
-    <div className="flex flex-col gap-2 rounded-md bg-primary p-2">
+    <div className="flex flex-col gap-2 border-b-2 border-background bg-primary p-2 md:px-[calc(19vw_+_16px)]">
       <div className="flex items-center justify-between">
         <Link className="flex items-center" href={`/user/${sessionUser.id}`}>
           <UserImage

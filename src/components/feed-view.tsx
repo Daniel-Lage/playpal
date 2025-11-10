@@ -32,8 +32,8 @@ export function FeedView({
 
   return (
     <>
-      <div className="flex flex-col gap-2 overflow-hidden rounded-md bg-primary">
-        <div className="grid grid-cols-2 gap-1 p-2 font-bold">
+      <div className="left-0 h-16 w-screen gap-2 overflow-hidden border-b-2 border-background bg-primary px-2 md:px-[calc(19vw_+_16px)]">
+        <div className="grid h-full w-full grid-cols-2 place-items-center gap-1 font-bold">
           <TabLinkButton
             className={showPlaylists ? "bg-primary" : "bg-primary-accent"}
             onClick={() => setShowPlaylists(false)}
@@ -49,17 +49,22 @@ export function FeedView({
           </TabLinkButton>
         </div>
       </div>
-      {showPlaylists ? (
-        <PlaylistsView playlists={playlists} sessionUserId={sessionUser?.id} />
-      ) : (
-        <PostsView
-          posts={posts}
-          sessionUser={sessionUser}
-          send={send}
-          lastQueried={lastQueried}
-          refresh={refresh}
-        />
-      )}
+      <div>
+        {showPlaylists ? (
+          <PlaylistsView
+            playlists={playlists}
+            sessionUserId={sessionUser?.id}
+          />
+        ) : (
+          <PostsView
+            posts={posts}
+            sessionUser={sessionUser}
+            send={send}
+            lastQueried={lastQueried}
+            refresh={refresh}
+          />
+        )}
+      </div>
     </>
   );
 }

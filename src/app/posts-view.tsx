@@ -15,6 +15,8 @@ import type { User } from "next-auth";
 import { PostCreator } from "~/components/post-creator";
 import { Check, X } from "lucide-react";
 import { ActionStatus } from "~/models/status.model";
+import { MainContentView } from "~/components/main-content-view";
+import { PopupType, PopupView } from "~/components/popup-view";
 
 export function PostsView({
   posts: postsProp,
@@ -117,8 +119,7 @@ export function PostsView({
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center md:justify-between">
-        {posts.length} Posts
+      <div className="flex flex-col items-start gap-2 bg-primary p-2 px-2 md:mx-[19vw] md:flex-row md:items-center md:justify-between md:px-4">
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>
@@ -133,9 +134,11 @@ export function PostsView({
         />
       </div>
 
-      {treatedPosts.map((post) => (
-        <PostView key={post.id} post={post} sessionUserId={sessionUser?.id} />
-      ))}
+      <MainContentView>
+        {treatedPosts.map((post) => (
+          <PostView key={post.id} post={post} sessionUserId={sessionUser?.id} />
+        ))}
+      </MainContentView>
 
       {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
         <StatusMessage status={status} />
@@ -167,20 +170,16 @@ function getTreatedPosts(
 function StatusMessage({ status }: { status: ActionStatus }) {
   if (status === ActionStatus.Success)
     return (
-      <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
-        <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">
-          <Check size={40} />
-          Post Sent Sucessfully
-        </div>
-      </div>
+      <PopupView type={PopupType.Success}>
+        <Check size={40} />
+        Post Sent Sucessfully
+      </PopupView>
     );
 
   return (
-    <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
-      <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-red-500 px-4 py-8 md:w-fit">
-        <X size={40} />
-        Internal Server Error
-      </div>
-    </div>
+    <PopupView type={PopupType.ServerError}>
+      <X size={40} />
+      Internal Server Error
+    </PopupView>
   );
 }

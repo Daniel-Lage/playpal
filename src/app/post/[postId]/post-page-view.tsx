@@ -4,6 +4,7 @@ import { Check, X } from "lucide-react";
 import type { User } from "next-auth";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PlaylistView } from "~/components/playlist-view";
+import { PopupType, PopupView } from "~/components/popup-view";
 import { PostCreator } from "~/components/post-creator";
 import { PostView } from "~/components/post-view";
 import { Sorter } from "~/components/sorter";
@@ -114,10 +115,10 @@ export function PostPageView({
 
   return (
     <>
-      <div className="flex flex-col rounded-md bg-primary">
+      <div className="flex flex-col bg-primary">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
-            <div>
+            <div className="border-b-2 border-background md:mx-[19vw]">
               {!!post.playlist && (
                 <>
                   <PlaylistView
@@ -141,20 +142,20 @@ export function PostPageView({
                 sessionUserId={sessionUser?.id}
                 isMainPost={true}
               />
-
-              {sessionUser?.image && sessionUser?.name && (
-                <PostCreator
-                  send={handleSend}
-                  sessionUser={sessionUser}
-                  disabled={status === ActionStatus.Active}
-                  setStatus={setStatus}
-                />
-              )}
             </div>
+
+            {sessionUser?.image && sessionUser?.name && (
+              <PostCreator
+                send={handleSend}
+                sessionUser={sessionUser}
+                disabled={status === ActionStatus.Active}
+                setStatus={setStatus}
+              />
+            )}
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:mx-[19vw] md:flex-row md:items-center md:justify-between">
         {post.replyThreads?.length ?? 0} Replies
         <Sorter
           title="Sort by"
@@ -253,20 +254,16 @@ function getTreatedReplies(
 function StatusMessage({ status }: { status: ActionStatus }) {
   if (status === ActionStatus.Success)
     return (
-      <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
-        <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">
-          <Check size={40} />
-          Reply Sent Sucessfully
-        </div>
-      </div>
+      <PopupView type={PopupType.Success}>
+        <Check size={40} />
+        Reply Sent Sucessfully
+      </PopupView>
     );
 
   return (
-    <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
-      <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-red-500 px-4 py-8 md:w-fit">
-        <X size={40} />
-        Internal Server Error
-      </div>
-    </div>
+    <PopupView type={PopupType.ServerError}>
+      <X size={40} />
+      Internal Server Error
+    </PopupView>
   );
 }

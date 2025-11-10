@@ -32,6 +32,7 @@ import {
 import type { Device } from "~/models/device.model";
 import { DevicePicker } from "~/components/device-picker";
 import { ActionStatus, PlayTracksStatus } from "~/models/status.model";
+import { PopupType, PopupView } from "~/components/popup-view";
 
 export function PlaylistPageView({
   playlist,
@@ -161,6 +162,7 @@ export function PlaylistPageView({
           ),
         }[tab]
       }
+
       <DevicePicker
         devices={devices}
         pickDevice={(device) => {
@@ -221,31 +223,25 @@ function getTreatedTracks(
 function PlayStatusMessage({ status }: { status: PlayTracksStatus }) {
   if (status === PlayTracksStatus.Success)
     return (
-      <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
-        <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">
-          <Check size={40} />
-          Playing Tracks Successfully
-        </div>
-      </div>
+      <PopupView type={PopupType.Success}>
+        <Check size={40} />
+        Playing Tracks Successfully
+      </PopupView>
     );
 
   if (status === PlayTracksStatus.NoDevice)
     return (
-      <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
-        <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-yellow-500 px-4 py-8 md:w-fit">
-          <SearchX size={40} />
-          Spotify Device Not Found
-        </div>
-      </div>
+      <PopupView type={PopupType.UserError}>
+        <SearchX size={40} />
+        Spotify Device Not Found
+      </PopupView>
     );
 
   return (
-    <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
-      <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-red-500 px-4 py-8 md:w-fit">
-        <X size={40} />
-        Internal Server Error
-      </div>
-    </div>
+    <PopupView type={PopupType.ServerError}>
+      <X size={40} />
+      Internal Server Error
+    </PopupView>
   );
 }
 
@@ -411,7 +407,7 @@ function PlaylistRepliesView({
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:mx-[19vw] md:flex-row md:items-center md:justify-between">
         {playlist.replyThreads?.length ?? 0} Replies
         <Sorter
           title="Sort by"
@@ -470,20 +466,16 @@ function getTreatedReplies(
 function SendStatusMessage({ status }: { status: ActionStatus }) {
   if (status === ActionStatus.Success)
     return (
-      <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
-        <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-green-500 px-4 py-8 md:w-fit">
-          <Check size={40} />
-          Reply Sent Sucessfully
-        </div>
-      </div>
+      <PopupView type={PopupType.Success}>
+        <Check size={40} />
+        Reply Sent Sucessfully
+      </PopupView>
     );
 
   return (
-    <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
-      <div className="relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md bg-red-500 px-4 py-8 md:w-fit">
-        <X size={40} />
-        Internal Server Error
-      </div>
-    </div>
+    <PopupView type={PopupType.ServerError}>
+      <X size={40} />
+      Internal Server Error
+    </PopupView>
   );
 }

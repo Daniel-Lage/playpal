@@ -5,6 +5,7 @@ import type { UserObject } from "~/models/user.model";
 import { PostView } from "~/components/post-view";
 import { UserView } from "~/components/user-view";
 import { useEffect, useRef, useState } from "react";
+import { MainContentView } from "~/components/main-content-view";
 
 export function ResultsView({
   users: usersProp,
@@ -42,21 +43,19 @@ export function ResultsView({
 
   if (users.length === 0 && posts.length === 0)
     return (
-      <>
-        <div className="flex flex-col items-center justify-center gap-2">
-          <div className="text-xl text-secondary">No results found</div>
-        </div>
-      </>
+      <MainContentView>
+        <span className="text-xl text-secondary">No results found</span>
+      </MainContentView>
     );
 
   return (
-    <>
+    <MainContentView>
       {users.length !== 0 && (
-        <div className="flex flex-col gap-2">
-          <div className="rounded-md bg-secondary">
-            <div className="p-2 font-bold">Users</div>
+        <div className="flex flex-col overflow-hidden rounded-md bg-secondary">
+          <div className="w-full border-b-2 border-background p-2 font-bold">
+            Users
           </div>
-          <div className="grid grid-cols-4 gap-2 rounded-b-md md:grid-cols-6">
+          <div className="grid grid-cols-4 gap-2 md:grid-cols-6">
             {users.map((user) => (
               <UserView key={user.id} user={user} />
             ))}
@@ -66,6 +65,6 @@ export function ResultsView({
       {posts.map((post) => (
         <PostView key={post.id} post={post} sessionUserId={sessionUserId} />
       ))}
-    </>
+    </MainContentView>
   );
 }

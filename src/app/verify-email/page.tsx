@@ -1,16 +1,15 @@
 import Link from "next/link";
 import { LinkButton } from "~/components/buttons/link-button";
+import { OneElementView } from "~/components/one-element-view";
 
 export default async function VerifyEmailPage() {
   return (
-    <div className="grid h-screen w-full place-items-center">
-      <div className="flex w-96 flex-col gap-4 rounded-md bg-primary p-8">
-        <h1 className="p-2 text-xl font-bold">Check your email</h1>A sign in
-        link has been sent to your email address.
-        <Link href="/">
-          <LinkButton>Return</LinkButton>
-        </Link>
-      </div>
-    </div>
+    <OneElementView>
+      <h1 className="p-2 text-xl font-bold">Check your email</h1>A sign in link
+      has been sent to your email address.
+      <Link href="/">
+        <LinkButton>Return</LinkButton>
+      </Link>
+    </OneElementView>
   );
 }

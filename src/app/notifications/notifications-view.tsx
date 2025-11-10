@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { TabLinkButton } from "~/components/buttons/tab-link-button";
+import { MainContentView } from "~/components/main-content-view";
 import { PostView } from "~/components/post-view";
 import { UserImage } from "~/components/user-image";
 import { formatTimelapse } from "~/helpers/format-timelapse";
@@ -26,7 +27,7 @@ export default function NotificationsView({
 
   return (
     <>
-      <div className="flex flex-col rounded-md bg-primary p-2 text-xl">
+      <div className="flex flex-col bg-primary p-2 md:px-[calc(19vw_+_16px)]">
         <h1 className="p-2 text-xl font-bold">Notifications</h1>
         <div className="grid grid-cols-4 gap-1">
           <TabLinkButton
@@ -46,30 +47,32 @@ export default function NotificationsView({
           ))}
         </div>
       </div>
-      {notifications
-        .filter((notification) =>
-          tab !== undefined ? notification.type === tab : true,
-        )
-        .map((notification) => (
-          <div
-            key={
-              notification.target
-                ? notification.notifierId + notification.target.id
-                : notification.notifierId
-            }
-            className="flex flex-col rounded-md bg-secondary"
-          >
-            <NotificationView
-              notification={notification}
-              timelapse={
-                formatTimelapse(
-                  Date.now() - notification.createdAt.getTime(),
-                ) ?? notification.createdAt.toUTCString()
+      <MainContentView>
+        {notifications
+          .filter((notification) =>
+            tab !== undefined ? notification.type === tab : true,
+          )
+          .map((notification) => (
+            <div
+              key={
+                notification.target
+                  ? notification.notifierId + notification.target.id
+                  : notification.notifierId
               }
-              sessionUserId={sessionUserId}
-            />
-          </div>
-        ))}
+              className="flex flex-col rounded-md bg-secondary"
+            >
+              <NotificationView
+                notification={notification}
+                timelapse={
+                  formatTimelapse(
+                    Date.now() - notification.createdAt.getTime(),
+                  ) ?? notification.createdAt.toUTCString()
+                }
+                sessionUserId={sessionUserId}
+              />
+            </div>
+          ))}
+      </MainContentView>
     </>
   );
 }

@@ -44,7 +44,7 @@ export function StartNav({ profileURL }: { profileURL?: string }) {
   return (
     <div
       className={cn(
-        "fixed bottom-0 left-0 flex h-12 w-screen min-w-56 shrink-0 gap-6 bg-terciary font-bold transition-opacity md:h-svh md:w-[19vw] md:flex-col md:p-10",
+        "fixed bottom-0 left-0 z-10 flex h-12 w-screen shrink-0 gap-6 bg-terciary font-bold transition-opacity md:h-svh md:w-[19vw] md:flex-col md:p-10",
         faded && "opacity-40 md:opacity-100",
       )}
     >
@@ -118,7 +118,7 @@ function StartNavButton({
 
 export function EndNav({ sessionUser }: { sessionUser: User | undefined }) {
   return (
-    <div className="fixed right-0 top-0 flex h-12 w-screen shrink-0 flex-col justify-center gap-6 bg-terciary p-2 font-bold md:h-svh md:w-[19vw] md:justify-normal md:p-4">
+    <div className="fixed right-0 top-0 z-10 flex h-12 w-screen shrink-0 flex-col justify-center gap-6 bg-terciary p-2 font-bold md:h-svh md:w-[19vw] md:justify-normal md:p-4">
       {sessionUser?.image ? (
         <Link
           href={`/user/${sessionUser.id}`}
