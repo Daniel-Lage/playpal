@@ -25,7 +25,7 @@ export function StartNav({ profileURL }: { profileURL?: string }) {
   const [faded, setFaded] = useState(false);
 
   useEffect(() => {
-    window.onscroll = () => {
+    window.addEventListener("scroll", () => {
       if (window.scrollY - 10 > scrollY.current) {
         scrollY.current = window.scrollY;
         setFaded(true);
@@ -38,7 +38,7 @@ export function StartNav({ profileURL }: { profileURL?: string }) {
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
         setFaded(false);
       }
-    };
+    });
   }, []);
 
   return (
@@ -63,7 +63,11 @@ export function StartNav({ profileURL }: { profileURL?: string }) {
 
       <StartNavButton
         title="Profile"
-        href={profileURL ?? ""}
+        href={
+          !!profileURL && pathname.startsWith(profileURL)
+            ? pathname
+            : (profileURL ?? "")
+        }
         active={!!profileURL && pathname.startsWith(profileURL)}
       />
 

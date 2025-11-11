@@ -3,6 +3,7 @@
 import { Check, X } from "lucide-react";
 import type { User } from "next-auth";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { MainContentView } from "~/components/main-content-view";
 import { PlaylistView } from "~/components/playlist-view";
 import { PopupType, PopupView } from "~/components/popup-view";
 import { PostCreator } from "~/components/post-creator";
@@ -118,16 +119,15 @@ export function PostPageView({
       <div className="flex flex-col bg-primary">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
-            <div className="border-b-2 border-background md:mx-[19vw]">
+            <div className="md:mx-[19vw]">
               {!!post.playlist && (
-                <>
+                <div className="border-b-2 border-background">
                   <PlaylistView
                     playlist={post.playlist}
                     focused={true}
                     sessionUserId={sessionUser?.id}
                   />
-                  <div className="mx-4 h-1 self-center rounded-sm bg-secondary-foreground"></div>
-                </>
+                </div>
               )}
 
               {post.thread && (
@@ -137,6 +137,7 @@ export function PostPageView({
                   isMainPost={true}
                 />
               )}
+
               <PostView
                 post={post}
                 sessionUserId={sessionUser?.id}
@@ -171,13 +172,15 @@ export function PostPageView({
         />
       </div>
 
-      {treatedReplies.map((thread) => (
-        <Thread
-          key={`${thread[0]?.replierId}:thread`}
-          thread={thread.map(({ replier }) => replier)}
-          sessionUserId={sessionUser?.id}
-        />
-      ))}
+      <MainContentView>
+        {treatedReplies.map((thread) => (
+          <Thread
+            key={`${thread[0]?.replierId}:thread`}
+            thread={thread.map(({ replier }) => replier)}
+            sessionUserId={sessionUser?.id}
+          />
+        ))}
+      </MainContentView>
 
       {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
         <StatusMessage status={status} />
@@ -213,8 +216,8 @@ export function Thread({
               key={post.id}
               post={post}
               sessionUserId={sessionUserId}
-              isCutoff={isMainPost ? false : index === cutoff}
-              isLastPost={isMainPost ? false : index === thread.length - 1}
+              isCutoff={index === cutoff}
+              isLastPost={index === thread.length - 1}
               CutOff={() =>
                 isMainPost ||
                 setCutoff(index === cutoff ? thread.length - 1 : index)

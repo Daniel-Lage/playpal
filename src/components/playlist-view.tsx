@@ -20,16 +20,16 @@ export function PlaylistView({
   focused?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-2 rounded-md bg-secondary p-2">
-      <div
-        className={cn(
-          "flex items-start gap-2 font-bold",
-          focused ? "bg-primary" : "bg-secondary",
-        )}
-      >
+    <div
+      className={cn(
+        "flex flex-col gap-2 rounded-md p-2",
+        focused ? "bg-primary" : "bg-secondary",
+      )}
+    >
+      <div className="flex items-start gap-2 font-bold">
         <Link
           href={`/playlist/${playlist.id}`}
-          className="flex grow gap-2"
+          className="flex grow gap-2 overflow-x-hidden"
           title={playlist.name}
         >
           <Image

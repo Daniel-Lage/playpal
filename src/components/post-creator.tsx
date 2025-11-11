@@ -90,16 +90,19 @@ export function PostCreator({
   }, [input, disabled, send, metadata, urls]);
 
   return (
-    <div className="flex flex-col gap-2 border-b-2 border-background bg-primary p-2 md:px-[calc(19vw_+_16px)]">
-      <div className="flex items-center justify-between">
-        <Link className="flex items-center" href={`/user/${sessionUser.id}`}>
+    <div className="flex flex-col gap-2 border-b-2 border-background bg-primary px-2 pb-2 md:mx-[19vw]">
+      <div className="flex items-center">
+        <Link
+          className="flex h-12 w-12 items-center justify-center"
+          href={`/user/${sessionUser.id}`}
+        >
           <UserImage
             size={40}
             image={sessionUser.image}
             name={sessionUser.name}
           />
-          <div className="px-2 font-bold">{sessionUser.name}</div>
         </Link>
+        <div className="px-2 font-bold">{sessionUser.name}</div>
       </div>
       <div className="flex grow flex-col">
         <TextInput

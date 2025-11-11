@@ -54,7 +54,7 @@ export function PostView({
           className="flex h-12 w-12 shrink-0 items-center justify-center"
         >
           <UserImage
-            size={32}
+            size={40}
             image={post.author.image}
             name={post.author.name}
           />
@@ -122,22 +122,28 @@ export function PostView({
       </div>
 
       <div className="flex grow overflow-hidden text-wrap">
-        {!isLastPost && (
-          <button
-            className="relative flex min-h-full w-12 items-center justify-center gap-2"
-            onClick={CutOff}
-          >
-            {isCutoff ? (
-              <>
-                <div className="absolute h-3 w-1 rounded-md bg-foreground"></div>
-                <div className="absolute h-1 w-3 rounded-md bg-foreground"></div>
-              </>
-            ) : (
-              <>
-                <div className="h-full w-1 rounded-md bg-foreground"></div>
-              </>
-            )}
-          </button>
+        {isMainPost ? (
+          <div className="relative flex min-h-full w-12 items-center justify-center gap-2">
+            <div className="h-full w-1 rounded-md bg-foreground"></div>
+          </div>
+        ) : (
+          !isLastPost && (
+            <button
+              className="relative flex min-h-full w-12 items-center justify-center gap-2"
+              onClick={CutOff}
+            >
+              {isCutoff ? (
+                <>
+                  <div className="absolute h-3 w-1 rounded-md bg-foreground"></div>
+                  <div className="absolute h-1 w-3 rounded-md bg-foreground"></div>
+                </>
+              ) : (
+                <>
+                  <div className="h-full w-1 rounded-md bg-foreground"></div>
+                </>
+              )}
+            </button>
+          )
         )}
         <div className="flex grow flex-col justify-between">
           <FormattedContent

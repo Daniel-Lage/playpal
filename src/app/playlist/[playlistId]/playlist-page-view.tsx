@@ -33,6 +33,7 @@ import type { Device } from "~/models/device.model";
 import { DevicePicker } from "~/components/device-picker";
 import { ActionStatus, PlayTracksStatus } from "~/models/status.model";
 import { PopupType, PopupView } from "~/components/popup-view";
+import { MainContentView } from "~/components/main-content-view";
 
 export function PlaylistPageView({
   playlist,
@@ -423,13 +424,15 @@ function PlaylistRepliesView({
         />
       </div>
 
-      {treatedReplies.map((thread) => (
-        <Thread
-          key={`${thread[0]?.id}:thread`}
-          thread={thread.map((replier) => replier)}
-          sessionUserId={sessionUser?.id}
-        />
-      ))}
+      <MainContentView>
+        {treatedReplies.map((thread) => (
+          <Thread
+            key={`${thread[0]?.id}:thread`}
+            thread={thread.map((replier) => replier)}
+            sessionUserId={sessionUser?.id}
+          />
+        ))}
+      </MainContentView>
 
       {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
         <SendStatusMessage status={status} />

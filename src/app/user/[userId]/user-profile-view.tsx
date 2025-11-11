@@ -30,16 +30,17 @@ export function UserProfileView({
   const [simple, setSimple] = useState(false);
 
   useEffect(() => {
-    window.onscroll = () => {
+    window.addEventListener("scroll", () => {
+      console.log(window.scrollY);
       if (window.scrollY - 10 > scrollY.current) {
         scrollY.current = window.scrollY;
         setSimple(true);
       }
-      if (window.scrollY + 10 < scrollY.current) {
+      if (window.scrollY === 0) {
         scrollY.current = window.scrollY;
         setSimple(false);
       }
-    };
+    });
   }, []);
 
   if (!user?.name || !user.image) return;
@@ -48,8 +49,8 @@ export function UserProfileView({
     <>
       <div
         className={cn(
-          simple ? "h-14" : "h-32",
-          "fixed flex w-screen flex-col justify-center gap-2 overflow-hidden border-b-2 border-background bg-primary transition-all md:px-[calc(19vw_+_16px)]",
+          simple ? "border-background" : "border-primary",
+          "fixed flex h-14 w-screen flex-col justify-center gap-2 overflow-hidden border-b-2 bg-primary md:px-[calc(19vw_+_16px)]",
         )}
       >
         <div className="flex items-center gap-2 p-2">
@@ -105,26 +106,19 @@ export function UserProfileView({
             <ShareButton path={`/user/${user.id}`} title="profile" />
           </MenuView>
         </div>
-        {!simple && (
-          <div className="flex gap-2 pl-4 text-xs font-bold text-gray-700 md:text-base">
-            <Link
-              href={`/user/${user.id}/followers`}
-              className="hover:underline"
-            >
-              {user.followers.length} followers
-            </Link>
-
-            <Link
-              href={`/user/${user.id}/following`}
-              className="hover:underline"
-            >
-              {user.following.length} following
-            </Link>
-          </div>
-        )}
       </div>
+      <div className="h-14"></div>
+      {!simple && (
+        <div className="flex gap-2 pl-4 text-xs font-bold text-gray-700 md:mx-[19vw] md:text-base">
+          <Link href={`/user/${user.id}/followers`} className="hover:underline">
+            {user.followers.length} followers
+          </Link>
 
-      <div className="h-32"></div>
+          <Link href={`/user/${user.id}/following`} className="hover:underline">
+            {user.following.length} following
+          </Link>
+        </div>
+      )}
     </>
   );
 }
