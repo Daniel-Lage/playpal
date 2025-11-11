@@ -31,7 +31,9 @@ export default async function RootLayout({
         <StartNav
           profileURL={session ? `/user/${session?.user.id}` : undefined}
         />
-        <main className="z-0 my-12 md:my-0">{children}</main>
+        <main className="z-0 my-12 max-w-screen-sm overflow-hidden md:my-0">
+          {children}
+        </main>
         <EndNav sessionUser={session?.user} />
       </body>
     </html>
