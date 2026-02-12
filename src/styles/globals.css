@@ -6,6 +6,10 @@
   color-scheme: dark;
 }
 
+::-webkit-scrollbar {
+  display: none;
+}
+
 html {
   @apply text-black;
 }
