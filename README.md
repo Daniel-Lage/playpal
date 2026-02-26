@@ -1,6 +1,6 @@
 # PlayPal
 
-[See it live at: https://playpal-sepia.vercel.app](https://playpal-sepia.vercel.app/)
+[See it live at: https://playpal-fm.vercel.app](https://playpal-fm.vercel.app/)
 
 ## Summary
 
