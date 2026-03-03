@@ -13,7 +13,7 @@ import {
 import { IconButton } from "./icon-button";
 
 export function ShareButton({ path, title }: { path: string; title?: string }) {
-  const url = `https://playpal-sepia.vercel.app${path}`;
+  const url = `https://playpal-fm.vercel.app${path}`;
 
   return (
     <Dialog>

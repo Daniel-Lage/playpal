@@ -5,6 +5,7 @@ import type { Paging } from "~/models/paging.model";
 import type { Playlist } from "~/models/playlist.model";
 import { db } from "./db";
 import { playlistsTable } from "./db/schema";
+import { onConflictDoUpdateAll } from "~/helpers/on-conflict-do-update-all";
 
 export async function loadPlaylists(accessToken: string, userId: string) {
   const response = await fetch(
@@ -75,5 +76,8 @@ export async function loadPlaylists(accessToken: string, userId: string) {
         }),
       ),
     )
-    .onConflictDoNothing();
+    .onConflictDoUpdate({
+      target: playlistsTable.id,
+      set: onConflictDoUpdateAll(playlistsTable),
+    });
 }
