@@ -56,7 +56,7 @@ export default function PlaylistsView({
 
   return (
     <>
-      <div className="flex flex-col items-start gap-2 border-b-2 border-background bg-primary p-2 md:flex-row md:items-center md:px-[calc(19vw_+_16px)]">
+      <div className="flex flex-col items-start gap-2 border-b-2 border-background bg-primary p-2 md:flex-row md:items-center md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
         {playlists.length} Playlists
         <Sorter
           title="Sort by"

@@ -27,7 +27,7 @@ export default function NotificationsView({
 
   return (
     <>
-      <div className="flex flex-col bg-primary p-2 md:px-[calc(19vw_+_16px)]">
+      <div className="flex flex-col bg-primary p-2 md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
         <h1 className="p-2 text-xl font-bold">Notifications</h1>
         <div className="grid grid-cols-4 gap-1">
           <TabLinkButton

@@ -408,7 +408,7 @@ function PlaylistRepliesView({
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:mx-[19vw] md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:flex-row md:items-center md:justify-between md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
         {playlist.replyThreads?.length ?? 0} Replies
         <Sorter
           title="Sort by"

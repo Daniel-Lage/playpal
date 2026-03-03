@@ -32,7 +32,7 @@ export function FeedView({
 
   return (
     <>
-      <div className="left-0 h-16 w-screen gap-2 overflow-hidden border-b-2 border-background bg-primary px-2 md:px-[calc(19vw_+_16px)]">
+      <div className="left-0 h-16 w-screen gap-2 overflow-hidden border-b-2 border-background bg-primary px-2 md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
         <div className="grid h-full w-full grid-cols-2 place-items-center gap-1 font-bold">
           <TabLinkButton
             className={showPlaylists ? "bg-primary" : "bg-primary-accent"}

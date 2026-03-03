@@ -33,7 +33,7 @@ export default async function SearchPage({
 
 async function SearchViewForm({ q }: { q: string | undefined }) {
   return (
-    <div className="flex flex-col gap-2 overflow-hidden bg-primary p-2 md:mx-[19vw]">
+    <div className="flex flex-col gap-2 overflow-hidden bg-primary p-2 md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
       <h1 className="p-2 text-xl font-bold">Search</h1>
       <form
         action="/search"

@@ -119,7 +119,7 @@ export function PostsView({
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 bg-primary p-2 px-2 md:mx-[19vw] md:flex-row md:items-center md:justify-between md:px-4">
+      <div className="flex flex-col items-start gap-2 bg-primary p-2 px-2 md:flex-row md:items-center md:justify-between md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>

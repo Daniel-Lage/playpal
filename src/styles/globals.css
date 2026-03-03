@@ -11,7 +11,15 @@
 }
 
 html {
-  @apply text-black;
+  @apply text-black;  
+  --start-nav-expanded: 1;
+  --start-nav-collapsed: 0;
+  --csnw: 72px; 
+  --esnw: 19vw;
+  --cenw:calc((100vw - 72px) / 2);
+  --eenw:calc(38vw - 19vw);
+  --start-nav-w: calc((var(--csnw) * var(--start-nav-collapsed)) + (var(--esnw) * var(--start-nav-expanded)));
+  --end-nav-w: calc((var(--cenw) * var(--start-nav-collapsed)) + (var(--eenw) * var(--start-nav-expanded)));
 }
 
 body {

@@ -119,7 +119,7 @@ export function PostPageView({
       <div className="flex flex-col bg-primary">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
-            <div className="md:mx-[19vw]">
+            <div className="md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
               {!!post.playlist && (
                 <div className="border-b-2 border-background">
                   <PlaylistView
@@ -156,7 +156,7 @@ export function PostPageView({
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:mx-[19vw] md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:flex-row md:items-center md:justify-between md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
         {post.replyThreads?.length ?? 0} Replies
         <Sorter
           title="Sort by"
