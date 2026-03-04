@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
-import PlaylistsView from "~/components/playlists-view";
+import PlaylistFeedView from "~/components/playlist-feed-view";
 import { getPlaylists } from "~/server/get-playlists";
 
 export async function generateMetadata({
@@ -57,6 +57,14 @@ export default async function PlaylistsPage({
   const playlists = await getPlaylists({ userIds: [userId] });
 
   return (
-    <PlaylistsView playlists={playlists} sessionUserId={session?.user.id} />
+    <>
+      <div className="mainview">
+        <PlaylistFeedView
+          playlists={playlists}
+          sessionUserId={session?.user.id}
+        />
+      </div>
+      <div className="endnavview"></div>
+    </>
   );
 }

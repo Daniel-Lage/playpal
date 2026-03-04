@@ -45,30 +45,40 @@ export default async function HomePage() {
     }
 
   return (
-    <FeedView
-      posts={posts}
-      sessionUser={session?.user}
-      send={async (
-        input: string,
-        urls: Substring[] | undefined,
-        metadata: IMetadata | undefined,
-      ) => {
-        "use server";
+    <>
+      <div className="mainview">
+        <FeedView
+          posts={posts}
+          sessionUser={session?.user}
+          send={async (
+            input: string,
+            urls: Substring[] | undefined,
+            metadata: IMetadata | undefined,
+          ) => {
+            "use server";
 
-        if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
+            if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
 
-        const status = await postPost(input, session?.user.id, urls, metadata);
+            const status = await postPost(
+              input,
+              session?.user.id,
+              urls,
+              metadata,
+            );
 
-        revalidatePath("/");
+            revalidatePath("/");
 
-        return status;
-      }}
-      lastQueried={new Date()}
-      refresh={async (lastQueried: Date) => {
-        "use server";
-        return await getPosts({ userIds, lastQueried });
-      }}
-      playlists={playlists}
-    />
+            return status;
+          }}
+          lastQueried={new Date()}
+          refresh={async (lastQueried: Date) => {
+            "use server";
+            return await getPosts({ userIds, lastQueried });
+          }}
+          playlists={playlists}
+        />
+      </div>
+      <div className="endnavview"></div>
+    </>
   );
 }

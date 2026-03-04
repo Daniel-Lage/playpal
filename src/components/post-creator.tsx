@@ -90,7 +90,7 @@ export function PostCreator({
   }, [input, disabled, send, metadata, urls]);
 
   return (
-    <div className="flex flex-col gap-2 border-b-2 border-background bg-primary px-2 pb-2 md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
+    <div className="flex flex-col gap-2 border-b-2 border-background bg-primary px-2 pb-2">
       <div className="flex items-center">
         <Link
           className="flex h-12 w-12 items-center justify-center"

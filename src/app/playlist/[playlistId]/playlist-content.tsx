@@ -34,7 +34,7 @@ export function PlaylistContent({
   setTab: (value: PlaylistTab | ((prev: PlaylistTab) => PlaylistTab)) => void;
 }) {
   return (
-    <div className="flex flex-col gap-2 border-b-2 border-background bg-primary p-2 md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
+    <div className="flex flex-col gap-2 border-b-2 border-background bg-primary p-2">
       <div className="flex flex-col items-center gap-2 md:flex-row md:items-stretch">
         <Image
           width={150}

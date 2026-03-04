@@ -14,12 +14,14 @@ html {
   @apply text-black;  
   --start-nav-expanded: 1;
   --start-nav-collapsed: 0;
-  --csnw: 72px; 
-  --esnw: 19vw;
-  --cenw:calc((100vw - 72px) / 2);
-  --eenw:calc(38vw - 19vw);
+  --csnw: 96px; 
+  --esnw: 320px;
+  --cenw:calc((100vw - 96px) / 2);
+  --eenw:320px;
   --start-nav-w: calc((var(--csnw) * var(--start-nav-collapsed)) + (var(--esnw) * var(--start-nav-expanded)));
+  
   --end-nav-w: calc((var(--cenw) * var(--start-nav-collapsed)) + (var(--eenw) * var(--start-nav-expanded)));
+  --main-view-w: calc(100vw - var(--end-nav-w) - var(--start-nav-w))
 }
 
 body {
@@ -87,4 +89,21 @@ body {
   100% {
     transform: translateY(400px);
   }
+}
+
+.mainview {
+  @apply md:pl-[calc(var(--start-nav-w))];
+  @apply md:pr-[calc(var(--end-nav-w))];
+}
+
+.endnavview {
+  @apply fixed;
+  @apply right-0;
+  @apply top-0;
+  @apply hidden;
+  @apply h-screen;
+  @apply w-[--end-nav-w];
+  @apply bg-terciary;
+  @apply md:flex;
+  @apply md:flex-col;
 }

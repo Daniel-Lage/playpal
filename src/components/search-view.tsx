@@ -19,7 +19,7 @@ export function SearchView({
     >
       <Search />
       <input
-        placeholder="Search something!"
+        placeholder="Search"
         className="w-36 grow border-primary-accent bg-transparent placeholder-zinc-600 outline-none md:w-48"
         type="text"
         value={value}

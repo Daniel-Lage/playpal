@@ -57,16 +57,21 @@ export default async function LikesPage({
   const { posts, playlists } = await getUsersLikes(userId);
 
   return (
-    <FeedView
-      posts={posts}
-      sessionUser={session?.user}
-      lastQueried={new Date()}
-      refresh={async (lastQueried: Date) => {
-        "use server";
-        const { posts } = await getUsersLikes(userId, lastQueried);
-        return posts;
-      }}
-      playlists={playlists}
-    />
+    <>
+      <div className="mainview">
+        <FeedView
+          posts={posts}
+          sessionUser={session?.user}
+          lastQueried={new Date()}
+          refresh={async (lastQueried: Date) => {
+            "use server";
+            const { posts } = await getUsersLikes(userId, lastQueried);
+            return posts;
+          }}
+          playlists={playlists}
+        />
+      </div>
+      <div className="endnavview"></div>
+    </>
   );
 }

@@ -1,5 +1,6 @@
 import { getUsersFollowers } from "~/server/get-users-followers";
-import { UserView } from "~/components/user-view";
+import type { UserObject } from "~/models/user.model";
+import { UserFeedView } from "~/components/user-feed-view";
 
 export default async function FollowersPage({
   params: { userId },
@@ -10,14 +11,14 @@ export default async function FollowersPage({
 
   return (
     <>
-      <div className="flex">
-        {followers.map(
-          (follow) =>
-            follow.follower && (
-              <UserView key={follow.followerId} user={follow.follower} />
-            ),
-        )}
+      <div className="mainview">
+        <UserFeedView
+          users={followers
+            .map((follow) => follow.follower as UserObject)
+            .filter((user) => !!user)}
+        />
       </div>
+      <div className="endnavview"></div>
     </>
   );
 }

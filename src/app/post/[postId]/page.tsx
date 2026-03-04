@@ -58,33 +58,39 @@ export default async function PostPage({
     );
 
   return (
-    <PostPageView
-      post={post}
-      sessionUser={session?.user}
-      lastQueried={new Date()}
-      send={async (
-        input: string,
-        urls: Substring[] | undefined,
-        metadata: IMetadata | undefined,
-      ) => {
-        "use server";
+    <>
+      <div className="mainview">
+        <PostPageView
+          post={post}
+          sessionUser={session?.user}
+          lastQueried={new Date()}
+          send={async (
+            input: string,
+            urls: Substring[] | undefined,
+            metadata: IMetadata | undefined,
+          ) => {
+            "use server";
 
-        if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
+            if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
 
-        const result = await postPost(
-          input,
-          session?.user.id,
-          urls,
-          metadata,
-          post,
-        );
-        revalidatePath("/");
-        return result;
-      }}
-      refresh={async (lastQueried: Date) => {
-        "use server";
-        return await getReplies(postId, lastQueried);
-      }}
-    />
+            const result = await postPost(
+              input,
+              session?.user.id,
+              urls,
+              metadata,
+              post,
+            );
+
+            revalidatePath("/");
+            return result;
+          }}
+          refresh={async (lastQueried: Date) => {
+            "use server";
+            return await getReplies(postId, lastQueried);
+          }}
+        />
+      </div>
+      <div className="endnavview"></div>
+    </>
   );
 }

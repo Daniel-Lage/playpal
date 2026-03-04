@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
-import { PostsView } from "~/app/posts-view";
+import { PostFeedView } from "~/components/post-feed-view";
 import { getPosts } from "~/server/get-posts";
 
 export async function generateMetadata({
@@ -47,19 +47,22 @@ export default async function RepliesPage({
 
   return (
     <>
-      <PostsView
-        posts={posts}
-        sessionUser={session?.user}
-        lastQueried={new Date()}
-        refresh={async (lastQueried: Date) => {
-          "use server";
-          return await getPosts({
-            userIds: [userId],
-            replies: true,
-            lastQueried,
-          });
-        }}
-      />
+      <div className="mainview">
+        <PostFeedView
+          posts={posts}
+          sessionUser={session?.user}
+          lastQueried={new Date()}
+          refresh={async (lastQueried: Date) => {
+            "use server";
+            return await getPosts({
+              userIds: [userId],
+              replies: true,
+              lastQueried,
+            });
+          }}
+        />
+      </div>
+      <div className="endnavview"></div>
     </>
   );
 }

@@ -1,7 +1,8 @@
 import { getServerSession } from "next-auth";
 import { PostView } from "~/components/post-view";
-import { UserView } from "~/components/user-view";
+import { UserFeedView } from "~/components/user-feed-view";
 import { authOptions } from "~/lib/auth";
+import type { UserObject } from "~/models/user.model";
 import { getPostLikes } from "~/server/get-post-likes";
 
 export default async function PostLikesPage({
@@ -17,18 +18,26 @@ export default async function PostLikesPage({
 
   return (
     <>
-      <div className="flex flex-col gap-1 rounded-md bg-primary">
-        <PostView
-          post={post}
-          sessionUserId={session?.user.id}
-          isMainPost={true}
-        />
-        <div className="text-center font-bold">Liked By</div>
+      <div className="mainview">
+        <div className="flex flex-col gap-1 bg-primary">
+          <PostView
+            post={post}
+            sessionUserId={session?.user.id}
+            isMainPost={true}
+            hasReplyBox={false}
+          />
+          <div className="text-center font-bold">Liked By</div>
+        </div>
+
+        {post?.likes && post.likes.length > 0 && (
+          <UserFeedView
+            users={post?.likes
+              .map((like) => like?.liker as UserObject)
+              .filter((user) => !!user)}
+          />
+        )}
       </div>
-      {post.likes?.map(
-        (like) =>
-          like?.liker && <UserView key={like.userId} user={like.liker} />,
-      )}
+      <div className="endnavview"></div>
     </>
   );
 }

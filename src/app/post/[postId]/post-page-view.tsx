@@ -3,7 +3,7 @@
 import { Check, X } from "lucide-react";
 import type { User } from "next-auth";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { MainContentView } from "~/components/main-content-view";
+import { ItemsView } from "~/components/items-view";
 import { PlaylistView } from "~/components/playlist-view";
 import { PopupType, PopupView } from "~/components/popup-view";
 import { PostCreator } from "~/components/post-creator";
@@ -119,31 +119,30 @@ export function PostPageView({
       <div className="flex flex-col bg-primary">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
-            <div className="md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
-              {!!post.playlist && (
-                <div className="border-b-2 border-background">
-                  <PlaylistView
-                    playlist={post.playlist}
-                    focused={true}
-                    sessionUserId={sessionUser?.id}
-                  />
-                </div>
-              )}
-
-              {post.thread && (
-                <Thread
-                  thread={post.thread.map(({ repliee }) => repliee)}
+            {!!post.playlist && (
+              <div className="border-b-2 border-background">
+                <PlaylistView
+                  playlist={post.playlist}
+                  focused={true}
                   sessionUserId={sessionUser?.id}
-                  isMainPost={true}
                 />
-              )}
+              </div>
+            )}
 
-              <PostView
-                post={post}
+            {post.thread && (
+              <Thread
+                thread={post.thread.map(({ repliee }) => repliee)}
                 sessionUserId={sessionUser?.id}
                 isMainPost={true}
               />
-            </div>
+            )}
+
+            <PostView
+              post={post}
+              sessionUserId={sessionUser?.id}
+              isMainPost={true}
+              hasReplyBox={true}
+            />
 
             {sessionUser?.image && sessionUser?.name && (
               <PostCreator
@@ -156,7 +155,7 @@ export function PostPageView({
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:flex-row md:items-center md:justify-between md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
+      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:flex-row md:items-center md:justify-between">
         {post.replyThreads?.length ?? 0} Replies
         <Sorter
           title="Sort by"
@@ -172,7 +171,7 @@ export function PostPageView({
         />
       </div>
 
-      <MainContentView>
+      <ItemsView>
         {treatedReplies.map((thread) => (
           <Thread
             key={`${thread[0]?.replierId}:thread`}
@@ -180,7 +179,7 @@ export function PostPageView({
             sessionUserId={sessionUser?.id}
           />
         ))}
-      </MainContentView>
+      </ItemsView>
 
       {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
         <StatusMessage status={status} />

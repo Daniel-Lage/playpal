@@ -25,7 +25,7 @@ export function PlaylistSearch({
   filterTracks: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <div className="flex shrink-0 flex-col items-center justify-between gap-2 bg-primary p-2 md:flex-row md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
+    <div className="flex shrink-0 flex-col items-center justify-between gap-2 bg-primary p-2 md:flex-row">
       <div className="shrink-0">{count} Tracks</div>
       <div className="flex w-full items-center justify-between gap-2 md:w-fit">
         <Sorter

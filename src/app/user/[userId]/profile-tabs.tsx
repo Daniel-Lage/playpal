@@ -8,24 +8,22 @@ export function ProfileTabs({ userId }: { userId: string }) {
   const pathname = usePathname();
 
   return (
-    <div className="md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
-      <div className="grid h-16 grid-cols-3 place-items-center gap-1 border-b-2 border-background p-2 px-2 font-bold">
-        <ProfileTabLink
-          href={`/user/${userId}`}
-          title="Main"
-          pathname={pathname}
-        />
-        <ProfileTabLink
-          href={`/user/${userId}/replies`}
-          title="Replies"
-          pathname={pathname}
-        />
-        <ProfileTabLink
-          href={`/user/${userId}/likes`}
-          title="Likes"
-          pathname={pathname}
-        />
-      </div>
+    <div className="grid h-16 grid-cols-3 place-items-center gap-1 border-b-2 border-background p-2 px-2 font-bold">
+      <ProfileTabLink
+        href={`/user/${userId}`}
+        title="Main"
+        pathname={pathname}
+      />
+      <ProfileTabLink
+        href={`/user/${userId}/replies`}
+        title="Replies"
+        pathname={pathname}
+      />
+      <ProfileTabLink
+        href={`/user/${userId}/likes`}
+        title="Likes"
+        pathname={pathname}
+      />
     </div>
   );
 }

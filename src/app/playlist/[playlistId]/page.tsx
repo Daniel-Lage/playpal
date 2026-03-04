@@ -103,31 +103,36 @@ export default async function PlaylistPage({
   );
 
   return (
-    <PlaylistPageView
-      playlist={playlist}
-      tracks={tracks}
-      sessionUser={session.user}
-      expires_at={session.user.expires_at}
-      queue={queue}
-      play={async (
-        expired: boolean,
-        queue: PlaylistTrack[],
-        device?: Device,
-      ) => {
-        "use server";
+    <>
+      <div className="mainview">
+        <PlaylistPageView
+          playlist={playlist}
+          tracks={tracks}
+          sessionUser={session.user}
+          expires_at={session.user.expires_at}
+          queue={queue}
+          play={async (
+            expired: boolean,
+            queue: PlaylistTrack[],
+            device?: Device,
+          ) => {
+            "use server";
 
-        if (expired) {
-          revalidatePath("/playlist", "page");
-          return PlayTracksStatus.Failure;
-        }
+            if (expired) {
+              revalidatePath("/playlist", "page");
+              return PlayTracksStatus.Failure;
+            }
 
-        return (await playTracks(
-          queue,
-          session.user.access_token,
-          device,
-        )) as PlayTracksStatus;
-      }}
-      send={send}
-    />
+            return (await playTracks(
+              queue,
+              session.user.access_token,
+              device,
+            )) as PlayTracksStatus;
+          }}
+          send={send}
+        />
+      </div>
+      <div className="endnavview"></div>
+    </>
   );
 }

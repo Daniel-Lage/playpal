@@ -18,13 +18,18 @@ export default async function NotificationsPage() {
   const notifications = await getNotifications(session.user.id);
 
   return (
-    <NotificationsView
-      notifications={notifications.sort((a, b) => {
-        if (a.createdAt > b.createdAt) return -1;
-        if (a.createdAt < b.createdAt) return 1;
-        return 0;
-      })}
-      sessionUserId={session.user.id}
-    />
+    <>
+      <div className="mainview">
+        <NotificationsView
+          notifications={notifications.sort((a, b) => {
+            if (a.createdAt > b.createdAt) return -1;
+            if (a.createdAt < b.createdAt) return 1;
+            return 0;
+          })}
+          sessionUserId={session.user.id}
+        />
+      </div>
+      <div className="endnavview"></div>
+    </>
   );
 }

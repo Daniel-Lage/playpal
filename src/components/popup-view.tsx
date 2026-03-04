@@ -14,7 +14,7 @@ export function PopupView({
   children: React.ReactNode;
 }) {
   return (
-    <div className="margin-auto popup fixed bottom-20 flex w-full flex-col self-center md:bottom-6">
+    <div className="margin-auto popup fixed bottom-20 flex w-full flex-col md:bottom-6 md:w-[--main-view-w]">
       <div
         className={cn(
           "relative flex h-8 w-[90%] items-center justify-center gap-4 self-center rounded-md px-4 py-8 md:w-fit",

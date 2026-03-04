@@ -31,6 +31,7 @@ export function PostView({
   isLastPost = true,
   CutOff,
   isMainPost = false,
+  hasReplyBox = false,
 }: {
   post: MainPostObject | PostObject;
   sessionUserId?: string | null;
@@ -38,6 +39,7 @@ export function PostView({
   isLastPost?: boolean;
   CutOff?: () => void;
   isMainPost?: boolean;
+  hasReplyBox?: boolean;
 }) {
   const router = useRouter();
 
@@ -122,7 +124,7 @@ export function PostView({
       </div>
 
       <div className="flex grow overflow-hidden text-wrap">
-        {isMainPost ? (
+        {isMainPost && hasReplyBox ? (
           <div className="relative flex min-h-full w-12 items-center justify-center gap-2">
             <div className="h-full w-1 rounded-md bg-foreground"></div>
           </div>

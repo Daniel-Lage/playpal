@@ -18,7 +18,6 @@ import { useLocalStorage } from "~/hooks/use-local-storage";
 import { signIn } from "next-auth/react";
 import { Check, SearchX, X } from "lucide-react";
 import { setFirstItem } from "~/helpers/set-first-item";
-import { UserView } from "~/components/user-view";
 import { Thread } from "~/app/post/[postId]/post-page-view";
 import type { PlaylistLikeObject } from "~/models/like.model";
 import type { User } from "next-auth";
@@ -33,7 +32,9 @@ import type { Device } from "~/models/device.model";
 import { DevicePicker } from "~/components/device-picker";
 import { ActionStatus, PlayTracksStatus } from "~/models/status.model";
 import { PopupType, PopupView } from "~/components/popup-view";
-import { MainContentView } from "~/components/main-content-view";
+import { ItemsView } from "~/components/items-view";
+import { UserFeedView } from "~/components/user-feed-view";
+import type { UserObject } from "~/models/user.model";
 
 export function PlaylistPageView({
   playlist,
@@ -323,8 +324,12 @@ function PlaylistTracksView({
 }
 
 function PlaylistLikesView({ likes }: { likes: PlaylistLikeObject[] }) {
-  return likes.map(
-    (like) => like?.liker && <UserView key={like.userId} user={like.liker} />,
+  return (
+    <UserFeedView
+      users={likes
+        .map((like) => like?.liker as UserObject)
+        .filter((user) => !!user)}
+    />
   );
 }
 
@@ -408,7 +413,7 @@ function PlaylistRepliesView({
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:flex-row md:items-center md:justify-between md:pl-[calc(var(--start-nav-w)_+_16px)] md:pr-[calc(var(--end-nav-w)_+_16px)]">
+      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:flex-row md:items-center md:justify-between">
         {playlist.replyThreads?.length ?? 0} Replies
         <Sorter
           title="Sort by"
@@ -424,7 +429,7 @@ function PlaylistRepliesView({
         />
       </div>
 
-      <MainContentView>
+      <ItemsView>
         {treatedReplies.map((thread) => (
           <Thread
             key={`${thread[0]?.id}:thread`}
@@ -432,7 +437,7 @@ function PlaylistRepliesView({
             sessionUserId={sessionUser?.id}
           />
         ))}
-      </MainContentView>
+      </ItemsView>
 
       {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
         <SendStatusMessage status={status} />
