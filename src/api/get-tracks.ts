@@ -17,7 +17,10 @@ export async function getTracks(
 
     if (access_token) accessToken = access_token;
   }
+
   const tracks: PlaylistTrack[] = [];
+
+  if (trackTotal == 0) return tracks;
 
   if (!accessToken) throw new Error("acessToken is undefined");
 

@@ -49,8 +49,8 @@ export function UserProfileView({
     <>
       <div
         className={cn(
-          simple ? "border-background" : "border-primary",
-          "fixed flex h-14 w-screen flex-col justify-center gap-2 overflow-hidden border-b-2 bg-primary md:px-[calc(19vw_+_16px)]",
+          "flex h-14 flex-col justify-center gap-2 overflow-hidden border-b-2 bg-secondary",
+          simple ? "border-background" : "border-secondary",
         )}
       >
         <div className="flex items-center gap-2 p-2">
@@ -61,6 +61,7 @@ export function UserProfileView({
               {user.name}
             </div>
           </Link>
+
           <div>
             <FollowButton sessionUserId={sessionUserId} user={user} />
           </div>
@@ -107,9 +108,8 @@ export function UserProfileView({
           </MenuView>
         </div>
       </div>
-      <div className="h-14"></div>
       {!simple && (
-        <div className="flex gap-2 pl-4 text-xs font-bold text-gray-700 md:mx-[19vw] md:text-base">
+        <div className="flex gap-2 pl-4 text-xs font-bold text-gray-700 md:text-base">
           <Link href={`/user/${user.id}/followers`} className="hover:underline">
             {user.followers.length} followers
           </Link>

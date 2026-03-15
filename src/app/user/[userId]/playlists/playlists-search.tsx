@@ -24,7 +24,7 @@ export function PlaylistsSearch({
   filterPlaylists: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <div className="flex flex-col items-start gap-2 rounded-md bg-primary p-2 md:flex-row md:items-center">
+    <div className="flex flex-col items-start gap-2 rounded-md bg-secondary p-2 md:flex-row md:items-center">
       {length} Playlists
       <Sorter
         title="Sort by"

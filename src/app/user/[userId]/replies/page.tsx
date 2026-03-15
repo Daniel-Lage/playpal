@@ -4,8 +4,9 @@ import type { Metadata } from "next";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
 
-import { PostsView } from "~/app/posts-view";
+import { PostFeedView } from "~/components/post-feed-view";
 import { getPosts } from "~/server/get-posts";
+import { PageView } from "~/components/page-view";
 
 export async function generateMetadata({
   params: { userId },
@@ -46,8 +47,8 @@ export default async function RepliesPage({
   const posts = await getPosts({ userIds: [userId], replies: true });
 
   return (
-    <>
-      <PostsView
+    <PageView>
+      <PostFeedView
         posts={posts}
         sessionUser={session?.user}
         lastQueried={new Date()}
@@ -60,6 +61,6 @@ export default async function RepliesPage({
           });
         }}
       />
-    </>
+    </PageView>
   );
 }

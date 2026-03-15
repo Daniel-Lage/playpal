@@ -90,7 +90,7 @@ export function PostCreator({
   }, [input, disabled, send, metadata, urls]);
 
   return (
-    <div className="flex flex-col gap-2 border-b-2 border-background bg-primary px-2 pb-2 md:mx-[19vw]">
+    <div className="flex flex-col gap-2 border-b-2 border-background bg-secondary px-2 pb-2">
       <div className="flex items-center">
         <Link
           className="flex h-12 w-12 items-center justify-center"
@@ -188,7 +188,7 @@ function MetadataPreview({
   if (url) {
     if (loadingMetadata)
       return (
-        <div className="flex items-start gap-2 rounded-md bg-primary-accent p-2 font-bold">
+        <div className="flex items-start gap-2 rounded-md bg-secondary-accent p-2 font-bold">
           Loading Metadata...
         </div>
       );
@@ -196,7 +196,7 @@ function MetadataPreview({
       return (
         <Link
           href={metadata.og_url}
-          className="flex items-start gap-2 rounded-md bg-primary-accent p-2"
+          className="flex items-start gap-2 rounded-md bg-secondary-accent p-2"
         >
           {metadata?.og_image && (
             <Image

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { TabLinkButton } from "~/components/buttons/tab-link-button";
-import { MainContentView } from "~/components/main-content-view";
+import { ItemsView } from "~/components/items-view";
 import { PostView } from "~/components/post-view";
 import { UserImage } from "~/components/user-image";
 import { formatTimelapse } from "~/helpers/format-timelapse";
@@ -27,18 +27,19 @@ export default function NotificationsView({
 
   return (
     <>
-      <div className="flex flex-col bg-primary p-2 md:px-[calc(19vw_+_16px)]">
-        <h1 className="p-2 text-xl font-bold">Notifications</h1>
+      <div className="flex flex-col bg-secondary p-2">
         <div className="grid grid-cols-4 gap-1">
           <TabLinkButton
-            className={tab === undefined ? "bg-primary-accent" : "bg-primary"}
+            className={
+              tab === undefined ? "bg-secondary-accent" : "bg-secondary"
+            }
             onClick={() => setTab(undefined)}
           >
             All
           </TabLinkButton>
           {NotificationTypeOptions.map((type) => (
             <TabLinkButton
-              className={tab === type ? "bg-primary-accent" : "bg-primary"}
+              className={tab === type ? "bg-secondary-accent" : "bg-secondary"}
               onClick={() => setTab(type)}
               key={type}
             >
@@ -47,7 +48,7 @@ export default function NotificationsView({
           ))}
         </div>
       </div>
-      <MainContentView>
+      <ItemsView>
         {notifications
           .filter((notification) =>
             tab !== undefined ? notification.type === tab : true,
@@ -72,7 +73,7 @@ export default function NotificationsView({
               />
             </div>
           ))}
-      </MainContentView>
+      </ItemsView>
     </>
   );
 }

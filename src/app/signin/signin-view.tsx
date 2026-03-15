@@ -29,7 +29,7 @@ export function SignInView() {
       </FormButton>
 
       <div className="relative my-4 h-[2px] w-full bg-black text-center">
-        <span className="absolute top-[-0.7rem] self-center bg-primary px-1">
+        <span className="absolute top-[-0.7rem] self-center bg-secondary px-1">
           or
         </span>
       </div>

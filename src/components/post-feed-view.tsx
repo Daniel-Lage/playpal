@@ -15,10 +15,10 @@ import type { User } from "next-auth";
 import { PostCreator } from "~/components/post-creator";
 import { Check, X } from "lucide-react";
 import { ActionStatus } from "~/models/status.model";
-import { MainContentView } from "~/components/main-content-view";
+import { ItemsView } from "~/components/items-view";
 import { PopupType, PopupView } from "~/components/popup-view";
 
-export function PostsView({
+export function PostFeedView({
   posts: postsProp,
   sessionUser,
   lastQueried: lastQueriedProp,
@@ -119,7 +119,7 @@ export function PostsView({
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 bg-primary p-2 px-2 md:mx-[19vw] md:flex-row md:items-center md:justify-between md:px-4">
+      <div className="flex flex-col items-start gap-2 bg-secondary p-2 px-2 md:flex-row md:items-center md:justify-between">
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>
@@ -134,11 +134,11 @@ export function PostsView({
         />
       </div>
 
-      <MainContentView>
+      <ItemsView>
         {treatedPosts.map((post) => (
           <PostView key={post.id} post={post} sessionUserId={sessionUser?.id} />
         ))}
-      </MainContentView>
+      </ItemsView>
 
       {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
         <StatusMessage status={status} />

@@ -86,7 +86,6 @@ export default async function PlaylistPage({
     revalidatePath("/");
     return result;
   };
-
   if (!(await isPremiumUser(session.user.access_token)))
     return (
       <PlaylistPageView

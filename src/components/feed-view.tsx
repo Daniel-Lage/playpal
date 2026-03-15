@@ -1,13 +1,14 @@
 "use client";
 
 import type { User } from "next-auth";
-import { PostsView } from "~/app/posts-view";
+import { PostFeedView } from "~/components/post-feed-view";
 import type { IMetadata, PostObject, Substring } from "~/models/post.model";
-import PlaylistsView from "./playlists-view";
+import PlaylistFeedView from "./playlist-feed-view";
 import type { PlaylistObject } from "~/models/playlist.model";
 import { useState } from "react";
 import type { ActionStatus } from "~/models/status.model";
 import { TabLinkButton } from "./buttons/tab-link-button";
+import { PageView } from "./page-view";
 
 export function FeedView({
   posts,
@@ -31,18 +32,40 @@ export function FeedView({
   const [showPlaylists, setShowPlaylists] = useState(false);
 
   return (
-    <>
-      <div className="left-0 h-16 w-screen gap-2 overflow-hidden border-b-2 border-background bg-primary px-2 md:px-[calc(19vw_+_16px)]">
+    <PageView
+      sideContent={
+        <>
+          <div className="bg-secondary p-2 text-xl font-bold">
+            {showPlaylists ? "Posts" : "Playlists"}
+          </div>
+          {showPlaylists ? (
+            <PostFeedView
+              posts={posts}
+              sessionUser={sessionUser}
+              send={send}
+              lastQueried={lastQueried}
+              refresh={refresh}
+            />
+          ) : (
+            <PlaylistFeedView
+              playlists={playlists}
+              sessionUserId={sessionUser?.id}
+            />
+          )}
+        </>
+      }
+    >
+      <div className="h-16 gap-2 overflow-hidden border-b-2 border-background bg-secondary px-2">
         <div className="grid h-full w-full grid-cols-2 place-items-center gap-1 font-bold">
           <TabLinkButton
-            className={showPlaylists ? "bg-primary" : "bg-primary-accent"}
+            className={showPlaylists ? "bg-secondary" : "bg-secondary-accent"}
             onClick={() => setShowPlaylists(false)}
           >
             Posts
           </TabLinkButton>
 
           <TabLinkButton
-            className={!showPlaylists ? "bg-primary" : "bg-primary-accent"}
+            className={!showPlaylists ? "bg-secondary" : "bg-secondary-accent"}
             onClick={() => setShowPlaylists(true)}
           >
             Playlists
@@ -51,12 +74,12 @@ export function FeedView({
       </div>
       <div>
         {showPlaylists ? (
-          <PlaylistsView
+          <PlaylistFeedView
             playlists={playlists}
             sessionUserId={sessionUser?.id}
           />
         ) : (
-          <PostsView
+          <PostFeedView
             posts={posts}
             sessionUser={sessionUser}
             send={send}
@@ -65,6 +88,6 @@ export function FeedView({
           />
         )}
       </div>
-    </>
+    </PageView>
   );
 }

@@ -18,7 +18,7 @@ export function Sorter({
   reverse: () => void;
 }) {
   return (
-    <div className="flex h-fit grow-0 items-center justify-center gap-2 rounded-md border-2 border-primary-accent text-center text-sm">
+    <div className="flex h-fit grow-0 items-center justify-center gap-2 rounded-md border-2 border-secondary-accent text-center text-sm">
       <Select
         title={title}
         onSelect={onSelect}

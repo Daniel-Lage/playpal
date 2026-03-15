@@ -5,7 +5,7 @@ import { GeistSans } from "geist/font/sans";
 import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/lib/auth";
-import { StartNav, EndNav } from "./nav-bars";
+import { NavBar } from "~/app/nav-bar";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? ""),
@@ -28,13 +28,10 @@ export default async function RootLayout({
   return (
     <html lang="en" className={GeistSans.variable}>
       <body className="overflow-x-hidden">
-        <StartNav
-          profileURL={session ? `/user/${session?.user.id}` : undefined}
-        />
-        <main className="max-w-screen z-0 my-12 overflow-hidden md:my-0">
+        <NavBar sessionUser={session ? session.user : undefined} />
+        <main className="max-w-screen z-0 mb-12 overflow-hidden md:my-0">
           {children}
         </main>
-        <EndNav sessionUser={session?.user} />
       </body>
     </html>
   );

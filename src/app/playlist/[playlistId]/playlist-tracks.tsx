@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { MainContentView } from "~/components/main-content-view";
+import { ItemsView } from "~/components/items-view";
 import { SpotifyLink } from "~/components/spotify-link";
 import type { PlaylistTrack } from "~/models/track.model";
 
@@ -13,7 +13,7 @@ export function PlaylistTracks({
   playTrack: (track: PlaylistTrack) => void;
 }) {
   return (
-    <MainContentView>
+    <ItemsView>
       {treatedTracks.map((track) => (
         <button
           key={track.track.uri + track.added_at}
@@ -50,6 +50,6 @@ export function PlaylistTracks({
           )}
         </button>
       ))}
-    </MainContentView>
+    </ItemsView>
   );
 }

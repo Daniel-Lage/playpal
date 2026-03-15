@@ -14,13 +14,13 @@ export function SearchView({
 
   return (
     <div
-      className="flex grow cursor-text gap-2 rounded-full border-2 border-primary-accent p-2 focus-within:border-black"
+      className="flex grow cursor-text gap-2 rounded-full border-2 border-secondary-accent p-2 focus-within:border-black"
       onClick={() => inputRef.current?.focus()}
     >
       <Search />
       <input
-        placeholder="Search something!"
-        className="w-36 grow border-primary-accent bg-transparent placeholder-zinc-600 outline-none md:w-48"
+        placeholder="Search"
+        className="w-36 grow border-secondary-accent bg-transparent placeholder-zinc-600 outline-none md:w-48"
         type="text"
         value={value}
         onChange={onChange}
