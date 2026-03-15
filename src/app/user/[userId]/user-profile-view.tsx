@@ -49,8 +49,8 @@ export function UserProfileView({
     <>
       <div
         className={cn(
-          "flex h-14 flex-col justify-center gap-2 overflow-hidden border-b-2 bg-primary",
-          simple ? "border-background" : "border-primary",
+          "flex h-14 flex-col justify-center gap-2 overflow-hidden border-b-2 bg-secondary",
+          simple ? "border-background" : "border-secondary",
         )}
       >
         <div className="flex items-center gap-2 p-2">

@@ -56,7 +56,7 @@ export default function PlaylistFeedView({
 
   return (
     <>
-      <div className="flex flex-col items-start gap-2 border-b-2 border-background bg-primary p-2 md:flex-row md:items-center">
+      <div className="flex flex-col items-start gap-2 border-b-2 border-background bg-secondary p-2 md:flex-row md:items-center">
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>

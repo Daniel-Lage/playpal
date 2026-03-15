@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { PageView } from "~/components/page-view";
 import { PostView } from "~/components/post-view";
 import { UserFeedView } from "~/components/user-feed-view";
 import { authOptions } from "~/lib/auth";
@@ -17,27 +18,24 @@ export default async function PostLikesPage({
     return <div className="self-center text-xl text-secondary">Error</div>;
 
   return (
-    <>
-      <div className="mainview">
-        <div className="flex flex-col gap-1 bg-primary">
-          <PostView
-            post={post}
-            sessionUserId={session?.user.id}
-            isMainPost={true}
-            hasReplyBox={false}
-          />
-          <div className="text-center font-bold">Liked By</div>
-        </div>
-
-        {post?.likes && post.likes.length > 0 && (
-          <UserFeedView
-            users={post?.likes
-              .map((like) => like?.liker as UserObject)
-              .filter((user) => !!user)}
-          />
-        )}
+    <PageView>
+      <div className="flex flex-col gap-1 bg-secondary">
+        <PostView
+          post={post}
+          sessionUserId={session?.user.id}
+          isMainPost={true}
+          hasReplyBox={false}
+        />
+        <div className="text-center font-bold">Liked By</div>
       </div>
-      <div className="endnavview"></div>
-    </>
+
+      {post?.likes && post.likes.length > 0 && (
+        <UserFeedView
+          users={post?.likes
+            .map((like) => like?.liker as UserObject)
+            .filter((user) => !!user)}
+        />
+      )}
+    </PageView>
   );
 }

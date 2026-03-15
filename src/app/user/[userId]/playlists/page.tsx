@@ -6,6 +6,7 @@ import { authOptions } from "~/lib/auth";
 
 import PlaylistFeedView from "~/components/playlist-feed-view";
 import { getPlaylists } from "~/server/get-playlists";
+import { PageView } from "~/components/page-view";
 
 export async function generateMetadata({
   params: { userId },
@@ -57,14 +58,11 @@ export default async function PlaylistsPage({
   const playlists = await getPlaylists({ userIds: [userId] });
 
   return (
-    <>
-      <div className="mainview">
-        <PlaylistFeedView
-          playlists={playlists}
-          sessionUserId={session?.user.id}
-        />
-      </div>
-      <div className="endnavview"></div>
-    </>
+    <PageView>
+      <PlaylistFeedView
+        playlists={playlists}
+        sessionUserId={session?.user.id}
+      />
+    </PageView>
   );
 }

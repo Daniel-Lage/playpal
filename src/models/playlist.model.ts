@@ -61,5 +61,4 @@ export type PlaylistObject = typeof playlistsTable.$inferSelect &
 export enum PlaylistTab {
   Tracks,
   Likes,
-  Replies,
 }

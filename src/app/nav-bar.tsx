@@ -10,7 +10,7 @@ import { NavButton } from "~/components/buttons/nav-button";
 import { UserImage } from "~/components/user-image";
 import { cn } from "~/lib/utils";
 
-export function StartNav({ sessionUser }: { sessionUser?: User | undefined }) {
+export function NavBar({ sessionUser }: { sessionUser?: User | undefined }) {
   const profileUrl = useMemo(
     () => (sessionUser ? `/user/${sessionUser.id}` : undefined),
     [sessionUser],
@@ -24,20 +24,20 @@ export function StartNav({ sessionUser }: { sessionUser?: User | undefined }) {
 
   useEffect(() => {
     if (collapsed != undefined) {
-      localStorage.setItem("start-nav-collapsed", collapsed ? "1" : "0");
+      localStorage.setItem("nav-bar-collapsed", collapsed ? "1" : "0");
       document.documentElement.style.setProperty(
-        "--start-nav-collapsed",
+        "--nav-bar-collapsed",
         collapsed ? "1" : "0",
       );
       document.documentElement.style.setProperty(
-        "--start-nav-expanded",
+        "--nav-bar-expanded",
         collapsed ? "0" : "1",
       );
     }
   }, [collapsed]);
 
   useEffect(() => {
-    setCollapsed(window.localStorage.getItem("start-nav-collapsed") === "1");
+    setCollapsed(window.localStorage.getItem("nav-bar-collapsed") === "1");
     window.addEventListener("scroll", () => {
       if (window.scrollY - 10 > scrollY.current) {
         scrollY.current = window.scrollY;
@@ -58,13 +58,11 @@ export function StartNav({ sessionUser }: { sessionUser?: User | undefined }) {
     <>
       <div
         onClick={() => setCollapsed((prev) => !prev)}
-        className={cn(
-          "fixed bottom-0 left-[calc(var(--start-nav-w)_-_8px)] z-20 hidden h-svh w-4 cursor-pointer md:block",
-        )}
+        className="fixed bottom-0 left-[calc(var(--nav-bar-w)_-_8px)] z-20 hidden h-svh w-4 cursor-pointer md:block"
       ></div>
       <div
         className={cn(
-          "fixed bottom-0 left-0 z-10 flex h-12 w-screen shrink-0 items-center justify-around bg-terciary px-6 font-bold transition-opacity md:h-svh md:w-[--start-nav-w] md:flex-col md:justify-normal md:gap-6",
+          "fixed bottom-0 left-0 z-10 flex h-12 w-screen shrink-0 items-center justify-around border-r-2 border-background bg-primary px-6 font-bold transition-opacity md:h-svh md:w-[--nav-bar-w] md:flex-col md:items-end md:justify-normal md:gap-6",
           faded && "opacity-40 md:opacity-100",
           collapsed ? "md:py-6" : "md:p-6 md:pl-24",
         )}
@@ -73,8 +71,8 @@ export function StartNav({ sessionUser }: { sessionUser?: User | undefined }) {
 
         <div
           className={cn(
-            "hidden md:block",
-            collapsed ? "self-center" : "self-start",
+            "hidden md:block md:w-44",
+            collapsed ? "md:w-12" : "md:w-44",
           )}
         >
           <Image

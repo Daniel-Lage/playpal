@@ -40,7 +40,7 @@ function ProfileTabLink({
   return (
     <Link href={href} role="button" key={title} className="w-full">
       <TabLinkButton
-        className={href === pathname ? "bg-primary-accent" : "bg-primary"}
+        className={href === pathname ? "bg-secondary-accent" : "bg-secondary"}
       >
         {title}
       </TabLinkButton>

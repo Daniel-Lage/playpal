@@ -10,14 +10,8 @@ import { PostCreator } from "~/components/post-creator";
 import { PostView } from "~/components/post-view";
 import { Sorter } from "~/components/sorter";
 import { useLocalStorage } from "~/hooks/use-local-storage";
-import { cn } from "~/lib/utils";
 
-import type {
-  IMetadata,
-  MainPostObject,
-  PostObject,
-  Substring,
-} from "~/models/post.model";
+import type { IMetadata, MainPostObject, Substring } from "~/models/post.model";
 
 import {
   PostsSortingColumn,
@@ -26,6 +20,7 @@ import {
 
 import type { ReplyObject } from "~/models/reply.model";
 import { ActionStatus } from "~/models/status.model";
+import { Thread } from "../../../components/thread";
 
 export function PostPageView({
   post,
@@ -116,7 +111,7 @@ export function PostPageView({
 
   return (
     <>
-      <div className="flex flex-col bg-primary">
+      <div className="flex flex-col bg-secondary">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
             {!!post.playlist && (
@@ -155,7 +150,7 @@ export function PostPageView({
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col items-start gap-2 bg-secondary p-2 md:flex-row md:items-center md:justify-between">
         {post.replyThreads?.length ?? 0} Replies
         <Sorter
           title="Sort by"
@@ -185,46 +180,6 @@ export function PostPageView({
         <StatusMessage status={status} />
       )}
     </>
-  );
-}
-
-export function Thread({
-  thread,
-  sessionUserId,
-  isMainPost = false,
-}: {
-  thread: (PostObject | undefined)[];
-  sessionUserId: string | null | undefined;
-  isMainPost?: boolean;
-}) {
-  const [cutoff, setCutoff] = useState(thread.length - 1);
-
-  return (
-    <div
-      className={cn(
-        "flex flex-col justify-stretch rounded-md",
-        isMainPost ? "bg-primary" : "bg-secondary",
-      )}
-    >
-      {thread.map(
-        (post, index) =>
-          post &&
-          index <= cutoff && (
-            <PostView
-              isMainPost={isMainPost}
-              key={post.id}
-              post={post}
-              sessionUserId={sessionUserId}
-              isCutoff={index === cutoff}
-              isLastPost={index === thread.length - 1}
-              CutOff={() =>
-                isMainPost ||
-                setCutoff(index === cutoff ? thread.length - 1 : index)
-              }
-            />
-          ),
-      )}
-    </div>
   );
 }
 

@@ -10,10 +10,6 @@ const config: Config = {
         sans: ["var(--font-geist-sans)", ...fontFamily.sans],
       },
       colors: {
-        terciary: {
-          DEFAULT: "var(--terciary)",
-          accent: "var(--terciary-accent)",
-        },
         secondary: {
           DEFAULT: "var(--secondary)",
           foreground: "var(--secondary-foreground)",

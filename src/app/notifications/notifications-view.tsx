@@ -27,17 +27,19 @@ export default function NotificationsView({
 
   return (
     <>
-      <div className="flex flex-col bg-primary p-2">
+      <div className="flex flex-col bg-secondary p-2">
         <div className="grid grid-cols-4 gap-1">
           <TabLinkButton
-            className={tab === undefined ? "bg-primary-accent" : "bg-primary"}
+            className={
+              tab === undefined ? "bg-secondary-accent" : "bg-secondary"
+            }
             onClick={() => setTab(undefined)}
           >
             All
           </TabLinkButton>
           {NotificationTypeOptions.map((type) => (
             <TabLinkButton
-              className={tab === type ? "bg-primary-accent" : "bg-primary"}
+              className={tab === type ? "bg-secondary-accent" : "bg-secondary"}
               onClick={() => setTab(type)}
               key={type}
             >

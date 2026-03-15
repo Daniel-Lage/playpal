@@ -86,7 +86,6 @@ export default async function PlaylistPage({
     revalidatePath("/");
     return result;
   };
-
   if (!(await isPremiumUser(session.user.access_token)))
     return (
       <PlaylistPageView
@@ -103,36 +102,31 @@ export default async function PlaylistPage({
   );
 
   return (
-    <>
-      <div className="mainview">
-        <PlaylistPageView
-          playlist={playlist}
-          tracks={tracks}
-          sessionUser={session.user}
-          expires_at={session.user.expires_at}
-          queue={queue}
-          play={async (
-            expired: boolean,
-            queue: PlaylistTrack[],
-            device?: Device,
-          ) => {
-            "use server";
+    <PlaylistPageView
+      playlist={playlist}
+      tracks={tracks}
+      sessionUser={session.user}
+      expires_at={session.user.expires_at}
+      queue={queue}
+      play={async (
+        expired: boolean,
+        queue: PlaylistTrack[],
+        device?: Device,
+      ) => {
+        "use server";
 
-            if (expired) {
-              revalidatePath("/playlist", "page");
-              return PlayTracksStatus.Failure;
-            }
+        if (expired) {
+          revalidatePath("/playlist", "page");
+          return PlayTracksStatus.Failure;
+        }
 
-            return (await playTracks(
-              queue,
-              session.user.access_token,
-              device,
-            )) as PlayTracksStatus;
-          }}
-          send={send}
-        />
-      </div>
-      <div className="endnavview"></div>
-    </>
+        return (await playTracks(
+          queue,
+          session.user.access_token,
+          device,
+        )) as PlayTracksStatus;
+      }}
+      send={send}
+    />
   );
 }

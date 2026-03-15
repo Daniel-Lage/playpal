@@ -47,7 +47,7 @@ export function PostView({
     <div
       className={cn(
         "flex flex-col rounded-md bg-secondary px-2",
-        isMainPost ? "bg-primary" : "bg-secondary",
+        isMainPost ? "bg-secondary" : "bg-secondary",
       )}
     >
       <div className="flex h-12 items-center text-xs md:text-base">

@@ -23,7 +23,7 @@ export function PlaylistView({
     <div
       className={cn(
         "flex flex-col gap-2 rounded-md p-2",
-        focused ? "bg-primary" : "bg-secondary",
+        focused ? "bg-secondary" : "bg-secondary",
       )}
     >
       <div className="flex items-start gap-2 font-bold">
@@ -65,7 +65,11 @@ export function PlaylistView({
               )}
             </div>
             {!!playlist.description && (
-              <div className="text-wrap font-light">{playlist.description}</div>
+              <div className="text-wrap font-light">
+                {playlist.description.length > 53
+                  ? `${playlist.description.substring(0, 50)}...`
+                  : playlist.description}
+              </div>
             )}
             <div className="inline items-center font-bold">
               {playlist.owner?.name}

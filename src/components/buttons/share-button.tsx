@@ -35,7 +35,7 @@ export function ShareButton({ path, title }: { path: string; title?: string }) {
         </DialogHeader>
         <div className="flex items-center space-x-2">
           <div className="grid flex-1 gap-2">
-            <div className="select-all overflow-hidden overflow-ellipsis whitespace-nowrap rounded-md bg-primary-accent p-2">
+            <div className="select-all overflow-hidden overflow-ellipsis whitespace-nowrap rounded-md bg-secondary-accent p-2">
               {url}
             </div>
           </div>

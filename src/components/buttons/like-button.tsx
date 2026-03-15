@@ -33,12 +33,13 @@ export function LikeButton({
         </IconButton>
       ) : isLiked ? (
         <IconButton
+          className="[&_svg]:fill-primary-accent [&_svg]:stroke-primary-accent"
           onClick={() => {
             setIsLiked(false);
             unlike(sessionUserId).catch(() => setIsLiked(true));
           }}
         >
-          <Heart fill="red" color="red" />
+          <Heart />
         </IconButton>
       ) : (
         <IconButton

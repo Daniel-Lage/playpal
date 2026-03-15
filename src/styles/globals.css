@@ -11,17 +11,16 @@
 }
 
 html {
-  @apply text-black;  
-  --start-nav-expanded: 1;
-  --start-nav-collapsed: 0;
-  --csnw: 96px; 
-  --esnw: 320px;
-  --cenw:calc((100vw - 96px) / 2);
-  --eenw:320px;
-  --start-nav-w: calc((var(--csnw) * var(--start-nav-collapsed)) + (var(--esnw) * var(--start-nav-expanded)));
-  
-  --end-nav-w: calc((var(--cenw) * var(--start-nav-collapsed)) + (var(--eenw) * var(--start-nav-expanded)));
-  --main-view-w: calc(100vw - var(--end-nav-w) - var(--start-nav-w))
+  @apply text-black;
+  --nav-bar-expanded: 1;
+  --nav-bar-collapsed: 0;
+  --collapsed-nav-bar-width: 96px;
+  --expanded-nav-bar-width: 25vw;
+  --nav-bar-w: calc(
+    (var(--collapsed-nav-bar-width) * var(--nav-bar-collapsed)) +
+      (var(--expanded-nav-bar-width) * var(--nav-bar-expanded))
+  );
+  --side-bar-w: calc((100vw - var(--nav-bar-w)) / 3);
 }
 
 body {
@@ -31,34 +30,23 @@ body {
 
 @layer base {
   :root {
-    --background: hsl(215, 28%, 17%); /* only used by me */
-    --foreground: hsl(0, 0%, 0%); /* text */
-    --card: hsl(0, 0%, 100%); /* idk */
-    --card-foreground: hsl(0, 0%, 0%); /* text */
-    --popover: hsl(270, 97%, 87%); /* menu */
-    --popover-foreground: hsl(0, 0%, 0%); /* text */
-    --primary: hsl(270, 97%, 85%); /* only used by me */
-    --primary-accent: hsl(270, 95%, 75%);
-    --primary-foreground: hsl(0, 0%, 0%); /* text */
-    --secondary: hsl(170, 95%, 83%); /* only used by me */
-    --secondary-foreground: hsl(0, 0%, 0%); /* text */
-    --secondary-accent: hsl(170, 50%, 60%); /* only used by me */
-    --terciary: hsl(210, 95%, 83%); /* only used by me */
-    --terciary-accent: hsl(210, 70%, 70%); /* only used by me */
-    --muted: hsl(0, 0%, 96%); /* idk */
-    --muted-foreground: hsl(0, 0%, 0%); /* text */
-    --accent: hsl(249, 66%, 37%); /* selected option */
-    --accent-foreground: hsl(0, 0%, 0%); /* text */
-    --destructive: hsl(0, 84% 60%); /* idk */
-    --destructive-foreground: hsl(0, 0%, 0%); /* text */
-    --border: hsl(0, 0%, 89.8%); /* idk */
-    --input: hsl(0, 0%, 35%); /* text input */
-    --ring: hsl(0, 0%, 3.9%); /* idk */
-    --chart-1: hsl(12, 76%, 61%); /* idk */
-    --chart-2: hsl(173, 58%, 39%); /* idk */
-    --chart-3: hsl(197, 37%, 24%); /* idk */
-    --chart-4: hsl(43, 74%, 66%); /* idk */
-    --chart-5: hsl(27, 87%, 67%); /* idk */
+    --background: #333333;
+    --foreground: #000000;
+    --primary: #ab76e0;
+    --primary-accent: #c084fc;
+    --secondary: #b0cc90;
+    --secondary-accent: #84a361;
+    --muted-foreground: #000000;
+    --accent-foreground: #000000;
+    --destructive-foreground: #000000;
+    --input: #333333; /* text input */
+    --primary-foreground: #000000;
+    --secondary-foreground: #000000;
+    --card-foreground: #000000;
+    --popover: #acbf99; /* menu */
+    --accent: #84a361; /* selected option */
+    --popover-foreground: #000000;
+
     --radius: 0.5rem;
   }
 }
@@ -92,18 +80,6 @@ body {
 }
 
 .mainview {
-  @apply md:pl-[calc(var(--start-nav-w))];
-  @apply md:pr-[calc(var(--end-nav-w))];
-}
-
-.endnavview {
-  @apply fixed;
-  @apply right-0;
-  @apply top-0;
-  @apply hidden;
-  @apply h-screen;
-  @apply w-[--end-nav-w];
-  @apply bg-terciary;
-  @apply md:flex;
-  @apply md:flex-col;
+  @apply md:pl-[calc(var(--nav-bar-w))];
+  @apply md:pr-[calc(var(--side-bar-w))];
 }

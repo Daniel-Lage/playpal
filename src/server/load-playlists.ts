@@ -6,6 +6,8 @@ import type { Playlist } from "~/models/playlist.model";
 import { db } from "./db";
 import { playlistsTable } from "./db/schema";
 import { onConflictDoUpdateAll } from "~/helpers/on-conflict-do-update-all";
+import { getPlaylists } from "./get-playlists";
+import { inArray } from "drizzle-orm";
 
 export async function loadPlaylists(accessToken: string, userId: string) {
   const response = await fetch(
@@ -54,6 +56,8 @@ export async function loadPlaylists(accessToken: string, userId: string) {
     });
   }
 
+  const deletedPlaylists = await getPlaylists({ userIds: [userId] });
+
   await db
     .insert(playlistsTable)
     .values(
@@ -65,19 +69,29 @@ export async function loadPlaylists(accessToken: string, userId: string) {
           external_urls: { spotify },
           tracks: { total },
           description,
-        }) => ({
-          id,
-          userId,
-          name,
-          image: images[0]?.url ?? "",
-          totalTracks: total,
-          externalUrl: spotify,
-          description,
-        }),
+        }) => {
+          deletedPlaylists.filter((playlist) => playlist.id !== id); // filter playlists that still exist
+          return {
+            id,
+            userId,
+            name,
+            image: images[0]?.url ?? "",
+            totalTracks: total,
+            externalUrl: spotify,
+            description,
+          };
+        },
       ),
     )
     .onConflictDoUpdate({
       target: playlistsTable.id,
       set: onConflictDoUpdateAll(playlistsTable),
     });
+
+  await db.delete(playlistsTable).where(
+    inArray(
+      playlistsTable.id,
+      deletedPlaylists.map((playlist) => playlist.id),
+    ),
+  );
 }

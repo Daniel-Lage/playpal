@@ -10,6 +10,7 @@ import { revalidatePath } from "next/cache";
 import { PostPageView } from "./post-page-view";
 import { getReplies } from "~/server/get-replies";
 import { ActionStatus } from "~/models/status.model";
+import { PageView } from "~/components/page-view";
 
 export const dynamic = "force-dynamic";
 
@@ -58,39 +59,36 @@ export default async function PostPage({
     );
 
   return (
-    <>
-      <div className="mainview">
-        <PostPageView
-          post={post}
-          sessionUser={session?.user}
-          lastQueried={new Date()}
-          send={async (
-            input: string,
-            urls: Substring[] | undefined,
-            metadata: IMetadata | undefined,
-          ) => {
-            "use server";
+    <PageView>
+      <PostPageView
+        post={post}
+        sessionUser={session?.user}
+        lastQueried={new Date()}
+        send={async (
+          input: string,
+          urls: Substring[] | undefined,
+          metadata: IMetadata | undefined,
+        ) => {
+          "use server";
 
-            if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
+          if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
 
-            const result = await postPost(
-              input,
-              session?.user.id,
-              urls,
-              metadata,
-              post,
-            );
+          const result = await postPost(
+            input,
+            session?.user.id,
+            urls,
+            metadata,
+            post,
+          );
 
-            revalidatePath("/");
-            return result;
-          }}
-          refresh={async (lastQueried: Date) => {
-            "use server";
-            return await getReplies(postId, lastQueried);
-          }}
-        />
-      </div>
-      <div className="endnavview"></div>
-    </>
+          revalidatePath("/");
+          return result;
+        }}
+        refresh={async (lastQueried: Date) => {
+          "use server";
+          return await getReplies(postId, lastQueried);
+        }}
+      />
+    </PageView>
   );
 }

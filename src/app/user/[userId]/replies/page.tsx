@@ -6,6 +6,7 @@ import { authOptions } from "~/lib/auth";
 
 import { PostFeedView } from "~/components/post-feed-view";
 import { getPosts } from "~/server/get-posts";
+import { PageView } from "~/components/page-view";
 
 export async function generateMetadata({
   params: { userId },
@@ -46,23 +47,20 @@ export default async function RepliesPage({
   const posts = await getPosts({ userIds: [userId], replies: true });
 
   return (
-    <>
-      <div className="mainview">
-        <PostFeedView
-          posts={posts}
-          sessionUser={session?.user}
-          lastQueried={new Date()}
-          refresh={async (lastQueried: Date) => {
-            "use server";
-            return await getPosts({
-              userIds: [userId],
-              replies: true,
-              lastQueried,
-            });
-          }}
-        />
-      </div>
-      <div className="endnavview"></div>
-    </>
+    <PageView>
+      <PostFeedView
+        posts={posts}
+        sessionUser={session?.user}
+        lastQueried={new Date()}
+        refresh={async (lastQueried: Date) => {
+          "use server";
+          return await getPosts({
+            userIds: [userId],
+            replies: true,
+            lastQueried,
+          });
+        }}
+      />
+    </PageView>
   );
 }

@@ -72,7 +72,7 @@ export function SetUpView({
           <div className="relative w-40">
             {imageStatus === ActionStatus.Active && (
               <div className="absolute flex h-40 w-40 items-center justify-center rounded-full backdrop-brightness-50">
-                <div className="h-16 w-16 animate-spin rounded-full border-8 border-primary border-b-transparent"></div>
+                <div className="h-16 w-16 animate-spin rounded-full border-8 border-secondary border-b-transparent"></div>
               </div>
             )}
             <UserImage
