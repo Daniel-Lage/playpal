@@ -114,53 +114,60 @@ export function PlaylistPageView({
   const [storedStart, setStoredStart] = useState<PlaylistTrack | undefined>();
 
   return (
-    <PageView
-      sideContent={
-        <PlaylistRepliesView
+    <>
+      {status === PlayTracksStatus.Active && (
+        <div className="absolute z-10 flex h-full w-[--main-view-w] items-center justify-center backdrop-brightness-50 md:ml-[calc(var(--nav-bar-w))]">
+          <div className="h-16 w-16 animate-spin rounded-full border-8 border-secondary border-b-transparent"></div>
+        </div>
+      )}
+      <PageView
+        sideContent={
+          <PlaylistRepliesView
+            playlist={playlist}
+            sessionUser={sessionUser}
+            send={send}
+          />
+        }
+      >
+        <PlaylistContent
+          play={handlePlay}
+          disabled={status === PlayTracksStatus.Active}
+          shuffled={shuffled}
+          switchShuffled={() => {
+            setShuffled((prev) => !prev);
+          }}
           playlist={playlist}
-          sessionUser={sessionUser}
-          send={send}
+          sessionUserId={sessionUser?.id}
+          tab={tab}
+          setTab={setTab}
         />
-      }
-    >
-      <PlaylistContent
-        play={handlePlay}
-        disabled={status === PlayTracksStatus.Active}
-        shuffled={shuffled}
-        switchShuffled={() => {
-          setShuffled((prev) => !prev);
-        }}
-        playlist={playlist}
-        sessionUserId={sessionUser?.id}
-        tab={tab}
-        setTab={setTab}
-      />
-      {
         {
-          [PlaylistTab.Tracks]: (
-            <PlaylistTracksView
-              playlist={playlist}
-              playTrack={handlePlay}
-              tracks={tracks}
-              status={status}
-              sessionUserId={sessionUser?.id}
-            />
-          ),
-          [PlaylistTab.Likes]: (
-            <PlaylistLikesView likes={playlist.likes ?? []} />
-          ),
-        }[tab]
-      }
+          {
+            [PlaylistTab.Tracks]: (
+              <PlaylistTracksView
+                playlist={playlist}
+                playTrack={handlePlay}
+                tracks={tracks}
+                status={status}
+                sessionUserId={sessionUser?.id}
+              />
+            ),
+            [PlaylistTab.Likes]: (
+              <PlaylistLikesView likes={playlist.likes ?? []} />
+            ),
+          }[tab]
+        }
 
-      <DevicePicker
-        devices={devices}
-        pickDevice={(device) => {
-          void handlePlay(storedStart, device);
-          setStoredStart(undefined);
-          setDevices(undefined);
-        }}
-      />
-    </PageView>
+        <DevicePicker
+          devices={devices}
+          pickDevice={(device) => {
+            void handlePlay(storedStart, device);
+            setStoredStart(undefined);
+            setDevices(undefined);
+          }}
+        />
+      </PageView>
+    </>
   );
 }
 

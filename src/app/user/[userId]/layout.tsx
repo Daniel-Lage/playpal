@@ -3,6 +3,8 @@ import { UserProfileView } from "~/app/user/[userId]/user-profile-view";
 import { authOptions } from "~/lib/auth";
 import { getUser } from "~/server/get-user";
 import { ProfileTabs } from "./profile-tabs";
+import { PageView } from "~/components/page-view";
+import { ErrorPage } from "~/app/error-page";
 
 export default async function ProfileLayout({
   params,
@@ -17,17 +19,17 @@ export default async function ProfileLayout({
 
   const user = await getUser(userId);
 
-  if (!user)
-    // no profile
-    return <div className="self-center text-xl text-secondary">Error</div>;
+  if (!user) return <ErrorPage />;
 
   return (
     <>
-      <div className="mainview flex flex-col bg-secondary">
-        <UserProfileView user={user} sessionUserId={session?.user.id} />
+      <PageView>
+        <div className="flex flex-col bg-secondary">
+          <UserProfileView user={user} sessionUserId={session?.user.id} />
 
-        <ProfileTabs userId={userId} />
-      </div>
+          <ProfileTabs userId={userId} />
+        </div>
+      </PageView>
       {children}
     </>
   );

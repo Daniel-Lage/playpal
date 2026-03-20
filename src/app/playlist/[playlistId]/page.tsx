@@ -15,6 +15,7 @@ import type { IMetadata, Substring } from "~/models/post.model";
 import { postPlaylistReply } from "~/server/post-playlist-reply";
 import type { Device } from "~/models/device.model";
 import { ActionStatus, PlayTracksStatus } from "~/models/status.model";
+import { ErrorPage } from "~/app/error-page";
 
 export async function generateMetadata({
   params: { playlistId },
@@ -57,7 +58,7 @@ export default async function PlaylistPage({
 
   const playlist = await getPlaylist(playlistId);
 
-  if (!playlist) return <div>error</div>;
+  if (!playlist) return <ErrorPage />;
 
   const tracks = await getTracks(
     playlist.id,

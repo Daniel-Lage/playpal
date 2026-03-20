@@ -11,6 +11,7 @@ import { PostPageView } from "./post-page-view";
 import { getReplies } from "~/server/get-replies";
 import { ActionStatus } from "~/models/status.model";
 import { PageView } from "~/components/page-view";
+import { ErrorPage } from "~/app/error-page";
 
 export const dynamic = "force-dynamic";
 
@@ -53,10 +54,7 @@ export default async function PostPage({
   const session = await getServerSession(authOptions);
   const post = await getPost(postId);
 
-  if (!post)
-    return (
-      <div className="self-center text-xl text-secondary">Post Not Found</div>
-    );
+  if (!post) return <ErrorPage />;
 
   return (
     <PageView>

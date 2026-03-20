@@ -21,6 +21,7 @@ html {
       (var(--expanded-nav-bar-width) * var(--nav-bar-expanded))
   );
   --side-bar-w: calc((100vw - var(--nav-bar-w)) / 3);
+  --main-view-w: calc(100vw - var(--nav-bar-w) - var(--side-bar-w));
 }
 
 body {
@@ -77,9 +78,4 @@ body {
   100% {
     transform: translateY(400px);
   }
-}
-
-.mainview {
-  @apply md:pl-[calc(var(--nav-bar-w))];
-  @apply md:pr-[calc(var(--side-bar-w))];
 }
