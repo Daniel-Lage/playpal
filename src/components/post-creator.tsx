@@ -62,7 +62,7 @@ export function PostCreator({
   }, [metadataList, metadataIndex]);
 
   useEffect(() => {
-    if (urls) {
+    if (urls.length != 0) {
       setStatus(ActionStatus.Active);
       setLoadingMetadata(true);
       getMetadataList(urls)
