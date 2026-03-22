@@ -23,7 +23,6 @@ export async function getPost(
               author: true,
               likes: true,
               replies: {
-                // only gets direct replies
                 where: eq(repliesTable.separation, 0),
               },
             },
@@ -37,7 +36,6 @@ export async function getPost(
               author: true,
               likes: true,
               replies: {
-                // only gets direct replies
                 where: eq(repliesTable.separation, 0),
               },
             },

@@ -62,3 +62,12 @@ export enum PlaylistTab {
   Tracks,
   Likes,
 }
+
+export interface PlaylistChanges {
+  id: string;
+  name?: string;
+  image?: string;
+  totalTracks?: number;
+  externalUrl?: string;
+  description?: string;
+}

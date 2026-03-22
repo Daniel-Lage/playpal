@@ -1,4 +1,4 @@
-import { getServerSession, type NextAuthOptions } from "next-auth";
+import { type NextAuthOptions } from "next-auth";
 import type { Adapter } from "next-auth/adapters";
 
 import SpotifyProvider from "next-auth/providers/spotify";
@@ -6,16 +6,16 @@ import EmailProvider from "next-auth/providers/email";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { db } from "~/server/db";
 import * as schema from "~/server/db/schema";
-import { refreshTokens } from "~/api/refresh-tokens";
 import { loadPlaylists } from "~/server/load-playlists";
 import { eq } from "drizzle-orm";
 import { sendVerificationRequest } from "./custom-verification-request";
+import { getTokens } from "~/api/get-tokens";
 
 const spotifyAuthUrl = new URL("https://accounts.spotify.com/authorize");
 
 spotifyAuthUrl.search = new URLSearchParams({
   scope:
-    "user-read-email user-read-private user-read-playback-state user-modify-playback-state",
+    "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state",
 }).toString();
 
 export const authOptions: NextAuthOptions = {
@@ -47,40 +47,49 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    signIn: async ({ account }) => {
-      const session = await getServerSession(authOptions);
+    session: async ({ session, user }) => {
+      session.user.id = user.id;
 
-      if (!session) return true; // logging in for the first time with spotify
+      const account = await db.query.accountsTable.findFirst({
+        where: eq(schema.accountsTable.userId, user.id),
+      });
 
-      // connecting spotify to an existing account
-      if (session?.user?.spotify_id) return true;
-
-      if (account?.provider === "spotify") {
-        await db
-          .update(schema.usersTable)
-          .set({
-            access_token: account.access_token ?? null,
-            expires_at: account.expires_at ?? null,
-            spotify_id: account.providerAccountId,
-          })
-          .where(eq(schema.usersTable.id, session?.user.id));
+      if (
+        account?.access_token == null ||
+        account?.refresh_token == null ||
+        account?.expires_at == null
+      ) {
+        return session;
       }
 
-      return true;
-    },
-    session: async ({ session, user }) => {
-      if (user) session.user.id = user.id;
+      session.user.providerAccountId = account.providerAccountId;
+      session.user.access_token = account.access_token;
+      session.user.expires_at = account.expires_at;
 
-      if (!user.spotify_id) return session;
+      const now = Math.floor(new Date().getTime() / 1000);
 
-      const tokens = await refreshTokens(user.id);
+      if (now < account.expires_at) {
+        return session;
+      }
 
-      if (!tokens) return session;
+      const { access_token, expires_in } = await getTokens(
+        account.refresh_token,
+      );
 
-      await loadPlaylists(tokens.access_token, user.id);
+      if (access_token == null || expires_in == null) {
+        return session;
+      }
 
-      session.user.access_token = tokens.access_token;
-      session.user.expires_at = tokens.expires_at;
+      const expires_at = now + expires_in;
+      session.user.access_token = access_token;
+      session.user.expires_at = expires_at;
+
+      await db
+        .update(schema.accountsTable)
+        .set({ access_token, expires_at })
+        .where(eq(schema.accountsTable.userId, user.id));
+
+      await loadPlaylists(access_token, user.id);
 
       return session;
     },

@@ -12,7 +12,6 @@ export async function deleteUser(userId: string) {
     .returning();
 
   if (result[0]?.image) {
-    // previous image is in url form, we need to extract the key
     const previousImageKey = result[0]?.image.split("/").pop();
     void utapi.deleteFiles(previousImageKey!);
   }

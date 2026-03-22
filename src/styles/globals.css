@@ -14,13 +14,20 @@ html {
   @apply text-black;
   --nav-bar-expanded: 1;
   --nav-bar-collapsed: 0;
-  --collapsed-nav-bar-width: 96px;
+  --side-bar-expanded: 1;
+  --side-bar-collapsed: 0;
+  --collapsed-bar-width: 96px;
   --expanded-nav-bar-width: 25vw;
   --nav-bar-w: calc(
-    (var(--collapsed-nav-bar-width) * var(--nav-bar-collapsed)) +
+    (var(--collapsed-bar-width) * var(--nav-bar-collapsed)) +
       (var(--expanded-nav-bar-width) * var(--nav-bar-expanded))
   );
-  --side-bar-w: calc((100vw - var(--nav-bar-w)) / 3);
+  --expanded-side-bar-width: 32vw;
+  --side-bar-w: calc(
+    (var(--collapsed-bar-width) * var(--side-bar-collapsed)) +
+      (var(--expanded-side-bar-width) * var(--side-bar-expanded))
+  );
+
   --main-view-w: calc(100vw - var(--nav-bar-w) - var(--side-bar-w));
 }
 
@@ -78,4 +85,25 @@ body {
   100% {
     transform: translateY(400px);
   }
+}
+
+.tiptap {
+  outline: none;
+}
+
+.tiptap > p > a {
+  color: blue;
+  text-decoration: underline;
+}
+
+.tiptap > p > span[data-type="mention"] {
+  color: blue;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--background);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
 }

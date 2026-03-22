@@ -14,14 +14,13 @@ export async function getSearchResults(
       author: true,
       likes: true,
       replies: {
-        // only gets direct replies
         where: eq(repliesTable.separation, 0),
       },
     },
     orderBy: [desc(postsTable.createdAt)],
     where: and(
       ilike(postsTable.content, `%${searchQuery}%`),
-      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new posts
+      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`,
     ),
     limit: 100,
   })) as PostObject[];
@@ -29,7 +28,7 @@ export async function getSearchResults(
   const users = (await db.query.usersTable.findMany({
     where: and(
       ilike(usersTable.name, `%${searchQuery}%`),
-      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new posts
+      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`,
     ),
   })) as UserObject[];
 

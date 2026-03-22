@@ -10,18 +10,19 @@ export default async function SearchPage({
 }: {
   searchParams: { q: string | undefined };
 }) {
+  const session = await getServerSession(authOptions);
+
   if (!q)
     return (
-      <PageView>
+      <PageView sessionUser={session?.user}>
         <SearchViewForm />
       </PageView>
     );
 
-  const session = await getServerSession(authOptions);
   const { users, posts } = await getSearchResults(q);
 
   return (
-    <PageView>
+    <PageView sessionUser={session?.user}>
       <SearchViewForm q={q} />
       <ResultsView
         users={users}

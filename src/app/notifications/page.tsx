@@ -15,7 +15,7 @@ export default async function NotificationsPage() {
   const notifications = await getNotifications(session.user.id);
 
   return (
-    <PageView>
+    <PageView sessionUser={session?.user}>
       <NotificationsView
         notifications={notifications.sort((a, b) => {
           if (a.createdAt > b.createdAt) return -1;

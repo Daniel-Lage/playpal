@@ -2,6 +2,7 @@ import type { usersTable } from "~/server/db/schema";
 import type { FollowObject } from "./follow.model";
 import type { LikeObject } from "./like.model";
 import type { PostObject } from "./post.model";
+import type { User } from "next-auth";
 
 export interface SimplifiedUser {
   external_urls: { spotify: string };
@@ -20,14 +21,15 @@ export interface SpotifyUser extends SimplifiedUser {
   product: "premium" | "free" | "open";
 }
 
+type SessionUser = User & {
+  access_token: string | null;
+  expires_at: number | null;
+  providerAccountId: string | null;
+};
+
 declare module "next-auth" {
   interface Session {
-    user: User;
-  }
-  interface User {
-    access_token: string | null;
-    expires_at: number | null;
-    spotify_id: string | null;
+    user: SessionUser;
   }
 }
 

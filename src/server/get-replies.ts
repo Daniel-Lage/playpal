@@ -6,11 +6,10 @@ import type { ReplyObject } from "~/models/reply.model";
 import { Threadify } from "~/helpers/get-reply-thread";
 
 export async function getReplies(postId: string, lastQueried?: Date) {
-  console.log("getting replies");
   const replies = (await db.query.repliesTable.findMany({
     where: and(
       eq(repliesTable.replieeId, postId),
-      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new posts
+      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`,
     ),
     with: {
       replier: {
@@ -18,7 +17,6 @@ export async function getReplies(postId: string, lastQueried?: Date) {
           author: true,
           likes: true,
           replies: {
-            // only gets direct replies
             where: eq(repliesTable.separation, 0),
           },
         },

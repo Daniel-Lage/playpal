@@ -8,7 +8,7 @@ export async function getTracks(
   accessToken?: string | null,
 ) {
   if (!accessToken) {
-    if (process.env.FALLBACK_REFRESH_TOKEN === undefined)
+    if (process.env.FALLBACK_REFRESH_TOKEN == null)
       throw new Error("FALLBACK_REFRESH_TOKEN is not defined in env");
 
     const { access_token } = await getTokens(

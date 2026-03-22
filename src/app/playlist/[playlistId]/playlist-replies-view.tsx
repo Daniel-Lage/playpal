@@ -7,7 +7,6 @@ import { Sorter } from "~/components/sorter";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import type { PlaylistObject } from "~/models/playlist.model";
 import {
-  type Substring,
   type IMetadata,
   PostsSortingColumn,
   PostsSortingColumnOptions,
@@ -27,8 +26,8 @@ export function PlaylistRepliesView({
   sessionUser?: User | undefined;
   send?: (
     input: string,
-    urls: Substring[] | undefined,
-    metadata: IMetadata | undefined,
+    mentions?: string[] | undefined,
+    metadata?: IMetadata | undefined,
   ) => Promise<ActionStatus>;
 }) {
   const [reversed, setReversed] = useLocalStorage<boolean>(
@@ -71,14 +70,14 @@ export function PlaylistRepliesView({
   const handleSend = useCallback(
     async (
       input: string,
-      urls: Substring[] | undefined,
+      mentions: string[] | undefined,
       metadata: IMetadata | undefined,
     ) => {
       if (!send) return;
 
       setStatus(ActionStatus.Active);
 
-      setStatus(await send(input, urls, metadata));
+      setStatus(await send(input, mentions, metadata));
 
       setTimeout(() => {
         setStatus(ActionStatus.Inactive);
@@ -89,9 +88,7 @@ export function PlaylistRepliesView({
 
   return (
     <>
-      <div className="border-b-2 border-background bg-secondary p-2 text-xl font-bold">
-        Replies
-      </div>
+      <div className="bg-primary p-2 text-xl font-bold">Replies</div>
 
       {sessionUser?.image && sessionUser?.name && (
         <PostCreator
@@ -99,10 +96,11 @@ export function PlaylistRepliesView({
           sessionUser={sessionUser}
           disabled={status === ActionStatus.Active}
           setStatus={setStatus}
+          isPrimaryColor={true}
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 bg-secondary p-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:flex-row md:items-center md:justify-between">
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>
@@ -114,6 +112,7 @@ export function PlaylistRepliesView({
           reverse={() => {
             setReversed((prev) => !prev);
           }}
+          isPrimaryColor={true}
         />
       </div>
 

@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 
 import { getPosts } from "~/server/get-posts";
 import { authOptions } from "~/lib/auth";
-import { PostType, type IMetadata, type Substring } from "~/models/post.model";
+import { PostType, type IMetadata } from "~/models/post.model";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
 import { getPlaylists } from "~/server/get-playlists";
@@ -50,14 +50,19 @@ export default async function HomePage() {
       sessionUser={session?.user}
       send={async (
         input: string,
-        urls: Substring[] | undefined,
+        mentions: string[] | undefined,
         metadata: IMetadata | undefined,
       ) => {
         "use server";
 
-        if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
+        if (!session?.user) return ActionStatus.Failure;
 
-        const status = await postPost(input, session?.user.id, urls, metadata);
+        const status = await postPost(
+          input,
+          session?.user.id,
+          mentions,
+          metadata,
+        );
 
         revalidatePath("/");
 

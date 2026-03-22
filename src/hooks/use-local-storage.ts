@@ -9,7 +9,7 @@ export function useLocalStorage<T>(
   const [value, setValue] = useState<T>(fallback);
 
   useEffect(() => {
-    if (localStorage !== undefined) {
+    if (localStorage != null) {
       const newValue = localStorage.getItem(key);
       if (newValue === null) setValue(fallback);
       else setValue(parse(newValue) ?? fallback);

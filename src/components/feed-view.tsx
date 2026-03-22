@@ -2,7 +2,7 @@
 
 import type { User } from "next-auth";
 import { PostFeedView } from "~/components/post-feed-view";
-import type { IMetadata, PostObject, Substring } from "~/models/post.model";
+import type { IMetadata, PostObject } from "~/models/post.model";
 import PlaylistFeedView from "./playlist-feed-view";
 import type { PlaylistObject } from "~/models/playlist.model";
 import { useState } from "react";
@@ -24,7 +24,7 @@ export function FeedView({
   refresh: (lastQueried: Date) => Promise<PostObject[]>;
   send?: (
     input: string,
-    urls: Substring[] | undefined,
+    mentions: string[] | undefined,
     metadata: IMetadata | undefined,
   ) => Promise<ActionStatus>;
   playlists: PlaylistObject[];
@@ -35,7 +35,7 @@ export function FeedView({
     <PageView
       sideContent={
         <>
-          <div className="bg-secondary p-2 text-xl font-bold">
+          <div className="bg-primary p-2 text-xl font-bold">
             {showPlaylists ? "Posts" : "Playlists"}
           </div>
           {showPlaylists ? (
@@ -45,11 +45,13 @@ export function FeedView({
               send={send}
               lastQueried={lastQueried}
               refresh={refresh}
+              isPrimaryColor={true}
             />
           ) : (
             <PlaylistFeedView
               playlists={playlists}
               sessionUserId={sessionUser?.id}
+              isPrimaryColor={true}
             />
           )}
         </>

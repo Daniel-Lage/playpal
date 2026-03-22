@@ -13,7 +13,6 @@ export default async function SignInPage() {
       user={session?.user}
       deleteImage={async (image: string) => {
         "use server";
-        // image is in url form, we need to extract the key
         const previousImageKey = image.split("/").pop();
         void utapi.deleteFiles(previousImageKey!);
       }}

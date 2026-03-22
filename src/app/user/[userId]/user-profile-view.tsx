@@ -20,9 +20,11 @@ import { cn } from "~/lib/utils";
 export function UserProfileView({
   user,
   sessionUserId,
+  providerAccountId,
 }: {
   user: UserObject;
   sessionUserId: string | undefined;
+  providerAccountId: string | null | undefined;
 }) {
   const router = useRouter();
 
@@ -31,7 +33,6 @@ export function UserProfileView({
 
   useEffect(() => {
     window.addEventListener("scroll", () => {
-      console.log(window.scrollY);
       if (window.scrollY - 10 > scrollY.current) {
         scrollY.current = window.scrollY;
         setSimple(true);
@@ -67,9 +68,9 @@ export function UserProfileView({
           </div>
 
           {user.id === sessionUserId &&
-            (user.spotify_id ? (
+            (providerAccountId != null ? (
               <SpotifyLink
-                external_url={`https://open.spotify.com/user/${user.spotify_id}`}
+                external_url={`https://open.spotify.com/user/${providerAccountId}`}
               />
             ) : (
               <LinkButton onClick={() => signIn("spotify")}>
@@ -102,7 +103,7 @@ export function UserProfileView({
                 </ConfirmDialog>
               </>
             ) : (
-              <></> // eventually add report user or block user options
+              <></> // TODO: add report user or block user options
             )}
             <ShareButton path={`/user/${user.id}`} title="profile" />
           </MenuView>

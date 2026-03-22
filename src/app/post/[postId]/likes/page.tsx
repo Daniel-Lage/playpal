@@ -18,7 +18,7 @@ export default async function PostLikesPage({
     return <div className="self-center text-xl text-secondary">Error</div>;
 
   return (
-    <PageView>
+    <PageView sessionUser={session?.user}>
       <div className="flex flex-col gap-1 bg-secondary">
         <PostView
           post={post}

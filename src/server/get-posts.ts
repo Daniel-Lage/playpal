@@ -13,13 +13,11 @@ export async function getPosts({
   userIds?: string[];
   lastQueried?: Date;
 }) {
-  console.log("getting posts");
   const posts = await db.query.postsTable.findMany({
     with: {
       author: true,
       likes: { with: { liker: true } },
       replies: {
-        // only gets direct replies
         where: eq(repliesTable.separation, 0),
       },
     },
@@ -29,7 +27,7 @@ export async function getPosts({
       replies
         ? eq(postsTable.type, PostType.Reply)
         : eq(postsTable.type, PostType.Post),
-      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new posts
+      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`,
     ),
     limit: 100,
   });

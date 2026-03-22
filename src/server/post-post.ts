@@ -1,6 +1,5 @@
 "use server";
 import {
-  type Substring,
   type IMetadata,
   PostType,
   type MainPostObject,
@@ -8,11 +7,12 @@ import {
 import { db } from "./db";
 import { postsTable, repliesTable } from "./db/schema";
 import { ActionStatus } from "~/models/status.model";
+import { postMentions } from "./post-mentions";
 
 export async function postPost(
   content: string,
   userId: string,
-  urls: Substring[] | undefined,
+  mentions: string[] | undefined,
   metadata: IMetadata | undefined,
   parent?: MainPostObject,
 ): Promise<ActionStatus> {
@@ -22,7 +22,6 @@ export async function postPost(
       content,
       userId,
       type: parent ? PostType.Reply : PostType.Post,
-      urls,
       urlMetadata: metadata,
       playlistId: parent?.playlistId,
     })
@@ -50,6 +49,9 @@ export async function postPost(
       }
     }
   }
+
+  if (mentions != null && mentions.length != 0)
+    await postMentions(post.id, mentions);
 
   return ActionStatus.Success;
 }

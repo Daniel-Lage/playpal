@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 
 import { authOptions } from "~/lib/auth";
 
-import { type IMetadata, type Substring } from "~/models/post.model";
+import { type IMetadata } from "~/models/post.model";
 import { getUser } from "~/server/get-user";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
@@ -64,22 +64,23 @@ export default async function ProfilePage({
   return (
     <FeedView
       posts={posts}
+      playlists={playlists}
       sessionUser={session?.user}
       send={
         session?.user.id === userId
           ? async (
               input: string,
-              urls: Substring[] | undefined,
+              mentions: string[] | undefined,
               metadata: IMetadata | undefined,
             ) => {
               "use server";
 
-              if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
+              if (!session?.user) return ActionStatus.Failure;
 
               const status = await postPost(
                 input,
                 session.user.id,
-                urls,
+                mentions,
                 metadata,
               );
 
@@ -93,7 +94,6 @@ export default async function ProfilePage({
         "use server";
         return await getPosts({ userIds: [userId], lastQueried });
       }}
-      playlists={playlists}
     />
   );
 }

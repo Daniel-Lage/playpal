@@ -10,9 +10,9 @@ import {
 } from "drizzle-orm/pg-core";
 import { relations, sql } from "drizzle-orm";
 
-import type { PostType, IMetadata, Substring } from "~/models/post.model";
+import type { PostType, IMetadata } from "~/models/post.model";
 
-export const createTable = pgTableCreator((name) => `playpal_${name}`);
+const createTable = pgTableCreator((name) => `playpal_${name}`);
 
 export const usersTable = createTable("user", {
   id: text("id")
@@ -20,22 +20,19 @@ export const usersTable = createTable("user", {
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name"),
   email: text("email").unique(),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
+  emailVerified: timestamp("email_verified", { mode: "date" }),
   image: text("image"),
-  spotify_id: text("spotify_id"),
-  access_token: text("acess_token"),
-  expires_at: integer("expires_at"),
 });
 
 export const accountsTable = createTable(
   "account",
   {
-    userId: text("userId")
+    userId: text("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
     type: text("type").notNull(),
     provider: text("provider").notNull(),
-    providerAccountId: text("providerAccountId").notNull(),
+    providerAccountId: text("provider_account_id").notNull(),
     refresh_token: text("refresh_token"),
     access_token: text("access_token"),
     expires_at: integer("expires_at"),
@@ -44,64 +41,64 @@ export const accountsTable = createTable(
     id_token: text("id_token"),
     session_state: text("session_state"),
   },
-  (account) => ({
-    compoundKey: primaryKey({
+  (account) => [
+    primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
-  }),
+  ],
 );
 
 export const sessionsTable = createTable("session", {
-  sessionToken: text("sessionToken").primaryKey(),
-  userId: text("userId")
+  sessionToken: text("session_token").primaryKey(),
+  userId: text("user_id")
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
   expires: timestamp("expires", { mode: "date" }).notNull(),
 });
 
 export const verificationTokensTable = createTable(
-  "verificationToken",
+  "verification_token",
   {
     identifier: text("identifier").notNull(),
     token: text("token").notNull(),
     expires: timestamp("expires", { mode: "date" }).notNull(),
   },
-  (verificationToken) => ({
-    compositePk: primaryKey({
+  (verificationToken) => [
+    primaryKey({
       columns: [verificationToken.identifier, verificationToken.token],
     }),
-  }),
+  ],
 );
 
 export const authenticatorsTable = createTable(
   "authenticator",
   {
-    credentialID: text("credentialID").notNull().unique(),
-    userId: text("userId")
+    credentialID: text("credential_id").notNull().unique(),
+    userId: text("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
-    providerAccountId: text("providerAccountId").notNull(),
-    credentialPublicKey: text("credentialPublicKey").notNull(),
+    providerAccountId: text("provider_account_id").notNull(),
+    credentialPublicKey: text("credential_public_key").notNull(),
     counter: integer("counter").notNull(),
-    credentialDeviceType: text("credentialDeviceType").notNull(),
-    credentialBackedUp: boolean("credentialBackedUp").notNull(),
+    credentialDeviceType: text("credential_device_type").notNull(),
+    credentialBackedUp: boolean("credential_backed_up").notNull(),
     transports: text("transports"),
   },
-  (authenticator) => ({
-    compositePK: primaryKey({
+  (authenticator) => [
+    primaryKey({
       columns: [authenticator.userId, authenticator.credentialID],
     }),
-  }),
+  ],
 );
 
 export const postsTable = createTable("post", {
   id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  userId: text("userId")
+  userId: text("user_id")
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
-  content: varchar("content", { length: 256 }).notNull(),
+  content: varchar("content", { length: 1024 }).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
@@ -109,9 +106,8 @@ export const postsTable = createTable("post", {
     () => new Date(),
   ),
   type: varchar("type").$type<PostType>().notNull(),
-  urls: jsonb("urls").$type<Substring[]>(),
-  urlMetadata: jsonb("urlMetadata").$type<IMetadata>(),
-  playlistId: text("playlistId").references(() => playlistsTable.id, {
+  urlMetadata: jsonb("url_metadata").$type<IMetadata>(),
+  playlistId: text("playlist_id").references(() => playlistsTable.id, {
     onDelete: "cascade",
   }),
 });
@@ -119,10 +115,10 @@ export const postsTable = createTable("post", {
 export const repliesTable = createTable(
   "reply",
   {
-    replierId: text("replierId")
+    replierId: text("replier_id")
       .notNull()
       .references(() => postsTable.id, { onDelete: "cascade" }),
-    replieeId: text("replieeId")
+    replieeId: text("repliee_id")
       .notNull()
       .references(() => postsTable.id, { onDelete: "cascade" }),
     separation: integer("separation").notNull(),
@@ -130,51 +126,51 @@ export const repliesTable = createTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   },
-  (reply) => ({
-    compoundKey: primaryKey({
+  (reply) => [
+    primaryKey({
       columns: [reply.replieeId, reply.replierId],
     }),
-  }),
+  ],
 );
 
 export const likesTable = createTable(
   "like",
   {
-    postId: text("postId")
+    postId: text("post_id")
       .notNull()
       .references(() => postsTable.id, { onDelete: "cascade" }),
-    userId: text("userId")
+    userId: text("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   },
-  (like) => ({
-    compoundKey: primaryKey({
+  (like) => [
+    primaryKey({
       columns: [like.postId, like.userId],
     }),
-  }),
+  ],
 );
 
 export const followsTable = createTable(
   "follow",
   {
-    followerId: text("followerId")
+    followerId: text("follower_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
-    followeeId: text("followeeId")
+    followeeId: text("followee_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   },
-  (follow) => ({
-    compoundKey: primaryKey({
+  (follow) => [
+    primaryKey({
       columns: [follow.followeeId, follow.followerId],
     }),
-  }),
+  ],
 );
 
 export const usersTableRelations = relations(usersTable, ({ many }) => ({
@@ -215,13 +211,12 @@ export const postsTableRelations = relations(postsTable, ({ one, many }) => ({
 
 export const repliesTableRelations = relations(repliesTable, ({ one }) => ({
   replier: one(postsTable, {
-    // gets all posts a specific post is replying to
     fields: [repliesTable.replierId],
     references: [postsTable.id],
     relationName: "replier",
   }),
   repliee: one(postsTable, {
-    fields: [repliesTable.replieeId], // gets all posts replying to a specific post
+    fields: [repliesTable.replieeId],
     references: [postsTable.id],
     relationName: "repliee",
   }),
@@ -258,36 +253,36 @@ export const playlistsTable = createTable("playlist", {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
-  userId: text("userId")
+  userId: text("user_id")
     .notNull()
     .references(() => usersTable.id, { onDelete: "cascade" }),
   image: text("image").notNull(),
-  totalTracks: integer("totalTracks").notNull(),
-  createdAt: timestamp("createdAt", { withTimezone: true })
+  totalTracks: integer("total_tracks").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
-  externalUrl: text("externalUrl").notNull(),
+  externalUrl: text("external_url").notNull(),
   description: text("description"),
 });
 
 export const playlistLikesTable = createTable(
-  "playlist-like",
+  "playlist_like",
   {
-    playlistId: text("playlistId")
+    playlistId: text("playlist_id")
       .notNull()
       .references(() => playlistsTable.id, { onDelete: "cascade" }),
-    userId: text("userId")
+    userId: text("user_id")
       .notNull()
       .references(() => usersTable.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
   },
-  (like) => ({
-    compoundKey: primaryKey({
+  (like) => [
+    primaryKey({
       columns: [like.playlistId, like.userId],
     }),
-  }),
+  ],
 );
 
 export const playlistsTableRelations = relations(
@@ -322,3 +317,33 @@ export const playlistLikesTableRelations = relations(
     }),
   }),
 );
+
+export const mentionsTable = createTable(
+  "mention",
+  {
+    postId: text("post_id")
+      .notNull()
+      .references(() => postsTable.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+  },
+  (like) => [
+    primaryKey({
+      columns: [like.postId, like.userId],
+    }),
+  ],
+);
+
+export const mentionsTableRelations = relations(mentionsTable, ({ one }) => ({
+  mentionee: one(usersTable, {
+    fields: [mentionsTable.userId],
+    references: [usersTable.id],
+    relationName: "mentionee",
+  }),
+  mentioner: one(postsTable, {
+    fields: [mentionsTable.postId],
+    references: [postsTable.id],
+    relationName: "mentioner",
+  }),
+}));

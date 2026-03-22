@@ -11,13 +11,16 @@ import { PlaylistView } from "./playlist-view";
 import { Sorter } from "~/components/sorter";
 import { SearchView } from "~/components/search-view";
 import { ItemsView } from "./items-view";
+import { cn } from "~/lib/utils";
 
 export default function PlaylistFeedView({
   playlists,
   sessionUserId,
+  isPrimaryColor = false,
 }: {
   playlists: PlaylistObject[];
   sessionUserId?: string;
+  isPrimaryColor?: boolean;
 }) {
   const [filter, setFilter] = useState("");
 
@@ -41,7 +44,7 @@ export default function PlaylistFeedView({
           return text as PlaylistsSortingColumn;
         return null;
       }, []),
-      useCallback((psc) => psc, []), // already is text so no conversion is needed
+      useCallback((psc) => psc, []),
     );
 
   const treatedPlaylists = useMemo(() => {
@@ -56,7 +59,14 @@ export default function PlaylistFeedView({
 
   return (
     <>
-      <div className="flex flex-col items-start gap-2 border-b-2 border-background bg-secondary p-2 md:flex-row md:items-center">
+      <div
+        className={cn(
+          "flex flex-col items-start gap-2 border-b-2 border-background p-2 md:flex-row md:items-center",
+          isPrimaryColor
+            ? "bg-primary-border-b-2 border-background bg-primary"
+            : "bg-secondary",
+        )}
+      >
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>
@@ -68,10 +78,12 @@ export default function PlaylistFeedView({
           reverse={() => {
             setReversed((prev) => !prev);
           }}
+          isPrimaryColor={isPrimaryColor}
         />
         <SearchView
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
+          isPrimaryColor={isPrimaryColor}
         />
       </div>
       <ItemsView>
@@ -80,6 +92,7 @@ export default function PlaylistFeedView({
             key={playlist.id}
             playlist={playlist}
             sessionUserId={sessionUserId}
+            isPrimaryColor={isPrimaryColor}
           />
         ))}
       </ItemsView>

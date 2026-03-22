@@ -23,9 +23,13 @@ export default async function ProfileLayout({
 
   return (
     <>
-      <PageView>
+      <PageView sessionUser={session?.user}>
         <div className="flex flex-col bg-secondary">
-          <UserProfileView user={user} sessionUserId={session?.user.id} />
+          <UserProfileView
+            user={user}
+            sessionUserId={session?.user.id}
+            providerAccountId={session?.user.providerAccountId}
+          />
 
           <ProfileTabs userId={userId} />
         </div>

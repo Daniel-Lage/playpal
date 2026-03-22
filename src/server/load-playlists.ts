@@ -2,12 +2,11 @@
 
 import type { ApiError } from "~/models/error.model";
 import type { Paging } from "~/models/paging.model";
-import type { Playlist } from "~/models/playlist.model";
+import type { Playlist, PlaylistChanges } from "~/models/playlist.model";
 import { db } from "./db";
 import { playlistsTable } from "./db/schema";
-import { onConflictDoUpdateAll } from "~/helpers/on-conflict-do-update-all";
 import { getPlaylists } from "./get-playlists";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 
 export async function loadPlaylists(accessToken: string, userId: string) {
   const response = await fetch(
@@ -56,42 +55,72 @@ export async function loadPlaylists(accessToken: string, userId: string) {
     });
   }
 
-  const deletedPlaylists = await getPlaylists({ userIds: [userId] });
+  const wasDeleted = await getPlaylists({ userIds: [userId] });
 
-  await db
-    .insert(playlistsTable)
-    .values(
-      playlists.items.map(
-        ({
-          id,
-          images,
-          name,
-          external_urls: { spotify },
-          tracks: { total },
-          description,
-        }) => {
-          deletedPlaylists.filter((playlist) => playlist.id !== id); // filter playlists that still exist
-          return {
-            id,
-            userId,
-            name,
-            image: images[0]?.url ?? "",
-            totalTracks: total,
-            externalUrl: spotify,
-            description,
-          };
-        },
-      ),
-    )
-    .onConflictDoUpdate({
-      target: playlistsTable.id,
-      set: onConflictDoUpdateAll(playlistsTable),
-    });
+  const wasUpdated: PlaylistChanges[] = [];
+  const wasCreated: Playlist[] = [];
+
+  for (const playlist of playlists.items) {
+    const oldPlaylist = wasDeleted.find(
+      (oldPlaylist) => oldPlaylist.id === playlist.id,
+    );
+    if (oldPlaylist) {
+      const changes: PlaylistChanges = { id: playlist.id };
+      let hasChanged = false;
+
+      if (oldPlaylist.name != playlist.name) {
+        changes.name = playlist.name;
+        hasChanged = true;
+      }
+      if (oldPlaylist.image != playlist.images[0]?.url) {
+        changes.image = playlist.images[0]?.url ?? "";
+        hasChanged = true;
+      }
+      if (oldPlaylist.totalTracks != playlist.tracks.total) {
+        changes.totalTracks = playlist.tracks.total;
+        hasChanged = true;
+      }
+      if (oldPlaylist.description != playlist.description) {
+        changes.description = playlist.description ?? undefined;
+        hasChanged = true;
+      }
+
+      if (hasChanged) {
+        wasUpdated.push(changes);
+      }
+    } else {
+      wasCreated.push(playlist);
+    }
+  }
+
+  for (const change of wasUpdated) {
+    await db
+      .update(playlistsTable)
+      .set(change)
+      .where(eq(playlistsTable.id, change.id));
+  }
 
   await db.delete(playlistsTable).where(
     inArray(
       playlistsTable.id,
-      deletedPlaylists.map((playlist) => playlist.id),
+      wasDeleted.map((playlist) => playlist.id),
     ),
   );
+
+  await db
+    .insert(playlistsTable)
+    .values(
+      playlists.items.map((playlist) => {
+        return {
+          userId: userId,
+          id: playlist.id,
+          name: playlist.name,
+          image: playlist.images[0]?.url ?? "",
+          totalTracks: playlist.tracks.total,
+          externalUrl: playlist.external_urls.spotify,
+          description: playlist.description,
+        };
+      }),
+    )
+    .onConflictDoNothing();
 }

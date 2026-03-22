@@ -11,7 +11,7 @@ import { useLocalStorage } from "~/hooks/use-local-storage";
 import { signIn } from "next-auth/react";
 import { setFirstItem } from "~/helpers/set-first-item";
 import type { User } from "next-auth";
-import type { IMetadata, Substring } from "~/models/post.model";
+import type { IMetadata } from "~/models/post.model";
 import type { Device } from "~/models/device.model";
 import { DevicePicker } from "~/components/device-picker";
 import { type ActionStatus, PlayTracksStatus } from "~/models/status.model";
@@ -43,8 +43,8 @@ export function PlaylistPageView({
   expires_at?: number | null;
   send?: (
     input: string,
-    urls: Substring[] | undefined,
-    metadata: IMetadata | undefined,
+    mentions?: string[] | undefined,
+    metadata?: IMetadata | undefined,
   ) => Promise<ActionStatus>;
 }) {
   const [shuffled, setShuffled] = useLocalStorage<boolean>(
@@ -88,11 +88,9 @@ export function PlaylistPageView({
         newQueue = newQueue.slice(startIndex, startIndex + 99);
       }
 
-      const result = await play(
-        expires_at < Math.floor(new Date().getTime() / 1000),
-        newQueue,
-        device,
-      );
+      const expired = expires_at < Math.floor(new Date().getTime() / 1000);
+
+      const result = await play(expired, newQueue, device);
 
       if (typeof result === "number") {
         setStatus(result);
@@ -116,7 +114,7 @@ export function PlaylistPageView({
   return (
     <>
       {status === PlayTracksStatus.Active && (
-        <div className="absolute z-10 flex h-full w-[--main-view-w] items-center justify-center backdrop-brightness-50 md:ml-[calc(var(--nav-bar-w))]">
+        <div className="fixed z-10 flex h-full w-svw items-center justify-center backdrop-brightness-50 md:ml-[--nav-bar-w] md:w-[--main-view-w]">
           <div className="h-16 w-16 animate-spin rounded-full border-8 border-secondary border-b-transparent"></div>
         </div>
       )}

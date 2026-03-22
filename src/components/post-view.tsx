@@ -1,12 +1,6 @@
 "use client";
 
-import Image from "next/image";
-
-import {
-  type MainPostObject,
-  type PostObject,
-  type Substring,
-} from "~/models/post.model";
+import { type MainPostObject, type PostObject } from "~/models/post.model";
 import Link from "next/link";
 import { LikeButton } from "./buttons/like-button";
 import { formatTimelapse } from "~/helpers/format-timelapse";
@@ -23,6 +17,8 @@ import { UserImage } from "./user-image";
 import { ConfirmDialog } from "./confirm-dialog";
 import { IconButton } from "./buttons/icon-button";
 import { MenuButton } from "./buttons/menu-button";
+import { ContentRenderer } from "./content-renderer";
+import { MetadataCard } from "./post-creator";
 
 export function PostView({
   post,
@@ -30,6 +26,7 @@ export function PostView({
   isCutoff,
   isLastPost = true,
   CutOff,
+  isPrimaryColor = false,
   isMainPost = false,
   hasReplyBox = false,
 }: {
@@ -38,6 +35,7 @@ export function PostView({
   isCutoff?: boolean;
   isLastPost?: boolean;
   CutOff?: () => void;
+  isPrimaryColor?: boolean;
   isMainPost?: boolean;
   hasReplyBox?: boolean;
 }) {
@@ -46,8 +44,8 @@ export function PostView({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-md bg-secondary px-2",
-        isMainPost ? "bg-secondary" : "bg-secondary",
+        "flex flex-col overflow-hidden rounded-md bg-secondary px-2",
+        isPrimaryColor ? "bg-primary-accent" : "bg-secondary",
       )}
     >
       <div className="flex h-12 items-center text-xs md:text-base">
@@ -147,37 +145,10 @@ export function PostView({
             </button>
           )
         )}
-        <div className="flex grow flex-col justify-between">
-          <FormattedContent
-            input={post.content}
-            urls={post.urls}
-            ownUrl={`/post/${post.id}`}
-          />
+        <div className="flex grow flex-col justify-between overflow-hidden">
+          <ContentRenderer content={post.content} />
 
-          {post?.urlMetadata?.og_url && (
-            <Link
-              href={post.urlMetadata.og_url}
-              className="flex items-start gap-2 rounded-md bg-secondary-accent p-2"
-            >
-              {post?.urlMetadata?.og_image && (
-                <Image
-                  width={100}
-                  height={100}
-                  className="rounded-md"
-                  src={post?.urlMetadata?.og_image}
-                  alt={post.urlMetadata.og_title ?? "image"}
-                />
-              )}
-              <div className="grow overflow-hidden">
-                <div className="w-full truncate text-left text-xl font-bold md:text-2xl">
-                  {post.urlMetadata.og_title}
-                </div>
-                <div className="truncate text-left text-sm">
-                  {post.urlMetadata.og_description}
-                </div>
-              </div>
-            </Link>
-          )}
+          {post?.urlMetadata && <MetadataCard metadata={post?.urlMetadata} />}
 
           <div className="grid h-12 grid-cols-3 items-center justify-between font-bold">
             <LikeButton
@@ -213,58 +184,4 @@ export function PostView({
       </div>
     </div>
   );
-}
-
-function FormattedContent({
-  input,
-  urls,
-  ownUrl,
-}: {
-  input: string;
-  ownUrl: string;
-  urls?: Substring[] | null;
-}) {
-  if (!urls) return <Link href={ownUrl}>{input}</Link>;
-
-  const content: JSX.Element[] = [];
-
-  let contentIndex = 0;
-  for (let index = 0; index < urls.length; index++) {
-    const url = urls[index];
-    if (url) {
-      if (contentIndex != url.start) {
-        const value = input.slice(contentIndex, url.start);
-        content.push(
-          <Link href={ownUrl} key={index} className="inline whitespace-pre">
-            {value}
-          </Link>,
-        );
-      }
-      const value = input.slice(url.start, url.start + url.length);
-      content.push(
-        <Link
-          target="_blank"
-          href={value}
-          key={index}
-          className="inline whitespace-pre text-blue-700 hover:underline"
-        >
-          {value}
-        </Link>,
-      );
-      contentIndex = url.start + url.length;
-
-      if (index === urls.length - 1) {
-        if (contentIndex !== input.length) {
-          const value = input.slice(contentIndex);
-          content.push(
-            <Link href={ownUrl} key={index} className="inline whitespace-pre">
-              {value}
-            </Link>,
-          );
-        }
-      }
-    }
-  }
-
-  return content;
 }

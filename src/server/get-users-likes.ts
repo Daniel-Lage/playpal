@@ -12,7 +12,7 @@ export async function getUsersLikes(
   const postLikes = await db.query.likesTable.findMany({
     where: and(
       eq(likesTable.userId, userId),
-      lastQueried && sql`${likesTable.createdAt} > ${lastQueried}`, // get new posts
+      lastQueried && sql`${likesTable.createdAt} > ${lastQueried}`,
     ),
     with: {
       likee: {
@@ -20,7 +20,6 @@ export async function getUsersLikes(
           author: true,
           likes: true,
           replies: {
-            // only gets direct replies
             where: eq(repliesTable.separation, 0),
           },
         },
@@ -33,7 +32,7 @@ export async function getUsersLikes(
   const playlistLikes = await db.query.playlistLikesTable.findMany({
     where: and(
       eq(playlistLikesTable.userId, userId),
-      lastQueried && sql`${likesTable.createdAt} > ${lastQueried}`, // get new playlists
+      lastQueried && sql`${likesTable.createdAt} > ${lastQueried}`,
     ),
     with: {
       likee: {
@@ -53,7 +52,6 @@ export async function getUsersLikes(
                 },
               },
               replies: {
-                // only gets direct replies
                 where: eq(repliesTable.separation, 0),
               },
             },

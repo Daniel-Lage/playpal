@@ -47,7 +47,7 @@ export default async function RepliesPage({
   const posts = await getPosts({ userIds: [userId], replies: true });
 
   return (
-    <PageView>
+    <PageView sessionUser={session?.user}>
       <PostFeedView
         posts={posts}
         sessionUser={session?.user}

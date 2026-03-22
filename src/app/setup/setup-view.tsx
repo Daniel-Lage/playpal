@@ -84,7 +84,7 @@ export function SetUpView({
             <div className="absolute bottom-0 right-0">
               <IconButton
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-secondary"
+                className="bg-primary"
               >
                 <Edit />
               </IconButton>
@@ -116,6 +116,7 @@ export function SetUpView({
                   router.push("/");
                 })
                 .catch(console.error);
+            else router.push("/");
           }}
         >
           <ArrowBigRight />

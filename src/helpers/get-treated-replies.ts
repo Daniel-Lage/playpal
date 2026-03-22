@@ -7,7 +7,6 @@ export function getTreatedReplies(
 ) {
   return replies.sort((replyThreadA, replyThreadB) => {
     const key = {
-      // compares first post of thread
       [PostsSortingColumn.Likes]: (thread: PostObject[]) =>
         thread[0]?.likes?.length,
       [PostsSortingColumn.Replies]: (thread: PostObject[]) =>

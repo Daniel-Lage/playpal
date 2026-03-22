@@ -11,7 +11,7 @@ import { playTracks } from "~/api/play-tracks";
 import { revalidatePath } from "next/cache";
 import { getPlaylist } from "~/server/get-playlist";
 import { getTracks } from "~/api/get-tracks";
-import type { IMetadata, Substring } from "~/models/post.model";
+import type { IMetadata } from "~/models/post.model";
 import { postPlaylistReply } from "~/server/post-playlist-reply";
 import type { Device } from "~/models/device.model";
 import { ActionStatus, PlayTracksStatus } from "~/models/status.model";
@@ -70,23 +70,24 @@ export default async function PlaylistPage({
 
   const send = async (
     input: string,
-    urls: Substring[] | undefined,
+    mentions: string[] | undefined,
     metadata: IMetadata | undefined,
   ) => {
     "use server";
 
-    if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
+    if (!session?.user) return ActionStatus.Failure;
 
     const result = await postPlaylistReply(
       input,
       session?.user.id,
       playlist.id,
-      urls,
+      mentions,
       metadata,
     );
     revalidatePath("/");
     return result;
   };
+
   if (!(await isPremiumUser(session.user.access_token)))
     return (
       <PlaylistPageView

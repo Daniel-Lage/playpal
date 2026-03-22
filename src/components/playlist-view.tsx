@@ -12,18 +12,19 @@ import { IconButton } from "./buttons/icon-button";
 
 export function PlaylistView({
   playlist,
-  focused = false,
   sessionUserId,
+  isPrimaryColor = false,
 }: {
   sessionUserId?: string | null;
   playlist: PlaylistObject;
   focused?: boolean;
+  isPrimaryColor?: boolean;
 }) {
   return (
     <div
       className={cn(
         "flex flex-col gap-2 rounded-md p-2",
-        focused ? "bg-secondary" : "bg-secondary",
+        isPrimaryColor ? "bg-primary-accent" : "bg-secondary",
       )}
     >
       <div className="flex items-start gap-2 font-bold">

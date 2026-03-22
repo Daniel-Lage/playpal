@@ -6,6 +6,7 @@ import {
   postsTable,
   followsTable,
   playlistsTable,
+  mentionsTable,
 } from "./db/schema";
 import type { FollowObject } from "~/models/follow.model";
 import {
@@ -13,22 +14,20 @@ import {
   type NotificationObject,
 } from "~/models/notifications.model";
 import type { UserObject } from "~/models/user.model";
+import type { MentionObject } from "~/models/mention.model";
 
 export async function getNotifications(userId: string, lastQueried?: Date) {
   const posts = await db.query.postsTable.findMany({
-    // replies to your posts
     with: {
       author: true,
       likes: { with: { liker: true } },
       replies: {
-        // only gets direct replies
         with: {
           replier: {
             with: {
               author: true,
               likes: { with: { liker: true } },
               replies: {
-                // only gets direct replies
                 where: eq(repliesTable.separation, 0),
               },
             },
@@ -39,7 +38,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
     },
     where: and(
       eq(postsTable.userId, userId),
-      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new posts
+      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`,
     ),
     limit: 100,
   });
@@ -57,7 +56,6 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
             },
           },
           replies: {
-            // only gets direct replies
             where: eq(repliesTable.separation, 0),
           },
         },
@@ -65,7 +63,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
     },
     where: and(
       eq(playlistsTable.userId, userId),
-      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new playlists
+      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`,
     ),
     limit: 100,
   });
@@ -73,6 +71,32 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
   const follows: FollowObject[] = await db.query.followsTable.findMany({
     where: eq(followsTable.followeeId, userId),
     with: { follower: true },
+  });
+
+  const mentions: MentionObject[] = await db.query.mentionsTable.findMany({
+    where: eq(mentionsTable.userId, userId),
+    with: {
+      mentioner: {
+        with: {
+          author: true,
+          likes: { with: { liker: true } },
+          replies: {
+            with: {
+              replier: {
+                with: {
+                  author: true,
+                  likes: { with: { liker: true } },
+                  replies: {
+                    where: eq(repliesTable.separation, 0),
+                  },
+                },
+              },
+            },
+            where: eq(repliesTable.separation, 0),
+          },
+        },
+      },
+    },
   });
 
   const notifications: NotificationObject[] = [];
@@ -89,7 +113,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
   posts.forEach((post) => {
     if (post.replies) {
       post.replies.forEach((reply) => {
-        if (reply.replier.author.id === userId) return; // don't notify if the user is the author of the reply
+        if (reply.replier.author.id === userId) return;
 
         notifications.push({
           type: NotificationType.Reply,
@@ -103,7 +127,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
 
     if (post.likes) {
       post.likes.forEach((like) => {
-        if (like.userId === userId) return; // don't notify if the user is the one who liked the post
+        if (like.userId === userId) return;
 
         notifications.push({
           type: NotificationType.Like,
@@ -119,7 +143,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
   playlists.forEach((playlist) => {
     if (playlist.replies) {
       playlist.replies.forEach((reply) => {
-        if (reply.author.id === userId) return; // don't notify if the user is the author of the reply
+        if (reply.author.id === userId) return;
 
         notifications.push({
           type: NotificationType.Reply,
@@ -133,7 +157,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
 
     if (playlist.likes) {
       playlist.likes.forEach((like) => {
-        if (like.userId === userId) return; // don't notify if the user is the one who liked the playlist
+        if (like.userId === userId) return;
 
         notifications.push({
           type: NotificationType.Like,
@@ -145,5 +169,17 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
       });
     }
   });
+
+  mentions.forEach((mention) => {
+    if (mention.mentioner == null) return;
+
+    notifications.push({
+      type: NotificationType.Mention,
+      createdAt: mention.mentioner.createdAt,
+      notifier: mention.mentioner,
+      notifierId: mention.mentioner.id,
+    });
+  });
+
   return notifications;
 }

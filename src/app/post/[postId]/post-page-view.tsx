@@ -11,7 +11,7 @@ import { PostView } from "~/components/post-view";
 import { Sorter } from "~/components/sorter";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 
-import type { IMetadata, MainPostObject, Substring } from "~/models/post.model";
+import type { IMetadata, MainPostObject } from "~/models/post.model";
 
 import {
   PostsSortingColumn,
@@ -35,8 +35,8 @@ export function PostPageView({
   refresh: (lastQueried: Date) => Promise<ReplyObject[][]>;
   send?: (
     input: string,
-    urls: Substring[] | undefined,
-    metadata: IMetadata | undefined,
+    mentions?: string[] | undefined,
+    metadata?: IMetadata | undefined,
   ) => Promise<ActionStatus>;
 }) {
   const [replies, setReplies] = useState(post.replyThreads ?? []);
@@ -44,7 +44,6 @@ export function PostPageView({
   const lastQueried = useRef(lastQueriedProp);
 
   useEffect(() => {
-    // every 10 seconds tries to get replies from the last 10 seconds
     const interval = setInterval(() => {
       refresh(lastQueried.current)
         .then((newReplies) => {
@@ -52,7 +51,7 @@ export function PostPageView({
           lastQueried.current = new Date();
         })
         .catch(console.error);
-    }, 10000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [refresh]);
@@ -77,7 +76,7 @@ export function PostPageView({
         return text as PostsSortingColumn;
       return null;
     }, []),
-    useCallback((psc) => psc, []), // already is text so no conversion is needed
+    useCallback((psc) => psc, []),
   );
 
   const treatedReplies = useMemo(() => {
@@ -93,14 +92,14 @@ export function PostPageView({
   const handleSend = useCallback(
     async (
       input: string,
-      urls: Substring[] | undefined,
+      mentions: string[] | undefined,
       metadata: IMetadata | undefined,
     ) => {
       if (!send) return;
 
       setStatus(ActionStatus.Active);
 
-      setStatus(await send(input, urls, metadata));
+      setStatus(await send(input, mentions, metadata));
 
       setTimeout(() => {
         setStatus(ActionStatus.Inactive);
@@ -118,7 +117,6 @@ export function PostPageView({
               <div className="border-b-2 border-background">
                 <PlaylistView
                   playlist={post.playlist}
-                  focused={true}
                   sessionUserId={sessionUser?.id}
                 />
               </div>
@@ -189,7 +187,6 @@ function getTreatedReplies(
 ) {
   return replies.sort((replyThreadA, replyThreadB) => {
     const key = {
-      // compares first post of thread
       [PostsSortingColumn.Likes]: (thread: ReplyObject[]) =>
         thread[0]?.replier?.likes?.length,
       [PostsSortingColumn.Replies]: (thread: ReplyObject[]) =>

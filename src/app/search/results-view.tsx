@@ -27,7 +27,6 @@ export function ResultsView({
   const lastQueried = useRef(lastQueriedProp);
 
   useEffect(() => {
-    // every 10 seconds tries to get results from the last 10 seconds
     const interval = setInterval(() => {
       refresh(lastQueried.current)
         .then(({ users: newUsers, posts: newPosts }) => {
@@ -36,7 +35,7 @@ export function ResultsView({
           lastQueried.current = new Date();
         })
         .catch(console.error);
-    }, 10000);
+    }, 30000);
 
     return () => clearInterval(interval);
   }, [refresh]);
@@ -52,9 +51,7 @@ export function ResultsView({
     <ItemsView>
       {users.length !== 0 && (
         <div className="flex flex-col overflow-hidden rounded-md bg-secondary">
-          <div className="w-full border-b-2 border-background p-2 font-bold">
-            Users
-          </div>
+          <div className="w-full p-2 font-bold">Users</div>
           {users.map((user) => (
             <UserView key={user.id} user={user} />
           ))}

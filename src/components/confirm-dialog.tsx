@@ -31,7 +31,10 @@ export function ConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="bg-red-500">
+          <AlertDialogAction
+            onClick={onConfirm}
+            className="rounded-md bg-red-500 px-2"
+          >
             Confirm
           </AlertDialogAction>
         </AlertDialogFooter>

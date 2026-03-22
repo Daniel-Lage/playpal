@@ -3,7 +3,7 @@ import type { PostObject } from "./post.model";
 import type { UserObject } from "./user.model";
 
 export interface NotificationObject {
-  type: NotificationType; // potentially add more types in the future (mentions, quotes, etc.)
+  type: NotificationType;
   createdAt: Date;
   notifier: PostObject | UserObject;
   notifierId: string;
@@ -14,6 +14,7 @@ export enum NotificationType {
   Reply = "Reply",
   Follow = "Follow",
   Like = "Like",
+  Mention = "Mention",
 }
 
 export const NotificationTypeOptions = Object.values(NotificationType);

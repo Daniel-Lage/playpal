@@ -6,7 +6,6 @@ import {
   type PostObject,
   PostsSortingColumn,
   PostsSortingColumnOptions,
-  type Substring,
 } from "~/models/post.model";
 import { PostView } from "~/components/post-view";
 import { useLocalStorage } from "~/hooks/use-local-storage";
@@ -17,6 +16,7 @@ import { Check, X } from "lucide-react";
 import { ActionStatus } from "~/models/status.model";
 import { ItemsView } from "~/components/items-view";
 import { PopupType, PopupView } from "~/components/popup-view";
+import { cn } from "~/lib/utils";
 
 export function PostFeedView({
   posts: postsProp,
@@ -24,14 +24,16 @@ export function PostFeedView({
   lastQueried: lastQueriedProp,
   refresh,
   send,
+  isPrimaryColor = false,
 }: {
   posts: PostObject[];
   lastQueried: Date;
   sessionUser?: User | undefined;
+  isPrimaryColor?: boolean;
   refresh: (lastQueried: Date) => Promise<PostObject[]>;
   send?: (
     input: string,
-    urls: Substring[] | undefined,
+    mentions: string[] | undefined,
     metadata: IMetadata | undefined,
   ) => Promise<ActionStatus>;
 }) {
@@ -63,11 +65,10 @@ export function PostFeedView({
         return text as PostsSortingColumn;
       return null;
     }, []),
-    useCallback((psc) => psc, []), // already is text so no conversion is needed
+    useCallback((psc) => psc, []),
   );
 
   useEffect(() => {
-    // every 10 seconds tries to get posts from the last 10 seconds
     const interval = setInterval(() => {
       refresh(lastQueried.current)
         .then((newPosts) => {
@@ -92,14 +93,14 @@ export function PostFeedView({
   const handleSend = useCallback(
     async (
       input: string,
-      urls: Substring[] | undefined,
+      mentions: string[] | undefined,
       metadata: IMetadata | undefined,
     ) => {
       if (!send) return;
 
       setStatus(ActionStatus.Active);
 
-      setStatus(await send(input, urls, metadata));
+      setStatus(await send(input, mentions, metadata));
 
       setTimeout(() => {
         setStatus(ActionStatus.Inactive);
@@ -116,10 +117,18 @@ export function PostFeedView({
           sessionUser={sessionUser}
           disabled={status === ActionStatus.Active}
           setStatus={setStatus}
+          isPrimaryColor={isPrimaryColor}
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 bg-secondary p-2 px-2 md:flex-row md:items-center md:justify-between">
+      <div
+        className={cn(
+          "flex flex-col items-start gap-2 bg-secondary p-2 px-2 md:flex-row md:items-center md:justify-between",
+          isPrimaryColor
+            ? "border-b-2 border-background bg-primary"
+            : "bg-secondary",
+        )}
+      >
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>
@@ -131,12 +140,18 @@ export function PostFeedView({
           reverse={() => {
             setReversed((prev) => !prev);
           }}
+          isPrimaryColor={isPrimaryColor}
         />
       </div>
 
       <ItemsView>
         {treatedPosts.map((post) => (
-          <PostView key={post.id} post={post} sessionUserId={sessionUser?.id} />
+          <PostView
+            key={post.id}
+            post={post}
+            sessionUserId={sessionUser?.id}
+            isPrimaryColor={isPrimaryColor}
+          />
         ))}
       </ItemsView>
 

@@ -58,7 +58,7 @@ export default async function PlaylistsPage({
   const playlists = await getPlaylists({ userIds: [userId] });
 
   return (
-    <PageView>
+    <PageView sessionUser={session?.user}>
       <PlaylistFeedView
         playlists={playlists}
         sessionUserId={session?.user.id}

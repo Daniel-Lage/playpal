@@ -11,7 +11,6 @@ export async function getPostLikes(postId: string) {
       author: true,
       likes: { with: { liker: true } },
       replies: {
-        // only gets direct replies
         where: eq(repliesTable.separation, 0),
       },
     },

@@ -13,7 +13,6 @@ export async function getUser(userId: string): Promise<UserObject | undefined> {
           author: true,
           likes: true,
           replies: {
-            // only gets direct replies
             where: eq(repliesTable.separation, 0),
           },
         },
@@ -25,7 +24,6 @@ export async function getUser(userId: string): Promise<UserObject | undefined> {
               author: true,
               likes: true,
               replies: {
-                // only gets direct replies
                 where: eq(repliesTable.separation, 0),
               },
             },

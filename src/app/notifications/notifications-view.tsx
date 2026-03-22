@@ -30,9 +30,7 @@ export default function NotificationsView({
       <div className="flex flex-col bg-secondary p-2">
         <div className="grid grid-cols-4 gap-1">
           <TabLinkButton
-            className={
-              tab === undefined ? "bg-secondary-accent" : "bg-secondary"
-            }
+            className={tab == null ? "bg-secondary-accent" : "bg-secondary"}
             onClick={() => setTab(undefined)}
           >
             All
@@ -51,7 +49,7 @@ export default function NotificationsView({
       <ItemsView>
         {notifications
           .filter((notification) =>
-            tab !== undefined ? notification.type === tab : true,
+            tab != null ? notification.type === tab : true,
           )
           .map((notification) => (
             <div
@@ -110,6 +108,15 @@ function NotificationView({
         notifier={notification.notifier as UserObject}
         timelapse={timelapse}
         target={notification.target!}
+      />
+    );
+
+  if (notification.type === NotificationType.Mention)
+    return (
+      <PostView
+        post={notification.notifier as PostObject}
+        sessionUserId={sessionUserId}
+        isMainPost={false}
       />
     );
 }

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getPost } from "~/server/get-post";
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
-import { type IMetadata, type Substring } from "~/models/post.model";
+import { type IMetadata } from "~/models/post.model";
 import { postPost } from "~/server/post-post";
 import { revalidatePath } from "next/cache";
 import { PostPageView } from "./post-page-view";
@@ -57,24 +57,24 @@ export default async function PostPage({
   if (!post) return <ErrorPage />;
 
   return (
-    <PageView>
+    <PageView sessionUser={session?.user}>
       <PostPageView
         post={post}
         sessionUser={session?.user}
         lastQueried={new Date()}
         send={async (
           input: string,
-          urls: Substring[] | undefined,
+          mentions: string[] | undefined,
           metadata: IMetadata | undefined,
         ) => {
           "use server";
 
-          if (!session?.user) return ActionStatus.Failure; // shouldn't be able to be called if not logged in
+          if (!session?.user) return ActionStatus.Failure;
 
           const result = await postPost(
             input,
             session?.user.id,
-            urls,
+            mentions,
             metadata,
             post,
           );

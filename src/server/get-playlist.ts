@@ -21,7 +21,6 @@ export async function getPlaylist(playlistId: string) {
           likes: true,
           thread: true,
           replies: {
-            // only gets direct replies
             where: eq(repliesTable.separation, 0),
           },
         },

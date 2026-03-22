@@ -24,7 +24,6 @@ export async function getPlaylists({
             },
           },
           replies: {
-            // only gets direct replies
             where: eq(repliesTable.separation, 0),
           },
         },
@@ -33,7 +32,7 @@ export async function getPlaylists({
     orderBy: [desc(playlistsTable.createdAt)],
     where: and(
       userIds ? inArray(postsTable.userId, userIds) : undefined,
-      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`, // get new playlists
+      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`,
     ),
     limit: 100,
   });
