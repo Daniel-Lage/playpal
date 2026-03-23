@@ -21,7 +21,10 @@ export function UserImage({
     <Image
       width={size}
       height={size}
-      className={cn("aspect-square rounded-full", className)}
+      className={cn(
+        `aspect-square h-auto w-[${size}px] flex-shrink-0 flex-grow-0 rounded-md`,
+        className,
+      )}
       src={ready ? (image ?? "/avatar.svg") : "/avatar.svg"}
       alt={image ? (name ?? "") : ""}
       onLoad={() => {

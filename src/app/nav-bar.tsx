@@ -9,7 +9,6 @@ import {
   Search,
   UserRoundPen,
 } from "lucide-react";
-import type { User } from "next-auth";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -18,17 +17,22 @@ import { NavButton } from "~/components/buttons/nav-button";
 import { UserImage } from "~/components/user-image";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import { cn } from "~/lib/utils";
+import type { SessionUser } from "~/models/user.model";
 
-export function NavBar({ sessionUser }: { sessionUser?: User | undefined }) {
+export function NavBar({
+  sessionUser,
+}: {
+  sessionUser?: SessionUser | undefined;
+}) {
   const profileUrl = useMemo(
     () => (sessionUser ? `/user/${sessionUser.id}` : undefined),
     [sessionUser],
   );
-
   const pathname = usePathname();
 
   const scrollY = useRef(0);
   const [faded, setFaded] = useState(false);
+
   const [collapsed, setCollapsed] = useLocalStorage<boolean>(
     sessionUser?.id
       ? `${sessionUser.id}:nav_bar_collapsed`
@@ -96,9 +100,9 @@ export function NavBar({ sessionUser }: { sessionUser?: User | undefined }) {
           )}
         >
           <Image
-            className="rounded-md"
             width={48}
             height={48}
+            className="aspect-square h-auto w-12 flex-shrink-0 flex-grow-0 rounded-md"
             src="/favicon.ico"
             alt="playpal logo"
             priority

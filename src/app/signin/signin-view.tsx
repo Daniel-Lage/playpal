@@ -38,6 +38,7 @@ export function SignInView() {
         <Image
           height={24}
           width={24}
+          className="aspect-square h-auto w-6 flex-shrink-0 flex-grow-0 rounded-md"
           src="/spotify-icon.svg"
           alt="spotify icon"
         />

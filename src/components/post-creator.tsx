@@ -14,9 +14,9 @@ import { getUsersFollowing } from "~/server/get-users-following";
 import { cn } from "~/lib/utils";
 import { flattenContent } from "~/helpers/flatten-content";
 import { getMetadataList } from "~/lib/get-metadata";
-import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { IconButton } from "./buttons/icon-button";
+import { MetadataCard } from "./metadata-card";
 
 export function PostCreator({
   send,
@@ -185,43 +185,5 @@ export function PostCreator({
         )}
       </div>
     </div>
-  );
-}
-
-/*
-TODO:
-get metadata from urls
-show cards for each url and the information from the metadata (create card even if no details from metadata)
-pick focused card for post display (and add 'scroll' to next card)
-*/
-
-export function MetadataCard({ metadata }: { metadata: IMetadata }) {
-  return (
-    <Link
-      href={metadata?.og_url ?? ""}
-      className="flex w-full flex-1 items-start gap-2 overflow-hidden rounded-md bg-secondary-accent p-2"
-    >
-      {metadata?.og_image && (
-        <Image
-          width={100}
-          height={100}
-          className="max-h-[100px] shrink-0 overflow-hidden"
-          src={metadata?.og_image ?? ""}
-          alt={metadata.og_title ?? "image"}
-        />
-      )}
-      <div className="overflow-hidden">
-        <div className="w-full truncate text-left text-xl font-bold md:text-2xl">
-          {metadata.og_title ?? metadata.og_site_name}
-        </div>
-        <div className="truncate text-left text-sm">
-          {metadata.og_description}
-        </div>
-
-        <div className="truncate text-left text-sm font-bold text-background">
-          {metadata.og_url}
-        </div>
-      </div>
-    </Link>
   );
 }

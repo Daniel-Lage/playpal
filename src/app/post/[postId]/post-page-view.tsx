@@ -1,11 +1,8 @@
 "use client";
 
-import { Check, X } from "lucide-react";
-import type { User } from "next-auth";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ItemsView } from "~/components/items-view";
 import { PlaylistView } from "~/components/playlist-view";
-import { PopupType, PopupView } from "~/components/popup-view";
 import { PostCreator } from "~/components/post-creator";
 import { PostView } from "~/components/post-view";
 import { Sorter } from "~/components/sorter";
@@ -20,7 +17,9 @@ import {
 
 import type { ReplyObject } from "~/models/reply.model";
 import { ActionStatus } from "~/models/status.model";
-import { Thread } from "../../../components/thread";
+import { Thread } from "~/components/thread";
+import type { SessionUser } from "~/models/user.model";
+import { StatusMessage } from "~/components/message-status";
 
 export function PostPageView({
   post,
@@ -31,7 +30,7 @@ export function PostPageView({
 }: {
   post: MainPostObject;
   lastQueried: Date;
-  sessionUser?: User | undefined;
+  sessionUser?: SessionUser | undefined;
   refresh: (lastQueried: Date) => Promise<ReplyObject[][]>;
   send?: (
     input: string,
@@ -174,9 +173,7 @@ export function PostPageView({
         ))}
       </ItemsView>
 
-      {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
-        <StatusMessage status={status} />
-      )}
+      <StatusMessage status={status} actionDone="Reply Sent" />
     </>
   );
 }
@@ -203,21 +200,4 @@ function getTreatedReplies(
     if (keyA < keyB) return 1;
     return 0;
   });
-}
-
-function StatusMessage({ status }: { status: ActionStatus }) {
-  if (status === ActionStatus.Success)
-    return (
-      <PopupView type={PopupType.Success}>
-        <Check size={40} />
-        Reply Sent Sucessfully
-      </PopupView>
-    );
-
-  return (
-    <PopupView type={PopupType.ServerError}>
-      <X size={40} />
-      Internal Server Error
-    </PopupView>
-  );
 }

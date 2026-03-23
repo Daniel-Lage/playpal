@@ -18,7 +18,7 @@ import { ConfirmDialog } from "./confirm-dialog";
 import { IconButton } from "./buttons/icon-button";
 import { MenuButton } from "./buttons/menu-button";
 import { ContentRenderer } from "./content-renderer";
-import { MetadataCard } from "./post-creator";
+import { MetadataCard } from "./metadata-card";
 
 export function PostView({
   post,
@@ -148,7 +148,12 @@ export function PostView({
         <div className="flex grow flex-col justify-between overflow-hidden">
           <ContentRenderer content={post.content} />
 
-          {post?.urlMetadata && <MetadataCard metadata={post?.urlMetadata} />}
+          {post?.urlMetadata && (
+            <MetadataCard
+              metadata={post?.urlMetadata}
+              isPrimaryColor={isPrimaryColor}
+            />
+          )}
 
           <div className="grid h-12 grid-cols-3 items-center justify-between font-bold">
             <LikeButton

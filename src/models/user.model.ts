@@ -21,7 +21,7 @@ export interface SpotifyUser extends SimplifiedUser {
   product: "premium" | "free" | "open";
 }
 
-type SessionUser = User & {
+export type SessionUser = User & {
   access_token: string | null;
   expires_at: number | null;
   providerAccountId: string | null;

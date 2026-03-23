@@ -34,9 +34,9 @@ export function PlaylistView({
           title={playlist.name}
         >
           <Image
-            width={100}
-            height={100}
-            className="inline aspect-square h-[100px] w-[100px] shrink-0 grow-0 rounded-sm"
+            width={96}
+            height={96}
+            className="inline aspect-square h-auto w-24 flex-shrink-0 flex-grow-0 rounded-md"
             src={playlist.image}
             alt={playlist.name}
           />

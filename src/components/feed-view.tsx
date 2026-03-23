@@ -1,6 +1,5 @@
 "use client";
 
-import type { User } from "next-auth";
 import { PostFeedView } from "~/components/post-feed-view";
 import type { IMetadata, PostObject } from "~/models/post.model";
 import PlaylistFeedView from "./playlist-feed-view";
@@ -9,6 +8,7 @@ import { useState } from "react";
 import type { ActionStatus } from "~/models/status.model";
 import { TabLinkButton } from "./buttons/tab-link-button";
 import { PageView } from "./page-view";
+import type { SessionUser } from "~/models/user.model";
 
 export function FeedView({
   posts,
@@ -20,7 +20,7 @@ export function FeedView({
 }: {
   posts: PostObject[];
   lastQueried: Date;
-  sessionUser?: User | undefined;
+  sessionUser?: SessionUser | undefined;
   refresh: (lastQueried: Date) => Promise<PostObject[]>;
   send?: (
     input: string,
@@ -33,6 +33,7 @@ export function FeedView({
 
   return (
     <PageView
+      sessionUser={sessionUser}
       sideContent={
         <>
           <div className="bg-primary p-2 text-xl font-bold">

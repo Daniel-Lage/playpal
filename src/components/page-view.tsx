@@ -5,7 +5,7 @@ import { NavButton } from "./buttons/nav-button";
 import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useLocalStorage } from "~/hooks/use-local-storage";
-import type { User } from "next-auth";
+import type { SessionUser } from "~/models/user.model";
 
 export function PageView({
   children,
@@ -14,7 +14,7 @@ export function PageView({
 }: {
   children: React.ReactNode;
   sideContent?: React.ReactNode;
-  sessionUser?: User | undefined;
+  sessionUser?: SessionUser | undefined;
 }) {
   const [collapsed, setCollapsed] = useLocalStorage<boolean>(
     sessionUser?.id

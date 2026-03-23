@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { User } from "next-auth";
-import { ArrowBigRight, Check, Edit, X } from "lucide-react";
+import { ArrowBigRight, Edit } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { updateName } from "~/server/update-name";
@@ -14,8 +14,8 @@ import { uploadFiles } from "~/helpers/uploadthing";
 import { ActionStatus } from "~/models/status.model";
 import { IconButton } from "~/components/buttons/icon-button";
 import { FormButton } from "~/components/buttons/form-button";
-import { PopupType, PopupView } from "~/components/popup-view";
 import { OneElementView } from "~/components/one-element-view";
+import { StatusMessage } from "~/components/message-status";
 
 export function SetUpView({
   user,
@@ -123,27 +123,7 @@ export function SetUpView({
           <div className="text-lg font-bold">Continue</div>
         </FormButton>
       </OneElementView>
-      {imageStatus !== ActionStatus.Active &&
-        imageStatus !== ActionStatus.Inactive && (
-          <StatusMessage status={imageStatus} />
-        )}
+      <StatusMessage status={imageStatus} actionDone="Image Uploaded" />
     </>
-  );
-}
-
-function StatusMessage({ status }: { status: ActionStatus }) {
-  if (status === ActionStatus.Success)
-    return (
-      <PopupView type={PopupType.Success}>
-        <Check size={40} />
-        Image Uploaded Sucessfully
-      </PopupView>
-    );
-
-  return (
-    <PopupView type={PopupType.ServerError}>
-      <X size={40} />
-      Internal Server Error
-    </PopupView>
   );
 }

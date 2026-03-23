@@ -10,13 +10,12 @@ import {
 import { PostView } from "~/components/post-view";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import { Sorter } from "~/components/sorter";
-import type { User } from "next-auth";
 import { PostCreator } from "~/components/post-creator";
-import { Check, X } from "lucide-react";
 import { ActionStatus } from "~/models/status.model";
 import { ItemsView } from "~/components/items-view";
-import { PopupType, PopupView } from "~/components/popup-view";
 import { cn } from "~/lib/utils";
+import type { SessionUser } from "~/models/user.model";
+import { StatusMessage } from "./message-status";
 
 export function PostFeedView({
   posts: postsProp,
@@ -28,7 +27,7 @@ export function PostFeedView({
 }: {
   posts: PostObject[];
   lastQueried: Date;
-  sessionUser?: User | undefined;
+  sessionUser?: SessionUser | undefined;
   isPrimaryColor?: boolean;
   refresh: (lastQueried: Date) => Promise<PostObject[]>;
   send?: (
@@ -155,9 +154,7 @@ export function PostFeedView({
         ))}
       </ItemsView>
 
-      {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
-        <StatusMessage status={status} />
-      )}
+      <StatusMessage status={status} actionDone="Post Sent" />
     </>
   );
 }
@@ -180,21 +177,4 @@ function getTreatedPosts(
     if (keyA < keyB) return 1;
     return 0;
   });
-}
-
-function StatusMessage({ status }: { status: ActionStatus }) {
-  if (status === ActionStatus.Success)
-    return (
-      <PopupView type={PopupType.Success}>
-        <Check size={40} />
-        Post Sent Sucessfully
-      </PopupView>
-    );
-
-  return (
-    <PopupView type={PopupType.ServerError}>
-      <X size={40} />
-      Internal Server Error
-    </PopupView>
-  );
 }

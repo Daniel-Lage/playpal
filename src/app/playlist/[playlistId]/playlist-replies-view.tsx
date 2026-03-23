@@ -1,5 +1,4 @@
 "use client";
-import type { User } from "node_modules/next-auth/core/types";
 import { useCallback, useMemo, useState } from "react";
 import { ItemsView } from "~/components/items-view";
 import { PostCreator } from "~/components/post-creator";
@@ -13,9 +12,9 @@ import {
 } from "~/models/post.model";
 import { ActionStatus } from "~/models/status.model";
 import { getTreatedReplies } from "../../../helpers/get-treated-replies";
-import { PopupType, PopupView } from "~/components/popup-view";
-import { Check, X } from "lucide-react";
 import { Thread } from "~/components/thread";
+import type { SessionUser } from "~/models/user.model";
+import { StatusMessage } from "~/components/message-status";
 
 export function PlaylistRepliesView({
   playlist,
@@ -23,7 +22,7 @@ export function PlaylistRepliesView({
   send,
 }: {
   playlist: PlaylistObject;
-  sessionUser?: User | undefined;
+  sessionUser?: SessionUser | undefined;
   send?: (
     input: string,
     mentions?: string[] | undefined,
@@ -126,26 +125,7 @@ export function PlaylistRepliesView({
         ))}
       </ItemsView>
 
-      {status !== ActionStatus.Active && status !== ActionStatus.Inactive && (
-        <StatusMessage status={status} />
-      )}
+      <StatusMessage status={status} actionDone="Reply Sent" />
     </>
-  );
-}
-
-function StatusMessage({ status }: { status: ActionStatus }) {
-  if (status === ActionStatus.Success)
-    return (
-      <PopupView type={PopupType.Success}>
-        <Check size={40} />
-        Reply Sent Sucessfully
-      </PopupView>
-    );
-
-  return (
-    <PopupView type={PopupType.ServerError}>
-      <X size={40} />
-      Internal Server Error
-    </PopupView>
   );
 }

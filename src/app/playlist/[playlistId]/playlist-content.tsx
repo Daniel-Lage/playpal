@@ -37,9 +37,9 @@ export function PlaylistContent({
     <div className="flex flex-col gap-2 border-b-2 border-background bg-secondary p-2">
       <div className="flex flex-col items-center gap-2 md:flex-row md:items-stretch">
         <Image
-          width={150}
-          height={150}
-          className="aspect-square h-[150px] w-[150px] flex-shrink-0 flex-grow-0 rounded-md"
+          width={160}
+          height={160}
+          className="aspect-square h-auto w-40 flex-shrink-0 flex-grow-0 rounded-md"
           src={playlist.image}
           alt={playlist.name}
         />
@@ -69,6 +69,7 @@ export function PlaylistContent({
         <PlayButton disabled={disabled} onClick={() => play()}>
           <Play fill="black" stroke="black" />
         </PlayButton>
+
         <IconButton
           onClick={switchShuffled}
           className={

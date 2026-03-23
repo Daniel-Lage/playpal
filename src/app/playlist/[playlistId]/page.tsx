@@ -13,8 +13,7 @@ import { getPlaylist } from "~/server/get-playlist";
 import { getTracks } from "~/api/get-tracks";
 import type { IMetadata } from "~/models/post.model";
 import { postPlaylistReply } from "~/server/post-playlist-reply";
-import type { Device } from "~/models/device.model";
-import { ActionStatus, PlayTracksStatus } from "~/models/status.model";
+import { ActionStatus } from "~/models/status.model";
 import { ErrorPage } from "~/app/error-page";
 
 export async function generateMetadata({
@@ -113,20 +112,16 @@ export default async function PlaylistPage({
       play={async (
         expired: boolean,
         queue: PlaylistTrack[],
-        device?: Device,
+        deviceId: string,
       ) => {
         "use server";
 
         if (expired) {
           revalidatePath("/playlist", "page");
-          return PlayTracksStatus.Failure;
+          return ActionStatus.Failure;
         }
 
-        return (await playTracks(
-          queue,
-          session.user.access_token,
-          device,
-        )) as PlayTracksStatus;
+        return await playTracks(queue, deviceId, session.user.access_token);
       }}
       send={send}
     />

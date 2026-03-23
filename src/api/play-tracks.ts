@@ -1,50 +1,16 @@
 "use server";
-import type { Device, Devices } from "~/models/device.model";
 import type { ApiError } from "~/models/error.model";
-import { PlayTracksStatus } from "~/models/status.model";
-import { type PlaylistTrack } from "~/models/track.model";
+import { ActionStatus } from "~/models/status.model";
+import type { PlaylistTrack } from "~/models/track.model";
 
 export async function playTracks(
   tracks: PlaylistTrack[],
+  deviceId: string,
   accessToken?: string | null,
-  device?: Device,
-): Promise<PlayTracksStatus | Device[]> {
+): Promise<ActionStatus> {
   if (!accessToken) {
     console.error("Error: acessToken is undefined");
-    return PlayTracksStatus.Failure;
-  }
-  if (!device) {
-    const response = await fetch(
-      "https://api.spotify.com/v1/me/player/devices",
-      {
-        headers: {
-          Authorization: `Bearer  ${accessToken}`,
-        },
-      },
-    );
-
-    if (!response.ok) {
-      const { error } = (await response.json()) as ApiError;
-
-      console.error(
-        `Status: ${response.statusText}; Description: ${error?.message};`,
-      );
-      return PlayTracksStatus.Failure;
-    }
-
-    const devices = (await response.json()) as Devices;
-
-    if (devices.devices.length > 1) {
-      return devices.devices;
-    }
-
-    device = devices.devices[0];
-  }
-
-  if (!device?.id) {
-    console.error("Error: No available spotify device");
-
-    return PlayTracksStatus.NoDevice;
+    return ActionStatus.Failure;
   }
 
   const firstTrack = tracks.shift();
@@ -54,14 +20,14 @@ export async function playTracks(
     console.error("Error: Shuffled Tracks: ", tracks);
 
     console.error("Empty Track Array");
-    return PlayTracksStatus.Failure;
+    return ActionStatus.Failure;
   }
 
   const addedToQueue = await fetch(
     "https://api.spotify.com/v1/me/player/queue?" +
       new URLSearchParams({
         uri: firstTrack.track.uri,
-        device_id: device.id,
+        device_id: deviceId,
       }).toString(),
     {
       method: "POST",
@@ -72,14 +38,19 @@ export async function playTracks(
   );
 
   if (!addedToQueue.ok) {
-    console.error("Error: Response: ", addedToQueue);
-    return PlayTracksStatus.Failure;
+    const { error } = (await addedToQueue.json()) as ApiError;
+
+    console.error("Error: Response: ", error?.message);
+
+    throw new Error(
+      `Status: ${addedToQueue.statusText}; Description: ${error?.message};`,
+    );
   }
 
   const skipped = await fetch(
     "https://api.spotify.com/v1/me/player/next?" +
       new URLSearchParams({
-        device_id: device.id,
+        device_id: deviceId,
       }).toString(),
     {
       method: "POST",
@@ -90,23 +61,25 @@ export async function playTracks(
   );
 
   if (!skipped.ok) {
-    console.error("Error: Response: ", skipped);
-    return PlayTracksStatus.Failure;
+    const { error } = (await skipped.json()) as ApiError;
+
+    console.error("Error: Response: ", error);
+    return ActionStatus.Failure;
   }
 
   const wait = new Promise((resolve) => {
     let index = 0;
     const interval = setInterval(() => {
       if (index < tracks.length) {
-        const track = tracks[index];
+        const track = tracks[index]?.track;
         if (track) {
-          track.track.disc_number = index;
+          track.disc_number = index;
 
           fetch(
             "https://api.spotify.com/v1/me/player/queue?" +
               new URLSearchParams({
-                uri: track.track.uri,
-                device_id: device.id,
+                uri: track.uri,
+                device_id: deviceId,
               }).toString(),
             {
               method: "POST",
@@ -128,5 +101,5 @@ export async function playTracks(
 
   await wait;
 
-  return PlayTracksStatus.Success;
+  return ActionStatus.Success;
 }

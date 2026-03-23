@@ -2,7 +2,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import type { PlaylistObject } from "~/models/playlist.model";
-import { PlayTracksStatus } from "~/models/status.model";
 import {
   type PlaylistTrack,
   TracksSortingColumn,
@@ -10,21 +9,19 @@ import {
 } from "~/models/track.model";
 import { PlaylistSearch } from "./playlist-search";
 import { PlaylistTracks } from "./playlist-tracks";
-import { PopupType, PopupView } from "~/components/popup-view";
-import { Check, SearchX, X } from "lucide-react";
 import type { SimplifiedArtist } from "~/models/artist.model";
 
 export function PlaylistTracksView({
   playlist,
   tracks,
   sessionUserId,
-  status,
   playTrack,
+  disabled,
 }: {
   playlist: PlaylistObject;
   tracks: PlaylistTrack[];
   sessionUserId?: string;
-  status: PlayTracksStatus;
+  disabled: boolean;
   playTrack: (track: PlaylistTrack) => void;
 }) {
   const [filter, setFilter] = useState("");
@@ -78,40 +75,10 @@ export function PlaylistTracksView({
 
       <PlaylistTracks
         treatedTracks={treatedTracks}
-        disabled={status === PlayTracksStatus.Active}
+        disabled={disabled}
         playTrack={playTrack}
       />
-
-      {status !== PlayTracksStatus.Active &&
-        status !== PlayTracksStatus.Inactive && (
-          <StatusMessage status={status} />
-        )}
     </>
-  );
-}
-
-function StatusMessage({ status }: { status: PlayTracksStatus }) {
-  if (status === PlayTracksStatus.Success)
-    return (
-      <PopupView type={PopupType.Success}>
-        <Check size={40} />
-        Playing Tracks Successfully
-      </PopupView>
-    );
-
-  if (status === PlayTracksStatus.NoDevice)
-    return (
-      <PopupView type={PopupType.UserError}>
-        <SearchX size={40} />
-        Spotify Device Not Found
-      </PopupView>
-    );
-
-  return (
-    <PopupView type={PopupType.ServerError}>
-      <X size={40} />
-      Internal Server Error
-    </PopupView>
   );
 }
 

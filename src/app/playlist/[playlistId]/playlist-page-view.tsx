@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { type PlaylistTrack } from "~/models/track.model";
 
@@ -10,17 +10,15 @@ import { PlaylistContent } from "./playlist-content";
 import { useLocalStorage } from "~/hooks/use-local-storage";
 import { signIn } from "next-auth/react";
 import { setFirstItem } from "~/helpers/set-first-item";
-import type { User } from "next-auth";
 import type { IMetadata } from "~/models/post.model";
-import type { Device } from "~/models/device.model";
-import { DevicePicker } from "~/components/device-picker";
-import { type ActionStatus, PlayTracksStatus } from "~/models/status.model";
+import { ActionStatus } from "~/models/status.model";
 import { PlaylistTracksView } from "./playlist-tracks-view";
 import { PlaylistRepliesView } from "./playlist-replies-view";
 import { PageView } from "~/components/page-view";
 import type { PlaylistLikeObject } from "~/models/like.model";
 import { UserFeedView } from "~/components/user-feed-view";
-import type { UserObject } from "~/models/user.model";
+import type { SessionUser, UserObject } from "~/models/user.model";
+import { PlayerView } from "~/components/player-view";
 
 export function PlaylistPageView({
   playlist,
@@ -34,12 +32,12 @@ export function PlaylistPageView({
   playlist: PlaylistObject;
   tracks: PlaylistTrack[];
   queue?: PlaylistTrack[];
-  sessionUser?: User | undefined;
+  sessionUser?: SessionUser | undefined;
   play?: (
     expired: boolean,
     queue: PlaylistTrack[],
-    device?: Device,
-  ) => Promise<PlayTracksStatus | Device[]>;
+    device: string,
+  ) => Promise<ActionStatus>;
   expires_at?: number | null;
   send?: (
     input: string,
@@ -54,19 +52,23 @@ export function PlaylistPageView({
     useCallback((value) => (value ? "true" : "false"), []),
   );
 
-  const [status, setStatus] = useState<PlayTracksStatus>(
-    PlayTracksStatus.Inactive,
-  );
+  const [status, setStatus] = useState(ActionStatus.Inactive);
+  const [tab, setTab] = useState(PlaylistTab.Tracks);
+  const [deviceId, setDeviceId] = useState<string | undefined>();
+  const [playerState, setPlayerState] = useState<
+    Spotify.PlaybackState | undefined
+  >();
 
   const handlePlay = useCallback(
-    async (start?: PlaylistTrack, device?: Device) => {
+    async (start?: PlaylistTrack) => {
       if (!sessionUser?.id) {
         void signIn();
         return;
       }
-      if (!play || !expires_at || !queue) return;
 
-      setStatus(PlayTracksStatus.Active);
+      if (!play || !expires_at || !queue || !deviceId) return;
+
+      setStatus(ActionStatus.Active);
 
       let newQueue: PlaylistTrack[] = [];
 
@@ -90,35 +92,85 @@ export function PlaylistPageView({
 
       const expired = expires_at < Math.floor(new Date().getTime() / 1000);
 
-      const result = await play(expired, newQueue, device);
+      const result = await play(expired, newQueue, deviceId);
 
       if (typeof result === "number") {
         setStatus(result);
 
         setTimeout(() => {
-          setStatus(PlayTracksStatus.Inactive);
+          setStatus(ActionStatus.Inactive);
         }, 4000);
-      } else {
-        setDevices(result);
-        setStoredStart(start);
       }
     },
-    [expires_at, play, sessionUser?.id, shuffled, tracks, queue],
+    [expires_at, play, sessionUser?.id, shuffled, tracks, queue, deviceId],
   );
 
-  const [tab, setTab] = useState(PlaylistTab.Tracks);
+  const playerRef = useRef<Spotify.Player | undefined>(undefined);
 
-  const [devices, setDevices] = useState<Device[] | undefined>();
-  const [storedStart, setStoredStart] = useState<PlaylistTrack | undefined>();
+  useEffect(() => {
+    if (
+      play != null &&
+      sessionUser?.access_token != null &&
+      playerRef.current == null
+    ) {
+      const token = sessionUser.access_token;
+
+      window.onSpotifyWebPlaybackSDKReady = () => {
+        const player = new Spotify.Player({
+          name: "Playpal",
+          getOAuthToken: (cb) => {
+            cb(token);
+          },
+          volume: 0.5,
+        });
+
+        player
+          .connect()
+          .then((success) => {
+            if (success) {
+              playerRef.current = player;
+
+              player.addListener("ready", (instance) => {
+                if (instance != null) setDeviceId(instance.device_id);
+              });
+
+              player.addListener("not_ready", () => {
+                setDeviceId(undefined);
+              });
+
+              player.addListener("player_state_changed", (state) => {
+                if (state != null) {
+                  setPlayerState(state);
+                }
+              });
+            } else {
+              player.disconnect();
+            }
+          })
+          .catch((error) => console.error(error));
+      };
+
+      const script = document.createElement("script");
+      script.src = "https://sdk.scdn.co/spotify-player.js";
+      script.async = true;
+
+      document.body.appendChild(script);
+    }
+    return () => {
+      playerRef.current?.disconnect();
+      playerRef.current = undefined;
+    };
+  }, [sessionUser, play]);
 
   return (
     <>
-      {status === PlayTracksStatus.Active && (
+      {status === ActionStatus.Active && (
         <div className="fixed z-10 flex h-full w-svw items-center justify-center backdrop-brightness-50 md:ml-[--nav-bar-w] md:w-[--main-view-w]">
           <div className="h-16 w-16 animate-spin rounded-full border-8 border-secondary border-b-transparent"></div>
         </div>
       )}
       <PageView
+        sessionUser={sessionUser}
         sideContent={
           <PlaylistRepliesView
             playlist={playlist}
@@ -129,7 +181,7 @@ export function PlaylistPageView({
       >
         <PlaylistContent
           play={handlePlay}
-          disabled={status === PlayTracksStatus.Active}
+          disabled={status === ActionStatus.Active}
           shuffled={shuffled}
           switchShuffled={() => {
             setShuffled((prev) => !prev);
@@ -139,29 +191,29 @@ export function PlaylistPageView({
           tab={tab}
           setTab={setTab}
         />
-        {
+        <div className="pb-24">
           {
-            [PlaylistTab.Tracks]: (
-              <PlaylistTracksView
-                playlist={playlist}
-                playTrack={handlePlay}
-                tracks={tracks}
-                status={status}
-                sessionUserId={sessionUser?.id}
-              />
-            ),
-            [PlaylistTab.Likes]: (
-              <PlaylistLikesView likes={playlist.likes ?? []} />
-            ),
-          }[tab]
-        }
+            {
+              [PlaylistTab.Tracks]: (
+                <PlaylistTracksView
+                  playlist={playlist}
+                  playTrack={handlePlay}
+                  tracks={tracks}
+                  disabled={status === ActionStatus.Active}
+                  sessionUserId={sessionUser?.id}
+                />
+              ),
+              [PlaylistTab.Likes]: (
+                <PlaylistLikesView likes={playlist.likes ?? []} />
+              ),
+            }[tab]
+          }
+        </div>
 
-        <DevicePicker
-          devices={devices}
-          pickDevice={(device) => {
-            void handlePlay(storedStart, device);
-            setStoredStart(undefined);
-            setDevices(undefined);
+        <PlayerView
+          playerState={playerState}
+          togglePlay={() => {
+            void playerRef.current?.togglePlay();
           }}
         />
       </PageView>
