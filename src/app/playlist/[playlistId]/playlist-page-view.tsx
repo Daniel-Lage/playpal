@@ -196,7 +196,6 @@ export function PlaylistPageView({
             {
               [PlaylistTab.Tracks]: (
                 <PlaylistTracksView
-                  playlist={playlist}
                   playTrack={handlePlay}
                   tracks={tracks}
                   disabled={status === ActionStatus.Active}

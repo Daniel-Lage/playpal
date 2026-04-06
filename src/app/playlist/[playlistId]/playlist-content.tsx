@@ -50,7 +50,12 @@ export function PlaylistContent({
               <div className="flex items-start justify-between text-wrap text-2xl font-bold">
                 {playlist.name}
               </div>
-              <div className="text-wrap font-light">{playlist.description}</div>
+              <div className="text-wrap text-sm font-light md:text-base">
+                {playlist.description}
+              </div>
+              <div className="text-wrap text-xs md:text-base">
+                {playlist.totalTracks} tracks
+              </div>
 
               <div className="flex gap-2">
                 <UserImage
@@ -59,7 +64,7 @@ export function PlaylistContent({
                   name={playlist.owner.name}
                 />
                 <Link
-                  className="inline items-center font-bold hover:underline"
+                  className="inline items-center font-bold text-background hover:underline"
                   href={`/user/${playlist.owner.id}`}
                 >
                   {playlist.owner?.name}

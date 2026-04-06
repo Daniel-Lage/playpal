@@ -14,12 +14,10 @@ export function PlaylistSearch({
   sortColumn,
   reverse,
   filterTracks,
-  count,
 }: {
   sortingColumn: TracksSortingColumn | undefined;
   reversed: boolean;
   filter: string;
-  count: number;
   sortColumn: (value: string) => void;
   reverse: () => void;
   filterTracks: (e: ChangeEvent<HTMLInputElement>) => void;

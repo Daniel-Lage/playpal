@@ -1,7 +1,6 @@
 "use client";
 import { useState, useCallback, useMemo } from "react";
 import { useLocalStorage } from "~/hooks/use-local-storage";
-import type { PlaylistObject } from "~/models/playlist.model";
 import {
   type PlaylistTrack,
   TracksSortingColumn,
@@ -12,13 +11,11 @@ import { PlaylistTracks } from "./playlist-tracks";
 import type { SimplifiedArtist } from "~/models/artist.model";
 
 export function PlaylistTracksView({
-  playlist,
   tracks,
   sessionUserId,
   playTrack,
   disabled,
 }: {
-  playlist: PlaylistObject;
   tracks: PlaylistTrack[];
   sessionUserId?: string;
   disabled: boolean;
@@ -60,7 +57,6 @@ export function PlaylistTracksView({
   return (
     <>
       <PlaylistSearch
-        count={playlist.totalTracks}
         sortingColumn={sortingColumn}
         reversed={reversed}
         filter={filter}
