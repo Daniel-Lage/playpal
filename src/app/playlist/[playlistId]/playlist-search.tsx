@@ -25,9 +25,8 @@ export function PlaylistSearch({
   filterTracks: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <div className="flex shrink-0 flex-col items-center justify-between gap-2 bg-secondary p-2 md:flex-row">
-      <div className="shrink-0 font-bold">{count} Tracks</div>
-      <div className="flex w-full items-center justify-between gap-2 md:w-fit">
+    <div className="flex shrink-0 items-center justify-between gap-2 bg-secondary p-2">
+      <div className="flex items-center justify-between gap-2 md:w-fit">
         <Sorter
           title="Sort by"
           onSelect={sortColumn}
@@ -37,7 +36,7 @@ export function PlaylistSearch({
           reverse={reverse}
         />
       </div>
-      <div className="flex w-full">
+      <div className="flex">
         <SearchView value={filter} onChange={filterTracks} />
       </div>
     </div>

@@ -38,7 +38,7 @@ export function Select({
         <Button
           role="combobox"
           aria-expanded={open}
-          className="w-40 justify-between"
+          className="justify-between md:w-40"
         >
           {title}
           <Menu />

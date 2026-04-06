@@ -14,6 +14,7 @@ export function LikeButton({
   onClick,
   like,
   unlike,
+  big,
 }: {
   hasLike: boolean;
   count: number;
@@ -22,17 +23,19 @@ export function LikeButton({
   like: (suid: string) => Promise<void>;
   unlike: (suid: string) => Promise<void>;
   sessionUserId?: string | null;
+  big?: boolean;
 }) {
   const [isLiked, setIsLiked] = useState(hasLike);
 
   return (
     <div className="flex items-center gap-2">
       {!sessionUserId ? (
-        <IconButton onClick={() => signIn()}>
+        <IconButton big={big} onClick={() => signIn()}>
           <Heart />
         </IconButton>
       ) : isLiked ? (
         <IconButton
+          big={big}
           className="[&_svg]:fill-primary-accent [&_svg]:stroke-primary-accent"
           onClick={() => {
             setIsLiked(false);
@@ -43,6 +46,7 @@ export function LikeButton({
         </IconButton>
       ) : (
         <IconButton
+          big={big}
           onClick={() => {
             setIsLiked(true);
             like(sessionUserId).catch(() => setIsLiked(false));

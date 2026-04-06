@@ -23,7 +23,7 @@ export function PlaylistView({
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 rounded-md p-2",
+        "flex flex-col rounded-md p-1 md:gap-2 md:p-2",
         isPrimaryColor ? "bg-primary-accent" : "bg-secondary",
       )}
     >
@@ -36,22 +36,24 @@ export function PlaylistView({
           <Image
             width={96}
             height={96}
-            className="inline aspect-square h-auto w-24 flex-shrink-0 flex-grow-0 rounded-md"
+            className="inline aspect-square h-16 w-16 flex-shrink-0 flex-grow-0 rounded-md md:h-24 md:w-24"
             src={playlist.image}
             alt={playlist.name}
           />
 
-          <div className="flex h-full grow flex-col items-start gap-1 truncate">
-            <div className="flex items-center justify-between text-wrap text-3xl font-bold">
-              {playlist.name}
+          <div className="flex h-full grow flex-col items-start truncate">
+            <div className="flex items-center justify-between text-wrap font-bold">
+              <span className="truncate text-base md:text-xl">
+                {playlist.name}
+              </span>
 
               {playlist.likes && playlist.likes.length !== 0 && (
                 <>
-                  <div className="whitespace-pre text-base font-normal">
+                  <div className="whitespace-pre text-sm font-normal md:text-base">
                     {" · "}
                   </div>
                   <Link
-                    className="inline grow items-center text-base font-normal hover:underline"
+                    className="inline grow items-center text-sm font-normal hover:underline md:text-base"
                     href={`/post/${playlist.id}`}
                   >
                     Liked by{" "}
@@ -66,13 +68,13 @@ export function PlaylistView({
               )}
             </div>
             {!!playlist.description && (
-              <div className="text-wrap font-light">
+              <div className="text-wrap text-sm font-light md:text-base">
                 {playlist.description.length > 53
                   ? `${playlist.description.substring(0, 50)}...`
                   : playlist.description}
               </div>
             )}
-            <div className="inline items-center font-bold">
+            <div className="inline items-center text-xs font-bold text-background md:text-sm">
               {playlist.owner?.name}
             </div>
           </div>

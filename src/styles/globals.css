@@ -88,6 +88,8 @@ body {
 }
 
 .tiptap {
+  @apply text-sm;
+  @apply md:text-base;
   outline: none;
 }
 

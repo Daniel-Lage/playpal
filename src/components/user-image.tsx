@@ -22,7 +22,7 @@ export function UserImage({
       width={size}
       height={size}
       className={cn(
-        `aspect-square h-auto w-[${size}px] flex-shrink-0 flex-grow-0 rounded-md`,
+        `aspect-square h-auto w-[${size}px] flex-shrink-0 flex-grow-0 rounded-full`,
         className,
       )}
       src={ready ? (image ?? "/avatar.svg") : "/avatar.svg"}

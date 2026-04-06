@@ -8,6 +8,7 @@ import { LikeButton } from "~/components/buttons/like-button";
 import { PlayButton } from "~/components/buttons/play-button";
 import { ShareButton } from "~/components/buttons/share-button";
 import { SpotifyLink } from "~/components/spotify-link";
+import { UserImage } from "~/components/user-image";
 import type { PlaylistObject } from "~/models/playlist.model";
 import { PlaylistTab } from "~/models/playlist.model";
 import type { PlaylistTrack } from "~/models/track.model";
@@ -39,26 +40,31 @@ export function PlaylistContent({
         <Image
           width={160}
           height={160}
-          className="aspect-square h-auto w-40 flex-shrink-0 flex-grow-0 rounded-md"
+          className="mt-9 aspect-square h-auto w-56 flex-shrink-0 flex-grow-0 rounded-md md:mt-0"
           src={playlist.image}
           alt={playlist.name}
         />
         <div className="flex w-full flex-col">
           <div className="flex w-full gap-2">
             <div className="flex h-full grow flex-col items-start gap-1 truncate">
-              <div className="flex items-start justify-between text-wrap text-4xl font-bold">
+              <div className="flex items-start justify-between text-wrap text-2xl font-bold">
                 {playlist.name}
               </div>
-              <div className="text-wrap text-sm font-light">
-                {playlist.description}
-              </div>
+              <div className="text-wrap font-light">{playlist.description}</div>
 
-              <Link
-                className="inline items-center font-bold hover:underline"
-                href={`/user/${playlist.owner.id}`}
-              >
-                {playlist.owner?.name}
-              </Link>
+              <div className="flex gap-2">
+                <UserImage
+                  size={24}
+                  image={playlist.owner.image}
+                  name={playlist.owner.name}
+                />
+                <Link
+                  className="inline items-center font-bold hover:underline"
+                  href={`/user/${playlist.owner.id}`}
+                >
+                  {playlist.owner?.name}
+                </Link>
+              </div>
             </div>
 
             <SpotifyLink external_url={playlist.externalUrl} />
@@ -71,6 +77,7 @@ export function PlaylistContent({
         </PlayButton>
 
         <IconButton
+          big
           onClick={switchShuffled}
           className={
             shuffled ? "[&_svg]:stroke-primary-accent" : "[&_svg]:stroke-black"
@@ -80,6 +87,7 @@ export function PlaylistContent({
         </IconButton>
         <div className="grid w-full grid-cols-2">
           <LikeButton
+            big
             hasLike={
               !!playlist.likes?.some((like) => like.userId === sessionUserId)
             }
@@ -94,7 +102,7 @@ export function PlaylistContent({
             }
           />
         </div>
-        <ShareButton path={`/playlist/${playlist.id}`} />
+        <ShareButton big path={`/playlist/${playlist.id}`} />
       </div>
     </div>
   );

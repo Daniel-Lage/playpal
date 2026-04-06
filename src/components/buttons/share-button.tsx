@@ -1,8 +1,7 @@
 "use client";
 
-import { Copy, Share } from "lucide-react";
+import { Copy, Share2 } from "lucide-react";
 
-import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -12,22 +11,24 @@ import {
 } from "~/components/ui/dialog";
 import { IconButton } from "./icon-button";
 
-export function ShareButton({ path, title }: { path: string; title?: string }) {
+export function ShareButton({
+  path,
+  title,
+  big,
+}: {
+  path: string;
+  title?: string;
+  big?: boolean;
+}) {
   const url = `https://playpal-fm.vercel.app${path}`;
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          className={
-            title
-              ? "flex h-9 w-[200px] items-center gap-2 p-0 px-2 text-base font-bold hover:backdrop-brightness-95 [&_svg]:size-6"
-              : "w-8 justify-center"
-          }
-        >
-          <Share />
+        <IconButton big={big}>
+          <Share2 />
           <span className={title ? "" : "sr-only"}>Share {title}</span>
-        </Button>
+        </IconButton>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
