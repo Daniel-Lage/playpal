@@ -4,11 +4,3 @@ export enum ActionStatus {
   Success,
   Failure,
 }
-
-export enum PlayTracksStatus {
-  Inactive,
-  Active,
-  Success,
-  Failure,
-  NoDevice,
-}

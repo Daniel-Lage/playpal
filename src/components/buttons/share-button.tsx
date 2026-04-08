@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "~/components/ui/dialog";
 import { IconButton } from "./icon-button";
+import { MenuButton } from "./menu-button";
 
 export function ShareButton({
   path,
@@ -25,10 +26,17 @@ export function ShareButton({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <IconButton big={big}>
-          <Share2 />
-          <span className={title ? "" : "sr-only"}>Share {title}</span>
-        </IconButton>
+        {title ? (
+          <MenuButton>
+            <Share2 />
+            <span>Share {title}</span>
+          </MenuButton>
+        ) : (
+          <IconButton big={big}>
+            <Share2 />
+            <span className="sr-only">Share {title}</span>
+          </IconButton>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

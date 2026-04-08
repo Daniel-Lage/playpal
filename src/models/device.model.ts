@@ -12,3 +12,12 @@ export interface Device {
   volume_percent: number | null;
   supports_volume: boolean;
 }
+
+export enum GetDevicesStatus {
+  UseWebPlayer = "Failure",
+  ChooseDevice = "ChooseDevice",
+}
+
+export type GetDevicesResponse =
+  | { status: GetDevicesStatus.UseWebPlayer }
+  | { status: GetDevicesStatus.ChooseDevice; data: Device[] };

@@ -15,6 +15,8 @@ import type { IMetadata } from "~/models/post.model";
 import { postPlaylistReply } from "~/server/post-playlist-reply";
 import { ActionStatus } from "~/models/status.model";
 import { ErrorPage } from "~/app/error-page";
+import { GetDevicesStatus } from "~/models/device.model";
+import { getDevices } from "~/api/get-devices";
 
 export async function generateMetadata({
   params: { playlistId },
@@ -93,7 +95,7 @@ export default async function PlaylistPage({
         playlist={playlist}
         sessionUser={session.user}
         tracks={tracks}
-        send={send}
+        sendReply={send}
       />
     );
 
@@ -109,7 +111,7 @@ export default async function PlaylistPage({
       sessionUser={session.user}
       expires_at={session.user.expires_at}
       queue={queue}
-      play={async (
+      playTracks={async (
         expired: boolean,
         queue: PlaylistTrack[],
         deviceId: string,
@@ -123,7 +125,17 @@ export default async function PlaylistPage({
 
         return await playTracks(queue, deviceId, session.user.access_token);
       }}
-      send={send}
+      loadDevices={async (expired: boolean) => {
+        "use server";
+
+        if (expired) {
+          revalidatePath("/playlist", "page");
+          return { status: GetDevicesStatus.UseWebPlayer };
+        }
+
+        return await getDevices(session.user.access_token);
+      }}
+      sendReply={send}
     />
   );
 }
