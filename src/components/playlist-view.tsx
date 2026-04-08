@@ -47,7 +47,7 @@ export function PlaylistView({
                 {playlist.name}
               </span>
 
-              {playlist.likes && playlist.likes.length !== 0 && (
+              {playlist.likes && playlist.likes.length > 0 && (
                 <>
                   <div className="whitespace-pre text-sm font-normal md:text-base">
                     {" · "}

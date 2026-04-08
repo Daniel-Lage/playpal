@@ -50,7 +50,7 @@ export async function postPost(
     }
   }
 
-  if (mentions != null && mentions.length != 0)
+  if (mentions != null && mentions.length > 0)
     await postMentions(post.id, mentions);
 
   return ActionStatus.Success;

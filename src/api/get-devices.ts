@@ -29,7 +29,7 @@ export async function getDevices(
     (device) => device.name !== "Spotify Web Player (PlayPal)",
   );
 
-  if (devices.length > 1) {
+  if (devices.length > 0) {
     return { status: GetDevicesStatus.ChooseDevice, data: devices };
   }
 

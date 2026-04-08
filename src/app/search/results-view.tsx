@@ -49,7 +49,7 @@ export function ResultsView({
 
   return (
     <ItemsView>
-      {users.length !== 0 && (
+      {users.length > 0 && (
         <div className="flex flex-col overflow-hidden rounded-md bg-secondary">
           <div className="w-full p-2 font-bold">Users</div>
           {users.map((user) => (

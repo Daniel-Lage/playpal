@@ -27,7 +27,7 @@ export async function postPlaylistReply(
 
   if (!post) return ActionStatus.Failure;
 
-  if (mentions != null && mentions.length != 0)
+  if (mentions != null && mentions.length > 0)
     await postMentions(post.id, mentions);
 
   return ActionStatus.Success;

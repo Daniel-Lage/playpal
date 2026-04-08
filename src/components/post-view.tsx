@@ -77,7 +77,7 @@ export function PostView({
             post.createdAt.toUTCString()}
         </Link>
 
-        {post.likes && post.likes.length !== 0 && (
+        {post.likes && post.likes.length > 0 && (
           <>
             <div className="whitespace-pre"> · </div>
             <Link

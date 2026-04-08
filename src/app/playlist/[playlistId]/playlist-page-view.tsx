@@ -252,10 +252,11 @@ export function PlaylistPageView({
         </div>
       )}
 
-      {devices && (
+      {devices && deviceId && (
         <DevicePicker
           devices={devices && [...devices]}
           pickDevice={pickDevice}
+          pickWebPlayer={() => pickDevice(deviceId)}
           close={() => {
             setQueueStart(undefined);
             setDevices(undefined);

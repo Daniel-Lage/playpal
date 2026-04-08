@@ -1,6 +1,6 @@
 "use client";
 
-import { BoomBox, Computer, Smartphone, X } from "lucide-react";
+import { BoomBox, Computer, Globe, Smartphone, X } from "lucide-react";
 
 import type { Device } from "~/models/device.model";
 import { MenuButton } from "./buttons/menu-button";
@@ -8,10 +8,12 @@ import { OneElementView } from "./one-element-view";
 import { IconButton } from "./buttons/icon-button";
 
 export function DevicePicker({
+  pickWebPlayer,
   pickDevice,
   close,
   devices,
 }: {
+  pickWebPlayer: () => void;
   pickDevice: (deviceId: string) => void;
   close: () => void;
   devices: Device[];
@@ -25,6 +27,10 @@ export function DevicePicker({
             <X />
           </IconButton>
         </div>
+        <MenuButton onClick={pickWebPlayer}>
+          Playpal
+          <Globe />
+        </MenuButton>
         {devices?.map((value) => (
           <MenuButton key={value.id} onClick={() => pickDevice(value.id)}>
             {value.name}

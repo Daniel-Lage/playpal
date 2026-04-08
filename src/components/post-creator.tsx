@@ -62,7 +62,7 @@ export function PostCreator({
   }, [metadataList, metadataIndex]);
 
   useEffect(() => {
-    if (urls.length != 0) {
+    if (urls.length > 0) {
       setStatus(ActionStatus.Active);
       setLoadingMetadata(true);
       getMetadataList(urls)
@@ -154,12 +154,12 @@ export function PostCreator({
           Post
         </LinkButton>
 
-        {urls.length != 0 && (
+        {urls.length > 0 && (
           <div className="flex w-full shrink items-center gap-2">
             <IconButton
               onClick={() => setMetadataIndex((prev) => prev - 1)}
-              disabled={metadataIndex == 0}
-              className={metadataIndex == 0 ? "[&_svg]:stroke-background" : ""}
+              disabled={metadataIndex === 0}
+              className={metadataIndex === 0 ? "[&_svg]:stroke-background" : ""}
             >
               <ChevronLeft />
             </IconButton>
@@ -172,9 +172,9 @@ export function PostCreator({
             )}
             <IconButton
               onClick={() => setMetadataIndex((prev) => prev + 1)}
-              disabled={metadataIndex == metadataList.length - 1}
+              disabled={metadataIndex === metadataList.length - 1}
               className={
-                metadataIndex == metadataList.length - 1
+                metadataIndex === metadataList.length - 1
                   ? "[&_svg]:stroke-background"
                   : ""
               }
