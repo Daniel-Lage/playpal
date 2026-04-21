@@ -19,11 +19,7 @@ import { useLocalStorage } from "~/hooks/use-local-storage";
 import { cn } from "~/lib/utils";
 import type { SessionUser } from "~/models/user.model";
 
-export function NavBar({
-  sessionUser,
-}: {
-  sessionUser?: SessionUser | undefined;
-}) {
+export function NavBar({ sessionUser }: { sessionUser?: SessionUser }) {
   const profileUrl = useMemo(
     () => (sessionUser ? `/user/${sessionUser.id}` : undefined),
     [sessionUser],

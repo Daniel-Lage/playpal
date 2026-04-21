@@ -28,7 +28,7 @@ export function Select({
   onSelect: ((value: string) => void) | undefined;
   options: string[];
   value: string;
-  disabled?: boolean | undefined;
+  disabled?: boolean;
 }) {
   const [open, setOpen] = React.useState(false);
 

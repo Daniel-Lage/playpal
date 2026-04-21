@@ -20,7 +20,7 @@ export function FeedView({
 }: {
   posts: PostObject[];
   lastQueried: Date;
-  sessionUser?: SessionUser | undefined;
+  sessionUser?: SessionUser;
   refresh: (lastQueried: Date) => Promise<PostObject[]>;
   send?: (
     input: string,

@@ -39,7 +39,7 @@ export function PlaylistPageView({
   playlist: PlaylistObject;
   tracks: PlaylistTrack[];
   queue?: PlaylistTrack[];
-  sessionUser?: SessionUser | undefined;
+  sessionUser?: SessionUser;
   expires_at?: number | null;
   playTracks?: (
     expired: boolean,
@@ -49,8 +49,8 @@ export function PlaylistPageView({
   loadDevices?: (expired: boolean) => Promise<GetDevicesResponse>;
   sendReply?: (
     input: string,
-    mentions?: string[] | undefined,
-    metadata?: IMetadata | undefined,
+    mentions?: string[],
+    metadata?: IMetadata,
   ) => Promise<ActionStatus>;
 }) {
   const [shuffled, setShuffled] = useLocalStorage<boolean>(

@@ -9,7 +9,7 @@ export function PlayerView({
   playerState,
   togglePlay,
 }: {
-  playerState?: Spotify.PlaybackState | undefined;
+  playerState?: Spotify.PlaybackState;
   togglePlay: () => void;
 }) {
   if (playerState?.track_window.current_track == null) return null;

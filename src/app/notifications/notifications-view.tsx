@@ -21,7 +21,7 @@ export default function NotificationsView({
   sessionUserId,
 }: {
   notifications: NotificationObject[];
-  sessionUserId?: string | null | undefined;
+  sessionUserId?: string | null;
 }) {
   const [tab, setTab] = useState<NotificationType | undefined>();
 
@@ -83,7 +83,7 @@ function NotificationView({
 }: {
   notification: NotificationObject;
   timelapse: string;
-  sessionUserId?: string | null | undefined;
+  sessionUserId?: string | null;
 }) {
   if (notification.type === NotificationType.Reply)
     return (

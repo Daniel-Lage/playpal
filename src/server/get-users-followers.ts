@@ -12,5 +12,5 @@ export async function getUsersFollowers(
     with: { follower: true },
   });
 
-  return follows as FollowObject[];
+  return follows;
 }

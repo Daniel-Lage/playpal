@@ -20,7 +20,7 @@ export function ResultsView({
   refresh: (
     lastQueried: Date,
   ) => Promise<{ users: UserObject[]; posts: PostObject[] }>;
-  sessionUserId?: string | null | undefined;
+  sessionUserId?: string | null;
 }) {
   const [users, setUsers] = useState(usersProp);
   const [posts, setPosts] = useState(postsProp);

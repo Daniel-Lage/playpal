@@ -1,5 +1,4 @@
 import { type NextAuthOptions } from "next-auth";
-import type { Adapter } from "next-auth/adapters";
 
 import SpotifyProvider from "next-auth/providers/spotify";
 import EmailProvider from "next-auth/providers/email";
@@ -19,7 +18,7 @@ spotifyAuthUrl.search = new URLSearchParams({
 }).toString();
 
 export const authOptions: NextAuthOptions = {
-  adapter: DrizzleAdapter(db, schema) as Adapter,
+  adapter: DrizzleAdapter(db, schema),
   pages: {
     signIn: "/signin",
     verifyRequest: "/verify-email",

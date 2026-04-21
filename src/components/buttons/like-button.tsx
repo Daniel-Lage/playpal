@@ -5,6 +5,7 @@ import { Heart } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { IconButton } from "./icon-button";
+import { cn } from "~/lib/utils";
 
 export function LikeButton({
   hasLike,
@@ -28,7 +29,12 @@ export function LikeButton({
   const [isLiked, setIsLiked] = useState(hasLike);
 
   return (
-    <div className="flex items-center gap-2">
+    <div
+      className={cn(
+        "flex items-center gap-1 md:text-base",
+        big ? "text-base" : "text-xs",
+      )}
+    >
       {!sessionUserId ? (
         <IconButton big={big} onClick={() => signIn()}>
           <Heart />

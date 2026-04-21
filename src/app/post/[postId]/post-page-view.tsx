@@ -30,12 +30,12 @@ export function PostPageView({
 }: {
   post: MainPostObject;
   lastQueried: Date;
-  sessionUser?: SessionUser | undefined;
+  sessionUser?: SessionUser;
   refresh: (lastQueried: Date) => Promise<ReplyObject[][]>;
   send?: (
     input: string,
-    mentions?: string[] | undefined,
-    metadata?: IMetadata | undefined,
+    mentions?: string[],
+    metadata?: IMetadata,
   ) => Promise<ActionStatus>;
 }) {
   const [replies, setReplies] = useState(post.replyThreads ?? []);

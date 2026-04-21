@@ -30,7 +30,7 @@ export function PlaylistContent({
   sessionUserId?: string;
   shuffled: boolean;
   switchShuffled: () => void;
-  play: (start?: PlaylistTrack | undefined) => void;
+  play: (start?: PlaylistTrack) => void;
   tab: PlaylistTab;
   setTab: (value: PlaylistTab | ((prev: PlaylistTab) => PlaylistTab)) => void;
 }) {

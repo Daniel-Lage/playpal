@@ -96,7 +96,7 @@ export function PlaylistView({
           />
 
           <Link
-            className="flex cursor-pointer items-center gap-2 hover:underline"
+            className="flex items-center justify-center gap-1 text-xs hover:underline md:gap-2 md:text-base"
             href={`/playlist/${playlist.id}`}
           >
             <IconButton>

@@ -63,8 +63,5 @@ export async function getUsersLikes(
 
   const playlists = playlistLikes.map((like) => like.likee);
 
-  return { posts, playlists } as {
-    posts: PostObject[];
-    playlists: PlaylistObject[];
-  };
+  return { posts, playlists };
 }

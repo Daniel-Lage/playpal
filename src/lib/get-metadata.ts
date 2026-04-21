@@ -19,14 +19,14 @@ export async function getMetadataList(urls: string[]): Promise<IMetadata[]> {
       .map(({ rawAttributes: { name, property, content } }) => {
         const attribute = name ?? property;
         if (content && attribute)
-          return [attribute.replace(":", "_") as PropertyKey, content] as const;
+          return [attribute.replace(":", "_"), content] as const;
         else return ["null", null] as const;
       })
       .filter((value) => value[1] != null);
 
     const metadata = Object.fromEntries(tags);
 
-    if (metadata.og_url == null) metadata.og_url = url;
+    metadata.og_url ??= url;
 
     return metadata;
   });

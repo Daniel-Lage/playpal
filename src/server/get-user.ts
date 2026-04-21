@@ -35,5 +35,5 @@ export async function getUser(userId: string): Promise<UserObject | undefined> {
     },
   });
 
-  return user as UserObject;
+  return user;
 }

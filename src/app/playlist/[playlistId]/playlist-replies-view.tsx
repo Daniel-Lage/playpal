@@ -22,11 +22,11 @@ export function PlaylistRepliesView({
   send,
 }: {
   playlist: PlaylistObject;
-  sessionUser?: SessionUser | undefined;
+  sessionUser?: SessionUser;
   send?: (
     input: string,
-    mentions?: string[] | undefined,
-    metadata?: IMetadata | undefined,
+    mentions?: string[],
+    metadata?: IMetadata,
   ) => Promise<ActionStatus>;
 }) {
   const [reversed, setReversed] = useLocalStorage<boolean>(

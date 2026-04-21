@@ -14,7 +14,7 @@ export function PageView({
 }: {
   children: React.ReactNode;
   sideContent?: React.ReactNode;
-  sessionUser?: SessionUser | undefined;
+  sessionUser?: SessionUser;
 }) {
   const [collapsed, setCollapsed] = useLocalStorage<boolean>(
     sessionUser?.id

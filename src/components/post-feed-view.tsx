@@ -27,7 +27,7 @@ export function PostFeedView({
 }: {
   posts: PostObject[];
   lastQueried: Date;
-  sessionUser?: SessionUser | undefined;
+  sessionUser?: SessionUser;
   isPrimaryColor?: boolean;
   refresh: (lastQueried: Date) => Promise<PostObject[]>;
   send?: (

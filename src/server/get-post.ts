@@ -62,8 +62,8 @@ export async function getPost(
       );
     }
 
-    return { ...post, replyThreads } as MainPostObject;
+    return { ...post, replyThreads };
   }
 
-  return { ...post, replies: undefined } as MainPostObject;
+  return { ...post, replyThreads: undefined };
 }

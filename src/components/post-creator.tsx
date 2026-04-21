@@ -27,8 +27,8 @@ export function PostCreator({
 }: {
   send: (
     input: string,
-    mentions?: string[] | undefined,
-    metadata?: IMetadata | undefined,
+    mentions?: string[],
+    metadata?: IMetadata,
   ) => Promise<void>;
   sessionUser: User;
   disabled: boolean;
