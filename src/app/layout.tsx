@@ -29,7 +29,7 @@ export default async function RootLayout({
     <html lang="en" className={GeistSans.variable}>
       <body className="overflow-x-hidden">
         <NavBar sessionUser={session ? session.user : undefined} />
-        <main className="max-w-screen z-0 mb-12 overflow-hidden md:my-0">
+        <main className="max-w-screen z-0 mb-24 overflow-hidden md:my-0">
           {children}
         </main>
       </body>

@@ -24,6 +24,7 @@ export function PlaylistContent({
   play,
   tab,
   setTab,
+  isLikedSongs = false,
 }: {
   playlist: PlaylistObject;
   disabled: boolean;
@@ -33,9 +34,10 @@ export function PlaylistContent({
   play: (start?: PlaylistTrack) => void;
   tab: PlaylistTab;
   setTab: (value: PlaylistTab | ((prev: PlaylistTab) => PlaylistTab)) => void;
+  isLikedSongs?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-2 border-b-2 border-background bg-secondary p-2">
+    <div className="flex flex-col gap-2 border-b p-2">
       <div className="flex flex-col items-center gap-2 md:flex-row md:items-stretch">
         <Image
           width={160}
@@ -64,7 +66,7 @@ export function PlaylistContent({
                   name={playlist.owner.name}
                 />
                 <Link
-                  className="inline items-center font-bold text-background hover:underline"
+                  className="inline items-center font-bold text-muted-foreground hover:underline"
                   href={`/user/${playlist.owner.id}`}
                 >
                   {playlist.owner?.name}
@@ -78,36 +80,41 @@ export function PlaylistContent({
       </div>
       <div className="flex grow items-end gap-4 rounded-md">
         <PlayButton disabled={disabled} onClick={() => play()}>
-          <Play fill="black" stroke="black" />
+          <Play
+            fill="var(--primary-foreground)"
+            stroke="var(--primary-foreground)"
+          />
         </PlayButton>
 
         <IconButton
           big
           onClick={switchShuffled}
           className={
-            shuffled ? "[&_svg]:stroke-primary-accent" : "[&_svg]:stroke-black"
+            shuffled ? "[&_svg]:stroke-primary" : "[&_svg]:stroke-foreground"
           }
         >
           <Shuffle className="drop-shadow-md" />
         </IconButton>
         <div className="grid w-full grid-cols-2">
-          <LikeButton
-            big
-            hasLike={
-              !!playlist.likes?.some((like) => like.userId === sessionUserId)
-            }
-            count={playlist.likes?.length ?? 0}
-            sessionUserId={sessionUserId}
-            unlike={(suid: string) => unlikePlaylist(playlist.id, suid)}
-            like={(suid: string) => likePlaylist(playlist.id, suid)}
-            onClick={() =>
-              tab === PlaylistTab.Likes
-                ? setTab(PlaylistTab.Tracks)
-                : setTab(PlaylistTab.Likes)
-            }
-          />
+          {!isLikedSongs && (
+            <LikeButton
+              big
+              hasLike={
+                !!playlist.likes?.some((like) => like.userId === sessionUserId)
+              }
+              count={playlist.likes?.length ?? 0}
+              sessionUserId={sessionUserId}
+              unlike={(suid: string) => unlikePlaylist(playlist.id, suid)}
+              like={(suid: string) => likePlaylist(playlist.id, suid)}
+              onClick={() =>
+                tab === PlaylistTab.Likes
+                  ? setTab(PlaylistTab.Tracks)
+                  : setTab(PlaylistTab.Likes)
+              }
+            />
+          )}
         </div>
-        <ShareButton big path={`/playlist/${playlist.id}`} />
+        {!isLikedSongs && <ShareButton big path={`/playlist/${playlist.id}`} />}
       </div>
     </div>
   );

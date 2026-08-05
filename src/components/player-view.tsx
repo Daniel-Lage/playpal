@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { cn } from "~/lib/utils";
 import { PlayButton } from "./buttons/play-button";
 import { Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -17,11 +16,7 @@ export function PlayerView({
 
   return (
     <div className="margin-auto fixed bottom-20 flex w-svw justify-stretch px-6 md:bottom-6 md:w-[--main-view-w] md:px-6">
-      <div
-        className={cn(
-          "relative flex grow items-center justify-between self-center overflow-hidden rounded-md bg-primary pb-2 md:grow md:pb-0",
-        )}
-      >
+      <div className="relative flex grow items-center justify-between self-center overflow-hidden rounded-md border border-primary bg-background pb-2 md:grow md:pb-0">
         <div className="flex min-w-0 items-center gap-1">
           {track.album.images[0]?.url ? (
             <Image
@@ -32,7 +27,7 @@ export function PlayerView({
               alt={track.album.name}
             />
           ) : (
-            <div className="h-10 w-10 rounded-md bg-black" />
+            <div className="h-10 w-10 rounded-md bg-border" />
           )}
 
           <div className="min-w-0 flex-1 font-bold md:w-32">
@@ -52,9 +47,15 @@ export function PlayerView({
         <div className="m-1">
           <PlayButton onClick={togglePlay}>
             {playerState.paused ? (
-              <Play fill="black" stroke="black" />
+              <Play
+                fill="var(--primary-foreground)"
+                stroke="var(--primary-foreground)"
+              />
             ) : (
-              <Pause fill="black" stroke="black" />
+              <Pause
+                fill="var(--primary-foreground)"
+                stroke="var(--primary-foreground)"
+              />
             )}
           </PlayButton>
         </div>

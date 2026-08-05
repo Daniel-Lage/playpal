@@ -17,6 +17,7 @@ export function FeedView({
   refresh,
   send,
   playlists,
+  isOwnFeed = false,
 }: {
   posts: PostObject[];
   lastQueried: Date;
@@ -28,6 +29,7 @@ export function FeedView({
     metadata: IMetadata | undefined,
   ) => Promise<ActionStatus>;
   playlists: PlaylistObject[];
+  isOwnFeed?: boolean;
 }) {
   const [showPlaylists, setShowPlaylists] = useState(false);
 
@@ -36,7 +38,7 @@ export function FeedView({
       sessionUser={sessionUser}
       sideContent={
         <>
-          <div className="bg-primary p-2 text-xl font-bold">
+          <div className="p-2 text-xl font-bold">
             {showPlaylists ? "Posts" : "Playlists"}
           </div>
           {showPlaylists ? (
@@ -46,29 +48,28 @@ export function FeedView({
               send={send}
               lastQueried={lastQueried}
               refresh={refresh}
-              isPrimaryColor={true}
             />
           ) : (
             <PlaylistFeedView
               playlists={playlists}
-              sessionUserId={sessionUser?.id}
-              isPrimaryColor={true}
+              sessionUser={sessionUser}
+              isOwnFeed={isOwnFeed}
             />
           )}
         </>
       }
     >
-      <div className="h-16 gap-2 overflow-hidden border-b-2 border-background bg-secondary px-2">
+      <div className="h-16 gap-2 overflow-hidden border-b px-2">
         <div className="grid h-full w-full grid-cols-2 place-items-center gap-1 font-bold">
           <TabLinkButton
-            className={showPlaylists ? "bg-secondary" : "bg-secondary-accent"}
+            className={!showPlaylists ? "border" : ""}
             onClick={() => setShowPlaylists(false)}
           >
             Posts
           </TabLinkButton>
 
           <TabLinkButton
-            className={!showPlaylists ? "bg-secondary" : "bg-secondary-accent"}
+            className={showPlaylists ? "border" : ""}
             onClick={() => setShowPlaylists(true)}
           >
             Playlists
@@ -79,7 +80,8 @@ export function FeedView({
         {showPlaylists ? (
           <PlaylistFeedView
             playlists={playlists}
-            sessionUserId={sessionUser?.id}
+            sessionUser={sessionUser}
+            isOwnFeed={isOwnFeed}
           />
         ) : (
           <PostFeedView

@@ -23,7 +23,7 @@ export function PlaylistSearch({
   filterTracks: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <div className="flex shrink-0 items-center justify-between gap-2 bg-secondary p-2">
+    <div className="flex shrink-0 items-center justify-between gap-2 border-b p-2">
       <div className="flex items-center justify-between gap-2 md:w-fit">
         <Sorter
           title="Sort by"

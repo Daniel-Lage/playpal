@@ -19,10 +19,8 @@ export function NavButton({
       href={href}
       onClick={onClick}
       className={cn(
-        "flex h-9 w-9 min-w-0 items-center justify-center gap-4 overflow-hidden text-clip rounded-full bg-primary-accent hover:brightness-95 md:h-12 [&_svg]:size-6 [&_svg]:shrink-0",
-        collapsed
-          ? "md:w-12"
-          : "md:w-44 md:justify-start md:rounded-2xl md:px-4",
+        "flex h-9 w-9 min-w-0 items-center justify-center gap-4 overflow-hidden text-clip rounded-full bg-primary text-primary-foreground hover:brightness-95 md:h-12 [&_svg]:size-6 [&_svg]:shrink-0 [&_svg]:stroke-primary-foreground",
+        collapsed ? "md:w-12" : "md:w-44 md:justify-start md:px-3",
         active ? "font-bold" : "font-normal",
       )}
     >

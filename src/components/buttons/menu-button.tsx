@@ -14,8 +14,8 @@ export function MenuButton({
   return (
     <button
       className={cn(
-        className,
         "flex h-9 w-[200px] items-center gap-2 p-0 px-2 font-bold hover:backdrop-brightness-95 [&_svg]:size-6",
+        className,
       )}
       onClick={onClick}
       disabled={disabled}

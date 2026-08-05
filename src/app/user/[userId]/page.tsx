@@ -66,6 +66,7 @@ export default async function ProfilePage({
       posts={posts}
       playlists={playlists}
       sessionUser={session?.user}
+      isOwnFeed={session?.user.id === userId}
       send={
         session?.user.id === userId
           ? async (

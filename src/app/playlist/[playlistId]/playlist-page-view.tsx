@@ -25,19 +25,23 @@ import {
   GetDevicesStatus,
 } from "~/models/device.model";
 import { DevicePicker } from "~/components/device-picker";
+import type { Paging } from "~/models/paging.model";
 
 export function PlaylistPageView({
   playlist,
-  tracks,
+  pagingTracks,
   sessionUser,
   expires_at,
   queue,
+  loadNextTracks,
   playTracks,
   sendReply,
   loadDevices,
+  isLikedSongs = false,
 }: {
   playlist: PlaylistObject;
-  tracks: PlaylistTrack[];
+  pagingTracks: Paging<PlaylistTrack>;
+  loadNextTracks?: (next: string) => Promise<Paging<PlaylistTrack>>;
   queue?: PlaylistTrack[];
   sessionUser?: SessionUser;
   expires_at?: number | null;
@@ -52,6 +56,7 @@ export function PlaylistPageView({
     mentions?: string[],
     metadata?: IMetadata,
   ) => Promise<ActionStatus>;
+  isLikedSongs?: boolean;
 }) {
   const [shuffled, setShuffled] = useLocalStorage<boolean>(
     sessionUser?.id ? `${sessionUser?.id}:play_shuffled` : "play_shuffled",
@@ -67,12 +72,134 @@ export function PlaylistPageView({
     Spotify.PlaybackState | undefined
   >();
 
+  const [tracksPage, setTracksPage] = useState(pagingTracks);
+  const [loadingNextPage, setLoadingNextPage] = useState(false);
+
   const [devices, setDevices] = useState<Device[] | undefined>();
   const [queueStart, setQueueStart] = useState<PlaylistTrack | undefined>();
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const loadingNextPageRef = useRef(false);
+  const tracksPageRef = useRef(pagingTracks);
+
+  useEffect(() => {
+    tracksPageRef.current = pagingTracks;
+    setTracksPage(pagingTracks);
+    setLoadingNextPage(false);
+    loadingNextPageRef.current = false;
+  }, [pagingTracks]);
+
+  const mergeTracksPage = useCallback((nextPage: Paging<PlaylistTrack>) => {
+    setTracksPage((current) => {
+      const mergedPage = {
+        ...nextPage,
+        items: [...current.items, ...nextPage.items],
+      };
+
+      tracksPageRef.current = mergedPage;
+
+      return mergedPage;
+    });
+  }, []);
+
+  const loadNextPage = useCallback(async () => {
+    const currentPage = tracksPageRef.current;
+
+    if (
+      loadNextTracks == null ||
+      currentPage.next == null ||
+      loadingNextPageRef.current
+    )
+      return false;
+
+    loadingNextPageRef.current = true;
+    setLoadingNextPage(true);
+
+    try {
+      const nextPage = await loadNextTracks(currentPage.next);
+
+      mergeTracksPage(nextPage);
+      return true;
+    } finally {
+      loadingNextPageRef.current = false;
+      setLoadingNextPage(false);
+    }
+  }, [loadNextTracks, mergeTracksPage]);
+
+  useEffect(() => {
+    if (tab !== PlaylistTab.Tracks || bottomRef.current == null) return;
+    if (loadNextTracks == null || tracksPage.next == null) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) void loadNextPage();
+      },
+      {
+        root: null,
+        rootMargin: "200px 0px",
+      },
+    );
+
+    observer.observe(bottomRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [loadNextPage, loadNextTracks, tab, tracksPage.next]);
 
   const playOnDevice = useCallback(
-    async (expired: boolean, newQueue: PlaylistTrack[], deviceId: string) => {
-      if (!playTracks) return;
+    async (expired: boolean, deviceId: string, start?: PlaylistTrack) => {
+      if (!playTracks || !queue) return;
+
+      let newQueue: PlaylistTrack[] = [];
+
+      if (shuffled)
+        newQueue = start
+          ? setFirstItem(
+              queue,
+              start,
+              (other) => other.track.uri === start.track.uri,
+            )
+          : queue;
+      else {
+        let currentTracks = tracksPageRef.current;
+        let playableTracks = currentTracks.items.filter(
+          (track) => !track.is_local,
+        );
+        let startIndex = start
+          ? Math.max(
+              playableTracks.findIndex(
+                (other) => other.track.uri === start.track.uri,
+              ),
+              0,
+            )
+          : 0;
+
+        while (
+          playableTracks.length - startIndex < 99 &&
+          currentTracks.next != null
+        ) {
+          const loaded = await loadNextPage();
+
+          if (!loaded) break;
+
+          currentTracks = tracksPageRef.current;
+          playableTracks = currentTracks.items.filter(
+            (track) => !track.is_local,
+          );
+          startIndex = start
+            ? playableTracks.findIndex(
+                (other) => other.track.uri === start.track.uri,
+              )
+            : 0;
+        }
+
+        newQueue = playableTracks;
+
+        newQueue = newQueue.slice(startIndex, startIndex + 99);
+      }
+
+      newQueue = newQueue.filter((track) => !track.is_local);
 
       const status = await playTracks(expired, newQueue, deviceId);
       setStatus(status);
@@ -81,7 +208,7 @@ export function PlaylistPageView({
         setStatus(ActionStatus.Inactive);
       }, 4000);
     },
-    [playTracks],
+    [loadNextPage, playTracks, queue, shuffled],
   );
 
   const pickDevice = useCallback(
@@ -91,42 +218,11 @@ export function PlaylistPageView({
 
       const expired = expires_at < Math.floor(new Date().getTime() / 1000);
 
-      let newQueue: PlaylistTrack[] = [];
-
-      if (shuffled)
-        newQueue = queueStart
-          ? setFirstItem(
-              queue,
-              queueStart,
-              (other) => other.track.uri === queueStart.track.uri,
-            )
-          : queue;
-      else {
-        newQueue = tracks.filter((track) => !track.is_local);
-
-        const startIndex = queueStart
-          ? newQueue.findIndex(
-              (other) => other.track.uri === queueStart.track.uri,
-            )
-          : 0;
-
-        newQueue = newQueue.slice(startIndex, startIndex + 99);
-      }
-
-      void playOnDevice(expired, newQueue, deviceId);
+      void playOnDevice(expired, deviceId, queueStart);
       setQueueStart(undefined);
       setDevices(undefined);
     },
-    [
-      expires_at,
-      loadDevices,
-      playTracks,
-      queue,
-      shuffled,
-      tracks,
-      queueStart,
-      playOnDevice,
-    ],
+    [expires_at, loadDevices, playTracks, queue, queueStart, playOnDevice],
   );
 
   const handlePlay = useCallback(
@@ -141,33 +237,13 @@ export function PlaylistPageView({
 
       setStatus(ActionStatus.Active);
 
-      let newQueue: PlaylistTrack[] = [];
-
-      if (shuffled)
-        newQueue = start
-          ? setFirstItem(
-              queue,
-              start,
-              (other) => other.track.uri === start.track.uri,
-            )
-          : queue;
-      else {
-        newQueue = tracks.filter((track) => !track.is_local);
-
-        const startIndex = start
-          ? newQueue.findIndex((other) => other.track.uri === start.track.uri)
-          : 0;
-
-        newQueue = newQueue.slice(startIndex, startIndex + 99);
-      }
-
       const expired = expires_at < Math.floor(new Date().getTime() / 1000);
 
       const loadResult = await loadDevices(expired);
 
       switch (loadResult.status) {
         case GetDevicesStatus.UseWebPlayer:
-          void playOnDevice(expired, newQueue, deviceId);
+          void playOnDevice(expired, deviceId, start);
           break;
         case GetDevicesStatus.ChooseDevice:
           setDevices(loadResult.data);
@@ -179,8 +255,6 @@ export function PlaylistPageView({
       expires_at,
       playTracks,
       sessionUser?.id,
-      shuffled,
-      tracks,
       queue,
       deviceId,
       loadDevices,
@@ -244,11 +318,12 @@ export function PlaylistPageView({
       playerRef.current = undefined;
     };
   }, [sessionUser, playTracks]);
+
   return (
     <>
       {status === ActionStatus.Active && (
         <div className="fixed z-10 flex h-full w-svw items-center justify-center backdrop-brightness-50 md:ml-[--nav-bar-w] md:w-[--main-view-w]">
-          <div className="h-16 w-16 animate-spin rounded-full border-8 border-secondary border-b-transparent"></div>
+          <div className="h-16 w-16 animate-spin rounded-full border-8 border-primary border-b-transparent"></div>
         </div>
       )}
 
@@ -268,11 +343,13 @@ export function PlaylistPageView({
       <PageView
         sessionUser={sessionUser}
         sideContent={
-          <PlaylistRepliesView
-            playlist={playlist}
-            sessionUser={sessionUser}
-            send={sendReply}
-          />
+          !isLikedSongs && (
+            <PlaylistRepliesView
+              playlist={playlist}
+              sessionUser={sessionUser}
+              send={sendReply}
+            />
+          )
         }
       >
         <PlaylistContent
@@ -286,17 +363,27 @@ export function PlaylistPageView({
           sessionUserId={sessionUser?.id}
           tab={tab}
           setTab={setTab}
+          isLikedSongs={isLikedSongs}
         />
+
         <div className="pb-24">
           {
             {
               [PlaylistTab.Tracks]: (
-                <PlaylistTracksView
-                  playTrack={handlePlay}
-                  tracks={tracks}
-                  disabled={status === ActionStatus.Active}
-                  sessionUserId={sessionUser?.id}
-                />
+                <>
+                  <PlaylistTracksView
+                    playTrack={handlePlay}
+                    tracks={tracksPage.items}
+                    disabled={status === ActionStatus.Active}
+                    sessionUserId={sessionUser?.id}
+                  />
+                  <div ref={bottomRef} className="h-1 w-full" />
+                  {loadingNextPage && (
+                    <div className="flex justify-center">
+                      <div className="h-16 w-16 animate-spin rounded-full border-8 border-primary border-b-transparent"></div>
+                    </div>
+                  )}
+                </>
               ),
               [PlaylistTab.Likes]: (
                 <PlaylistLikesView likes={playlist.likes ?? []} />

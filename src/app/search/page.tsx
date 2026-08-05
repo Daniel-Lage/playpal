@@ -41,10 +41,10 @@ export default async function SearchPage({
 async function SearchViewForm({ q }: { q?: string }) {
   return (
     <>
-      <div className="flex flex-col gap-2 overflow-hidden bg-secondary p-2">
+      <div className="flex flex-col gap-2 overflow-hidden p-2">
         <form
           action="/search"
-          className="flex grow cursor-text gap-2 rounded-full border-2 border-secondary-accent p-2 focus-within:border-black"
+          className="flex grow cursor-text gap-2 rounded-full border p-2 focus-within:border-primary"
         >
           <Search />
           <input
@@ -54,7 +54,7 @@ async function SearchViewForm({ q }: { q?: string }) {
             autoComplete="off"
             autoCorrect="off"
             autoCapitalize="off"
-            className="w-36 grow border-secondary-accent bg-transparent placeholder-zinc-600 outline-none md:w-48"
+            className="w-36 grow bg-transparent placeholder-zinc-600 outline-none md:w-48"
             type="text"
           />
         </form>

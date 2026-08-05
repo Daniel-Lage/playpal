@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { SpotifyLink } from "~/components/spotify-link";
-import { cn } from "~/lib/utils";
 import type { PlaylistObject } from "~/models/playlist.model";
 import { MessageSquare } from "lucide-react";
 import { LikeButton } from "./buttons/like-button";
@@ -13,20 +12,13 @@ import { IconButton } from "./buttons/icon-button";
 export function PlaylistView({
   playlist,
   sessionUserId,
-  isPrimaryColor = false,
 }: {
   sessionUserId?: string | null;
   playlist: PlaylistObject;
   focused?: boolean;
-  isPrimaryColor?: boolean;
 }) {
   return (
-    <div
-      className={cn(
-        "flex flex-col rounded-md p-1 md:gap-2 md:p-2",
-        isPrimaryColor ? "bg-primary-accent" : "bg-secondary",
-      )}
-    >
+    <div className="flex flex-col rounded-md border p-1 md:gap-2 md:p-2">
       <div className="flex items-start gap-2 font-bold">
         <Link
           href={`/playlist/${playlist.id}`}
@@ -54,7 +46,7 @@ export function PlaylistView({
                   </div>
                   <Link
                     className="inline grow items-center text-sm font-normal hover:underline md:text-base"
-                    href={`/post/${playlist.id}`}
+                    href={`/playlist/${playlist.id}`}
                   >
                     Liked by{" "}
                     {playlist.likes
@@ -74,7 +66,7 @@ export function PlaylistView({
                   : playlist.description}
               </div>
             )}
-            <div className="inline items-center text-xs font-bold text-background md:text-sm">
+            <div className="inline items-center text-xs font-bold text-muted-foreground md:text-sm">
               {playlist.owner?.name}
             </div>
           </div>

@@ -59,10 +59,7 @@ export default async function PlaylistsPage({
 
   return (
     <PageView sessionUser={session?.user}>
-      <PlaylistFeedView
-        playlists={playlists}
-        sessionUserId={session?.user.id}
-      />
+      <PlaylistFeedView playlists={playlists} sessionUser={session?.user} />
     </PageView>
   );
 }

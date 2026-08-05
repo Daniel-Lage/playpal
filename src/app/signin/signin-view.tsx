@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { LogIn } from "lucide-react";
-import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { Input } from "~/components/ui/input";
 import { FormButton } from "~/components/buttons/form-button";
 import { OneElementView } from "~/components/one-element-view";
+import { SpotifyIcon } from "~/components/spotify-icon";
 
 export function SignInView() {
   const [email, setEmail] = useState("");
@@ -28,20 +28,15 @@ export function SignInView() {
         <div className="text-lg font-bold">Sign in with Email</div>
       </FormButton>
 
-      <div className="relative my-4 h-[2px] w-full bg-black text-center">
-        <span className="absolute top-[-0.7rem] self-center bg-secondary px-1">
+      <div className="relative my-4 h-[2px] w-full bg-foreground text-center">
+        <span className="absolute top-[-0.7rem] self-center bg-background px-1">
           or
         </span>
       </div>
 
       <FormButton onClick={() => signIn("spotify")}>
-        <Image
-          height={24}
-          width={24}
-          className="aspect-square h-auto w-6 flex-shrink-0 flex-grow-0 rounded-md"
-          src="/spotify-icon.svg"
-          alt="spotify icon"
-        />
+        <SpotifyIcon />
+
         <div className="text-lg font-bold">Sign In with Spotify</div>
       </FormButton>
     </OneElementView>

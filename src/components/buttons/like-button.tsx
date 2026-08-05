@@ -42,7 +42,7 @@ export function LikeButton({
       ) : isLiked ? (
         <IconButton
           big={big}
-          className="[&_svg]:fill-primary-accent [&_svg]:stroke-primary-accent"
+          className="[&_svg]:fill-primary [&_svg]:stroke-primary"
           onClick={() => {
             setIsLiked(false);
             unlike(sessionUserId).catch(() => setIsLiked(true));

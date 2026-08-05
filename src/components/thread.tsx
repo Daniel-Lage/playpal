@@ -19,7 +19,7 @@ export function Thread({
     <div
       className={cn(
         "flex flex-col justify-stretch rounded-md",
-        isMainPost ? "bg-secondary" : "bg-secondary",
+        isMainPost ? "" : "",
       )}
     >
       {thread.map(

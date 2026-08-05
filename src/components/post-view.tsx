@@ -26,7 +26,6 @@ export function PostView({
   isCutoff,
   isLastPost = true,
   CutOff,
-  isPrimaryColor = false,
   isMainPost = false,
   hasReplyBox = false,
 }: {
@@ -35,19 +34,13 @@ export function PostView({
   isCutoff?: boolean;
   isLastPost?: boolean;
   CutOff?: () => void;
-  isPrimaryColor?: boolean;
   isMainPost?: boolean;
   hasReplyBox?: boolean;
 }) {
   const router = useRouter();
 
   return (
-    <div
-      className={cn(
-        "flex flex-col overflow-hidden rounded-md bg-secondary px-2",
-        isPrimaryColor ? "bg-primary-accent" : "bg-secondary",
-      )}
-    >
+    <div className="flex flex-col overflow-hidden rounded-md border px-2">
       <div className="flex h-12 items-center text-xs md:text-base">
         <Link
           href={`/user/${post.author.id}`}
@@ -148,12 +141,7 @@ export function PostView({
         <div className="flex grow flex-col justify-between overflow-hidden">
           <ContentRenderer content={post.content} />
 
-          {post?.urlMetadata && (
-            <MetadataCard
-              metadata={post?.urlMetadata}
-              isPrimaryColor={isPrimaryColor}
-            />
-          )}
+          {post?.urlMetadata && <MetadataCard metadata={post?.urlMetadata} />}
 
           <div className="grid h-12 grid-cols-3 items-center justify-between font-bold">
             <LikeButton

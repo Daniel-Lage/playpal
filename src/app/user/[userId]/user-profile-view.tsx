@@ -50,18 +50,22 @@ export function UserProfileView({
     <>
       <div
         className={cn(
-          "flex h-14 flex-col justify-center gap-2 overflow-hidden border-b-2 bg-secondary",
-          simple ? "border-background" : "border-secondary",
+          "flex h-14 flex-col justify-center gap-2 overflow-hidden border-b",
+          simple ? "" : "absolute",
+        )}
+      ></div>
+      <div
+        className={cn(
+          "flex h-14 flex-col justify-center gap-2 overflow-hidden border-b",
+          simple
+            ? "fixed top-0 w-[--main-view-w] bg-background"
+            : "border-transparent",
         )}
       >
         <div className="flex items-center gap-2 p-2">
-          <Link className="flex grow items-center" href={`/user/${user.id}`}>
-            <UserImage size={40} image={user.image} name={user.name} />
+          <UserImage size={40} image={user.image} name={user.name} />
 
-            <div className="grow px-2 font-bold hover:underline">
-              {user.name}
-            </div>
-          </Link>
+          <div className="grow px-2 font-bold">{user.name}</div>
 
           <div>
             <FollowButton sessionUserId={sessionUserId} user={user} />
@@ -109,17 +113,15 @@ export function UserProfileView({
           </MenuView>
         </div>
       </div>
-      {!simple && (
-        <div className="flex gap-2 pl-4 text-xs font-bold text-gray-700 md:text-base">
-          <Link href={`/user/${user.id}/followers`} className="hover:underline">
-            {user.followers.length} followers
-          </Link>
+      <div className="flex gap-2 pl-4 text-xs font-bold text-muted-foreground md:text-base">
+        <Link href={`/user/${user.id}/followers`} className="hover:underline">
+          {user.followers.length} followers
+        </Link>
 
-          <Link href={`/user/${user.id}/following`} className="hover:underline">
-            {user.following.length} following
-          </Link>
-        </div>
-      )}
+        <Link href={`/user/${user.id}/following`} className="hover:underline">
+          {user.following.length} following
+        </Link>
+      </div>
     </>
   );
 }

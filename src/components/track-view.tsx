@@ -14,7 +14,7 @@ export function TrackView({
   return (
     <button
       key={track.track.uri + track.added_at}
-      className="flex w-full items-center gap-1 rounded-md bg-secondary p-1 font-bold"
+      className="flex w-full items-center gap-1 rounded-md border p-1 font-bold"
       disabled={disabled || track.is_local}
       onClick={onClick}
     >
@@ -22,12 +22,12 @@ export function TrackView({
         <Image
           width={40}
           height={40}
-          className="aspect-square h-auto w-10 flex-shrink-0 flex-grow-0 rounded-md"
+          className="aspect-square h-auto w-10 flex-shrink-0 flex-grow-0 rounded-md border"
           src={track.track.album.images[0]?.url ?? ""}
           alt={track.track.album.name}
         />
       ) : (
-        <div className="h-10 w-10 rounded-md bg-black" />
+        <div className="h-10 w-10 rounded-md bg-border" />
       )}
       <div className="grow overflow-hidden">
         <div className="flex grow overflow-hidden">

@@ -109,11 +109,11 @@ export function PostPageView({
 
   return (
     <>
-      <div className="flex flex-col bg-secondary">
+      <div className="flex flex-col border-b">
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
             {!!post.playlist && (
-              <div className="border-b-2 border-background">
+              <div className="border-b">
                 <PlaylistView
                   playlist={post.playlist}
                   sessionUserId={sessionUser?.id}
@@ -147,7 +147,7 @@ export function PostPageView({
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-start gap-2 bg-secondary p-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col items-start gap-2 p-2 md:flex-row md:items-center md:justify-between">
         {post.replyThreads?.length ?? 0} Replies
         <Sorter
           title="Sort by"

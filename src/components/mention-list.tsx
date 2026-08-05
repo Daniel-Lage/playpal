@@ -51,7 +51,7 @@ const MentionList = forwardRef<MentionListRef, MentionListProps>(
     }));
 
     return (
-      <div className="flex flex-col gap-2 rounded-md bg-popover p-2">
+      <div className="flex flex-col gap-2 rounded-md border bg-popover p-2">
         {items.length ? (
           items.map((item, index) => (
             <button

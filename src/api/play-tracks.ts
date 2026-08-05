@@ -9,7 +9,7 @@ export async function playTracks(
   accessToken?: string | null,
 ): Promise<ActionStatus> {
   if (!accessToken) {
-    console.error("Error: acessToken is undefined");
+    console.error("Error: accessToken is undefined");
     return ActionStatus.Failure;
   }
 
@@ -32,7 +32,7 @@ export async function playTracks(
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer  ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     },
   );
@@ -55,7 +55,7 @@ export async function playTracks(
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer  ${accessToken}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     },
   );
@@ -67,39 +67,27 @@ export async function playTracks(
     return ActionStatus.Failure;
   }
 
-  const wait = new Promise((resolve) => {
-    let index = 0;
-    const interval = setInterval(() => {
-      if (index < tracks.length) {
-        const track = tracks[index]?.track;
-        if (track) {
-          track.disc_number = index;
+  for (const { track } of tracks) {
+    await fetch(
+      "https://api.spotify.com/v1/me/player/queue?" +
+        new URLSearchParams({
+          uri: track.uri,
+          device_id: deviceId,
+        }).toString(),
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+    ).catch((e) => {
+      console.error(e);
+    });
 
-          fetch(
-            "https://api.spotify.com/v1/me/player/queue?" +
-              new URLSearchParams({
-                uri: track.uri,
-                device_id: deviceId,
-              }).toString(),
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer  ${accessToken}`,
-              },
-            },
-          ).catch((e) => {
-            console.error(e);
-          });
-        }
-        index++;
-      } else {
-        resolve(true);
-        clearInterval(interval);
-      }
-    }, 10);
-  });
+    const sleep = new Promise((resolve) => setTimeout(resolve, 10));
 
-  await wait;
+    await sleep;
+  }
 
   return ActionStatus.Success;
 }

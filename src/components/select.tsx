@@ -45,7 +45,7 @@ export function Select({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] border-none p-0">
-        <Command className="border-none">
+        <Command>
           <CommandList>
             <CommandGroup>
               {options.map((option) => (

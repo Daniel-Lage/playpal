@@ -8,7 +8,7 @@ export function ProfileTabs({ userId }: { userId: string }) {
   const pathname = usePathname();
 
   return (
-    <div className="grid h-16 grid-cols-3 place-items-center gap-1 border-b-2 border-background p-2 px-2 font-bold">
+    <div className="grid h-16 grid-cols-3 place-items-center gap-1 border-b p-2 px-2 font-bold">
       <ProfileTabLink
         href={`/user/${userId}`}
         title="Main"
@@ -39,9 +39,7 @@ function ProfileTabLink({
 }) {
   return (
     <Link href={href} role="button" key={title} className="w-full">
-      <TabLinkButton
-        className={href === pathname ? "bg-secondary-accent" : "bg-secondary"}
-      >
+      <TabLinkButton className={href === pathname ? "border" : ""}>
         {title}
       </TabLinkButton>
     </Link>

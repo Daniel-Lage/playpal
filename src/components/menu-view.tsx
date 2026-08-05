@@ -20,9 +20,7 @@ export function MenuView({ children }: { children: React.ReactNode }) {
           <Ellipsis />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] border-none p-0">
-        {children}
-      </PopoverContent>
+      <PopoverContent className="w-[200px] p-0">{children}</PopoverContent>
     </Popover>
   );
 }

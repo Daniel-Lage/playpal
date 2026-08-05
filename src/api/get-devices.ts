@@ -10,7 +10,7 @@ export async function getDevices(
 ): Promise<GetDevicesResponse> {
   const response = await fetch("https://api.spotify.com/v1/me/player/devices", {
     headers: {
-      Authorization: `Bearer  ${accessToken}`,
+      Authorization: `Bearer ${accessToken}`,
     },
   });
 

@@ -5,18 +5,19 @@ import { authOptions } from "~/lib/auth";
 import type { Metadata } from "next";
 import { PlaylistPageView } from "./playlist-page-view";
 import { isPremiumUser } from "~/api/is-premium-user";
-import { getRandomSample } from "~/helpers/get-random-sample";
 import { type PlaylistTrack } from "~/models/track.model";
 import { playTracks } from "~/api/play-tracks";
 import { revalidatePath } from "next/cache";
 import { getPlaylist } from "~/server/get-playlist";
 import { getTracks } from "~/api/get-tracks";
+import { getNextPage } from "~/api/get-next-tracks";
 import type { IMetadata } from "~/models/post.model";
 import { postPlaylistReply } from "~/server/post-playlist-reply";
 import { ActionStatus } from "~/models/status.model";
 import { ErrorPage } from "~/app/error-page";
 import { GetDevicesStatus } from "~/models/device.model";
 import { getDevices } from "~/api/get-devices";
+import { getQueue } from "~/api/get-queue";
 
 export async function generateMetadata({
   params: { playlistId },
@@ -61,13 +62,25 @@ export default async function PlaylistPage({
 
   if (!playlist) return <ErrorPage />;
 
-  const tracks = await getTracks(
-    playlist.id,
-    playlist.totalTracks,
+  const pagingTracks = await getTracks(
+    `playlists/${playlist.id}`,
     session?.user.access_token,
   );
 
-  if (!session) return <PlaylistPageView playlist={playlist} tracks={tracks} />;
+  const loadNextTracks = async (next: string) => {
+    "use server";
+
+    return await getNextPage(next, session?.user.access_token);
+  };
+
+  if (!session)
+    return (
+      <PlaylistPageView
+        playlist={playlist}
+        pagingTracks={pagingTracks}
+        loadNextTracks={loadNextTracks}
+      />
+    );
 
   const send = async (
     input: string,
@@ -94,23 +107,26 @@ export default async function PlaylistPage({
       <PlaylistPageView
         playlist={playlist}
         sessionUser={session.user}
-        tracks={tracks}
+        pagingTracks={pagingTracks}
+        loadNextTracks={loadNextTracks}
         sendReply={send}
       />
     );
 
-  const queue = getRandomSample(
-    tracks.filter((track) => !track.is_local),
-    99,
+  const queue = await getQueue(
+    `playlists/${playlist.id}`,
+    pagingTracks.total,
+    session.user.access_token,
   );
 
   return (
     <PlaylistPageView
       playlist={playlist}
-      tracks={tracks}
+      pagingTracks={pagingTracks}
       sessionUser={session.user}
       expires_at={session.user.expires_at}
       queue={queue}
+      loadNextTracks={loadNextTracks}
       playTracks={async (
         expired: boolean,
         queue: PlaylistTrack[],

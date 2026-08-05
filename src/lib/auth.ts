@@ -14,7 +14,7 @@ const spotifyAuthUrl = new URL("https://accounts.spotify.com/authorize");
 
 spotifyAuthUrl.search = new URLSearchParams({
   scope:
-    "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state",
+    "streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state user-library-read",
 }).toString();
 
 export const authOptions: NextAuthOptions = {
@@ -53,6 +53,24 @@ export const authOptions: NextAuthOptions = {
         where: eq(schema.accountsTable.userId, user.id),
       });
 
+      if (!account) {
+        return session;
+      }
+      const now = Math.floor(new Date().getTime() / 1000);
+
+      const createdAtSeconds = Math.floor(account.createdAt.getTime() / 1000);
+
+      // 180 days for refresh token expiration
+      const refreshTokenExpiresAt = createdAtSeconds + 180 * 24 * 60 * 60;
+
+      if (now > refreshTokenExpiresAt) {
+        await db
+          .delete(schema.accountsTable)
+          .where(eq(schema.accountsTable.userId, user.id));
+
+        return session;
+      }
+
       if (
         account?.access_token == null ||
         account?.refresh_token == null ||
@@ -65,13 +83,11 @@ export const authOptions: NextAuthOptions = {
       session.user.access_token = account.access_token;
       session.user.expires_at = account.expires_at;
 
-      const now = Math.floor(new Date().getTime() / 1000);
-
       if (now < account.expires_at) {
         return session;
       }
 
-      const { access_token, expires_in } = await getTokens(
+      const { access_token, refresh_token, expires_in } = await getTokens(
         account.refresh_token,
       );
 
@@ -87,6 +103,13 @@ export const authOptions: NextAuthOptions = {
         .update(schema.accountsTable)
         .set({ access_token, expires_at })
         .where(eq(schema.accountsTable.userId, user.id));
+
+      if (refresh_token != null) {
+        await db
+          .update(schema.accountsTable)
+          .set({ refresh_token })
+          .where(eq(schema.accountsTable.userId, user.id));
+      }
 
       await loadPlaylists(access_token, user.id);
 

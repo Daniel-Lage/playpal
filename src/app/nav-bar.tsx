@@ -75,7 +75,7 @@ export function NavBar({ sessionUser }: { sessionUser?: SessionUser }) {
     <>
       <div
         className={cn(
-          "fixed bottom-0 left-0 z-50 flex h-12 w-screen shrink-0 items-center justify-around border-r-2 border-background bg-primary p-6 font-bold transition-opacity md:h-svh md:w-[--nav-bar-w] md:flex-col md:items-end md:justify-normal md:gap-6",
+          "fixed bottom-0 left-0 z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-background p-6 font-bold transition-opacity md:h-svh md:w-[--nav-bar-w] md:flex-col md:items-end md:justify-normal md:gap-6 md:border-r md:border-t-0",
           faded && "opacity-40 md:opacity-100",
         )}
       >

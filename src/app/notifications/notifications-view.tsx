@@ -27,17 +27,17 @@ export default function NotificationsView({
 
   return (
     <>
-      <div className="flex flex-col bg-secondary p-2">
-        <div className="grid grid-cols-4 gap-1">
+      <div className="flex flex-col border-b p-2">
+        <div className="grid grid-cols-5 place-content-center gap-1">
           <TabLinkButton
-            className={tab == null ? "bg-secondary-accent" : "bg-secondary"}
+            className={tab == null ? "border" : ""}
             onClick={() => setTab(undefined)}
           >
             All
           </TabLinkButton>
           {NotificationTypeOptions.map((type) => (
             <TabLinkButton
-              className={tab === type ? "bg-secondary-accent" : "bg-secondary"}
+              className={tab === type ? "border" : ""}
               onClick={() => setTab(type)}
               key={type}
             >
@@ -58,7 +58,7 @@ export default function NotificationsView({
                   ? notification.notifierId + notification.target.id
                   : notification.notifierId
               }
-              className="flex flex-col rounded-md bg-secondary"
+              className="flex flex-col rounded-md"
             >
               <NotificationView
                 notification={notification}

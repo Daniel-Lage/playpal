@@ -22,6 +22,7 @@ export async function getTokens(refreshToken: string) {
       `Status: ${response.statusText}; Description: ${error?.message};`,
     );
   }
+  const json = (await response.json()) as Tokens;
 
-  return (await response.json()) as Tokens;
+  return json;
 }

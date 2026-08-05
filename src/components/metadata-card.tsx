@@ -1,22 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "~/lib/utils";
 import type { IMetadata } from "~/models/post.model";
 
-export function MetadataCard({
-  metadata,
-  isPrimaryColor,
-}: {
-  metadata: IMetadata;
-  isPrimaryColor?: boolean;
-}) {
+export function MetadataCard({ metadata }: { metadata: IMetadata }) {
   return (
     <Link
       href={metadata?.og_url ?? ""}
-      className={cn(
-        "flex w-full flex-1 items-start gap-2 overflow-hidden rounded-md p-2",
-        isPrimaryColor ? "bg-primary" : "bg-secondary-accent",
-      )}
+      className="flex w-full flex-1 items-start gap-2 overflow-hidden rounded-md border p-2"
     >
       {metadata?.og_image && (
         <Image
@@ -35,7 +25,7 @@ export function MetadataCard({
           {metadata.og_description}
         </div>
 
-        <div className="truncate text-left text-xs font-bold text-background md:text-sm">
+        <div className="truncate text-left text-xs font-bold text-muted-foreground md:text-sm">
           {metadata.og_url}
         </div>
       </div>

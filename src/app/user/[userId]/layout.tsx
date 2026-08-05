@@ -24,7 +24,7 @@ export default async function ProfileLayout({
   return (
     <>
       <PageView sessionUser={session?.user}>
-        <div className="flex flex-col bg-secondary">
+        <div className="flex flex-col">
           <UserProfileView
             user={user}
             sessionUserId={session?.user.id}

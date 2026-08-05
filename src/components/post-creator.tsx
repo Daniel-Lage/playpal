@@ -11,7 +11,6 @@ import { LinkButton } from "./buttons/link-button";
 import { type Content, EditorContent, useEditor } from "@tiptap/react";
 import { getEditorExtensions } from "../lib/editor-extensions";
 import { getUsersFollowing } from "~/server/get-users-following";
-import { cn } from "~/lib/utils";
 import { flattenContent } from "~/helpers/flatten-content";
 import { getMetadataList } from "~/lib/get-metadata";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -23,7 +22,6 @@ export function PostCreator({
   sessionUser,
   disabled,
   setStatus,
-  isPrimaryColor = false,
 }: {
   send: (
     input: string,
@@ -35,7 +33,6 @@ export function PostCreator({
   setStatus: (
     value: ActionStatus | ((prevState: ActionStatus) => ActionStatus),
   ) => void;
-  isPrimaryColor?: boolean;
 }) {
   const [userList, setUserList] = useState<User[]>([]);
   const [urls, setUrls] = useState<string[]>([]);
@@ -122,14 +119,7 @@ export function PostCreator({
   );
 
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-2 border-b-2 border-background bg-secondary px-2 pb-2",
-        isPrimaryColor
-          ? "border-b-2 border-background bg-primary"
-          : "bg-secondary",
-      )}
-    >
+    <div className="flex flex-col gap-2 border-b px-2 pb-2">
       <div className="flex items-center">
         <Link
           className="flex h-12 w-12 items-center justify-center"
@@ -159,12 +149,14 @@ export function PostCreator({
             <IconButton
               onClick={() => setMetadataIndex((prev) => prev - 1)}
               disabled={metadataIndex === 0}
-              className={metadataIndex === 0 ? "[&_svg]:stroke-background" : ""}
+              className={
+                metadataIndex === 0 ? "[&_svg]:stroke-muted-foreground" : ""
+              }
             >
               <ChevronLeft />
             </IconButton>
             {loadingMetadata || metadataList[metadataIndex] == null ? (
-              <div className="flex flex-1 items-start gap-2 rounded-md bg-secondary-accent p-2 font-bold">
+              <div className="flex flex-1 items-start gap-2 rounded-md border p-2 font-bold">
                 Loading Metadata...
               </div>
             ) : (
@@ -175,7 +167,7 @@ export function PostCreator({
               disabled={metadataIndex === metadataList.length - 1}
               className={
                 metadataIndex === metadataList.length - 1
-                  ? "[&_svg]:stroke-background"
+                  ? "[&_svg]:stroke-muted-foreground"
                   : ""
               }
             >

@@ -11,22 +11,26 @@ import { PlaylistView } from "./playlist-view";
 import { Sorter } from "~/components/sorter";
 import { SearchView } from "~/components/search-view";
 import { ItemsView } from "./items-view";
-import { cn } from "~/lib/utils";
+import Image from "next/image";
+import { SpotifyLink } from "./spotify-link";
+import type { SessionUser } from "~/models/user.model";
+import Link from "next/link";
 
 export default function PlaylistFeedView({
   playlists,
-  sessionUserId,
-  isPrimaryColor = false,
+  isOwnFeed = false,
+  sessionUser,
 }: {
   playlists: PlaylistObject[];
-  sessionUserId?: string;
-  isPrimaryColor?: boolean;
+  sessionUser?: SessionUser;
+
+  isOwnFeed?: boolean;
 }) {
   const [filter, setFilter] = useState("");
 
   const [reversed, setReversed] = useLocalStorage<boolean>(
-    sessionUserId
-      ? `${sessionUserId}:playlists_reversed`
+    sessionUser?.id
+      ? `${sessionUser?.id}:playlists_reversed`
       : "playlists_reversed",
     false,
     useCallback((text) => text === "true", []),
@@ -35,8 +39,8 @@ export default function PlaylistFeedView({
 
   const [sortingColumn, setSortingColumn] =
     useLocalStorage<PlaylistsSortingColumn>(
-      sessionUserId
-        ? `${sessionUserId}:playlists_sorting_column`
+      sessionUser?.id
+        ? `${sessionUser?.id}:playlists_sorting_column`
         : "playlists_sorting_column",
       PlaylistsSortingColumn.CreatedAt,
       useCallback((text) => {
@@ -59,14 +63,7 @@ export default function PlaylistFeedView({
 
   return (
     <>
-      <div
-        className={cn(
-          "flex flex-col items-start gap-2 border-b-2 border-background p-2 md:flex-row md:items-center",
-          isPrimaryColor
-            ? "bg-primary-border-b-2 border-background bg-primary"
-            : "bg-secondary",
-        )}
-      >
+      <div className="flex flex-col items-start gap-2 border-b p-2 md:flex-row md:items-center">
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>
@@ -78,21 +75,51 @@ export default function PlaylistFeedView({
           reverse={() => {
             setReversed((prev) => !prev);
           }}
-          isPrimaryColor={isPrimaryColor}
         />
         <SearchView
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          isPrimaryColor={isPrimaryColor}
         />
       </div>
       <ItemsView>
+        {isOwnFeed && (
+          <div className="flex flex-col rounded-md border p-1 md:gap-2 md:p-2">
+            <div className="flex items-start gap-2 font-bold">
+              <Link
+                href={`/liked-songs`}
+                className="flex grow gap-2 overflow-x-hidden"
+                title="Liked Songs"
+              >
+                <Image
+                  width={96}
+                  height={96}
+                  className="inline aspect-square h-16 w-16 flex-shrink-0 flex-grow-0 rounded-md md:h-24 md:w-24"
+                  src="/liked-songs.jpg"
+                  alt="Liked Songs"
+                />
+
+                <div className="flex h-full grow flex-col items-start truncate">
+                  <div className="flex items-center justify-between text-wrap font-bold">
+                    <span className="truncate text-base md:text-xl">
+                      Liked Songs
+                    </span>
+                  </div>
+                  <div className="inline items-center text-xs font-bold text-muted-foreground md:text-sm">
+                    {sessionUser?.name}
+                  </div>
+                </div>
+              </Link>
+
+              <SpotifyLink external_url="https://open.spotify.com/collection/tracks" />
+            </div>
+          </div>
+        )}
+
         {treatedPlaylists.map((playlist) => (
           <PlaylistView
             key={playlist.id}
             playlist={playlist}
-            sessionUserId={sessionUserId}
-            isPrimaryColor={isPrimaryColor}
+            sessionUserId={sessionUser?.id}
           />
         ))}
       </ItemsView>

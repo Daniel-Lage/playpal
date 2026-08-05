@@ -14,8 +14,8 @@ export function LinkButton({
   return (
     <button
       className={cn(
-        className,
         "w-auto px-4 font-bold underline-offset-4 hover:underline",
+        className,
       )}
       onClick={onClick}
       disabled={disabled}

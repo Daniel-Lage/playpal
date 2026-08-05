@@ -23,12 +23,10 @@ export function PostFeedView({
   lastQueried: lastQueriedProp,
   refresh,
   send,
-  isPrimaryColor = false,
 }: {
   posts: PostObject[];
   lastQueried: Date;
   sessionUser?: SessionUser;
-  isPrimaryColor?: boolean;
   refresh: (lastQueried: Date) => Promise<PostObject[]>;
   send?: (
     input: string,
@@ -116,16 +114,12 @@ export function PostFeedView({
           sessionUser={sessionUser}
           disabled={status === ActionStatus.Active}
           setStatus={setStatus}
-          isPrimaryColor={isPrimaryColor}
         />
       )}
 
       <div
         className={cn(
-          "flex flex-col items-start gap-2 bg-secondary p-2 px-2 md:flex-row md:items-center md:justify-between",
-          isPrimaryColor
-            ? "border-b-2 border-background bg-primary"
-            : "bg-secondary",
+          "flex flex-col items-start gap-2 border-b p-2 px-2 md:flex-row md:items-center md:justify-between",
         )}
       >
         <Sorter
@@ -139,18 +133,12 @@ export function PostFeedView({
           reverse={() => {
             setReversed((prev) => !prev);
           }}
-          isPrimaryColor={isPrimaryColor}
         />
       </div>
 
       <ItemsView>
         {treatedPosts.map((post) => (
-          <PostView
-            key={post.id}
-            post={post}
-            sessionUserId={sessionUser?.id}
-            isPrimaryColor={isPrimaryColor}
-          />
+          <PostView key={post.id} post={post} sessionUserId={sessionUser?.id} />
         ))}
       </ItemsView>
 

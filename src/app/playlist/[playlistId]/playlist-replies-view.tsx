@@ -87,7 +87,7 @@ export function PlaylistRepliesView({
 
   return (
     <>
-      <div className="bg-primary p-2 text-xl font-bold">Replies</div>
+      <div className="border-b p-2 text-xl font-bold">Replies</div>
 
       {sessionUser?.image && sessionUser?.name && (
         <PostCreator
@@ -95,11 +95,10 @@ export function PlaylistRepliesView({
           sessionUser={sessionUser}
           disabled={status === ActionStatus.Active}
           setStatus={setStatus}
-          isPrimaryColor={true}
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 bg-primary p-2 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col items-start gap-2 p-2 md:flex-row md:items-center md:justify-between">
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>
@@ -111,7 +110,6 @@ export function PlaylistRepliesView({
           reverse={() => {
             setReversed((prev) => !prev);
           }}
-          isPrimaryColor={true}
         />
       </div>
 

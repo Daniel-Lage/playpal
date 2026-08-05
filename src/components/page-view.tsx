@@ -62,7 +62,7 @@ export function PageView({
           }
         }}
         className={cn(
-          "fixed right-0 top-0 hidden h-screen overflow-y-auto border-l-2 border-background bg-primary pt-12 md:flex md:flex-col",
+          "fixed right-0 top-0 z-10 hidden h-screen overflow-y-auto border-l bg-background pt-12 md:flex md:flex-col",
           collapsed ? "w-[96px]" : "w-[--side-bar-w]",
         )}
       >
@@ -70,7 +70,7 @@ export function PageView({
           className={cn(
             "fixed right-0 top-0 hidden justify-end p-6 md:flex",
             collapsed ? "w-[96px]" : "w-[--side-bar-w]",
-            scrolled ? "border-b-2 border-background bg-primary" : "",
+            scrolled ? "border-b border-l bg-background" : "",
           )}
         >
           <NavButton

@@ -10,11 +10,6 @@ const config: Config = {
         sans: ["var(--font-geist-sans)", ...fontFamily.sans],
       },
       colors: {
-        secondary: {
-          DEFAULT: "var(--secondary)",
-          foreground: "var(--secondary-foreground)",
-          accent: "var(--secondary-accent)",
-        },
         foreground: "var(--foreground)",
         background: "var(--background)",
         card: {
@@ -28,15 +23,10 @@ const config: Config = {
         primary: {
           DEFAULT: "var(--primary)",
           foreground: "var(--primary-foreground)",
-          accent: "var(--primary-accent)",
         },
         muted: {
           DEFAULT: "var(--muted)",
           foreground: "var(--muted-foreground)",
-        },
-        accent: {
-          DEFAULT: "var(--accent)",
-          foreground: "var(--accent-foreground)",
         },
         destructive: {
           DEFAULT: "var(--destructive)",

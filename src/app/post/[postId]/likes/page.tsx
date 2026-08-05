@@ -15,11 +15,11 @@ export default async function PostLikesPage({
   const post = await getPostLikes(postId);
 
   if (!post)
-    return <div className="self-center text-xl text-secondary">Error</div>;
+    return <div className="self-center text-xl text-primary">Error</div>;
 
   return (
     <PageView sessionUser={session?.user}>
-      <div className="flex flex-col gap-1 bg-secondary">
+      <div className="flex flex-col gap-1">
         <PostView
           post={post}
           sessionUserId={session?.user.id}

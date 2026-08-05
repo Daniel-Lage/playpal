@@ -38,22 +38,17 @@ body {
 
 @layer base {
   :root {
-    --background: #333333;
-    --foreground: #000000;
-    --primary: #ab76e0;
-    --primary-accent: #c084fc;
-    --secondary: #b0cc90;
-    --secondary-accent: #84a361;
-    --muted-foreground: #000000;
-    --accent-foreground: #000000;
-    --destructive-foreground: #000000;
-    --input: #333333; /* text input */
+    --background: #111111;
+    --foreground: #d4d4d4;
+    --border: #483a55;
+    --primary: #c084fc;
     --primary-foreground: #000000;
-    --secondary-foreground: #000000;
+    --muted-foreground: #999999;
+    --destructive-foreground: #000000;
+    --input: #000000;
     --card-foreground: #000000;
-    --popover: #acbf99; /* menu */
-    --accent: #84a361; /* selected option */
-    --popover-foreground: #000000;
+    --popover: #111111;
+    --popover-foreground: #ffffff;
 
     --radius: 0.5rem;
   }
@@ -103,7 +98,7 @@ body {
 }
 
 .tiptap p.is-editor-empty:first-child::before {
-  color: var(--background);
+  color: var(--muted-foreground);
   content: attr(data-placeholder);
   float: left;
   height: 0;

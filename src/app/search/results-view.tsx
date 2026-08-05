@@ -43,14 +43,14 @@ export function ResultsView({
   if (users.length === 0 && posts.length === 0)
     return (
       <ItemsView>
-        <span className="text-xl text-secondary">No results found</span>
+        <span className="text-xl text-primary">No results found</span>
       </ItemsView>
     );
 
   return (
     <ItemsView>
       {users.length > 0 && (
-        <div className="flex flex-col overflow-hidden rounded-md bg-secondary">
+        <div className="flex flex-col overflow-hidden rounded-md">
           <div className="w-full p-2 font-bold">Users</div>
           {users.map((user) => (
             <UserView key={user.id} user={user} />
