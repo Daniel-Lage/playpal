@@ -8,7 +8,7 @@ export function ProfileTabs({ userId }: { userId: string }) {
   const pathname = usePathname();
 
   return (
-    <div className="grid h-16 grid-cols-3 place-items-center gap-1 border-b p-2 px-2 font-bold">
+    <div className="bg-container grid h-16 grid-cols-3 place-items-center gap-1 border-b p-2 px-2 font-bold">
       <ProfileTabLink
         href={`/user/${userId}`}
         title="Main"

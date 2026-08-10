@@ -38,17 +38,19 @@ body {
 
 @layer base {
   :root {
-    --background: #111111;
+    --background: #101010;
+    --sidebar: #171717;
+    --container: #1d1d1d;
     --foreground: #d4d4d4;
-    --border: #483a55;
+    --border: color-mix(in srgb, var(--primary) 35%, var(--background));
     --primary: #c084fc;
     --primary-foreground: #000000;
     --muted-foreground: #999999;
     --destructive-foreground: #000000;
     --input: #000000;
     --card-foreground: #000000;
-    --popover: #111111;
-    --popover-foreground: #ffffff;
+    --popover: #1d1d1d;
+    --popover-foreground: #d4d4d4;
 
     --radius: 0.5rem;
   }
@@ -89,12 +91,12 @@ body {
 }
 
 .tiptap > p > a {
-  color: blue;
+  color: var(--primary);
   text-decoration: underline;
 }
 
 .tiptap > p > span[data-type="mention"] {
-  color: blue;
+  color: var(--primary);
 }
 
 .tiptap p.is-editor-empty:first-child::before {

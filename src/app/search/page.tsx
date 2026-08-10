@@ -1,9 +1,14 @@
 import { getSearchResults } from "~/server/get-search-results";
 import { ResultsView } from "./results-view";
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import { authOptions } from "~/lib/auth";
 import { Search } from "lucide-react";
 import { PageView } from "~/components/page-view";
+
+function storageKeyToCookieName(key: string) {
+  return `playpal.${key.replaceAll(":", ".")}`;
+}
 
 export default async function SearchPage({
   searchParams: { q },
@@ -11,10 +16,15 @@ export default async function SearchPage({
   searchParams: { q: string | undefined };
 }) {
   const session = await getServerSession(authOptions);
+  const cookieStore = cookies();
+  const initialCollapsed =
+    cookieStore.get(
+      storageKeyToCookieName(`${session?.user.id}:side_bar_collapsed`),
+    )?.value === "true";
 
   if (!q)
     return (
-      <PageView sessionUser={session?.user}>
+      <PageView sessionUser={session?.user} initialCollapsed={initialCollapsed}>
         <SearchViewForm />
       </PageView>
     );
@@ -22,7 +32,7 @@ export default async function SearchPage({
   const { users, posts } = await getSearchResults(q);
 
   return (
-    <PageView sessionUser={session?.user}>
+    <PageView sessionUser={session?.user} initialCollapsed={initialCollapsed}>
       <SearchViewForm q={q} />
       <ResultsView
         users={users}

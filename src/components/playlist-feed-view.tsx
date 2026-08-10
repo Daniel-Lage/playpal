@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
-import { useLocalStorage } from "~/hooks/use-local-storage";
+import { useCookies } from "~/hooks/use-cookies";
 import type { PlaylistObject } from "~/models/playlist.model";
 import {
   PlaylistsSortingColumn,
@@ -20,36 +20,39 @@ export default function PlaylistFeedView({
   playlists,
   isOwnFeed = false,
   sessionUser,
+  initialReversed,
+  initialSortingColumn,
 }: {
   playlists: PlaylistObject[];
   sessionUser?: SessionUser;
 
   isOwnFeed?: boolean;
+  initialReversed?: boolean;
+  initialSortingColumn?: PlaylistsSortingColumn;
 }) {
   const [filter, setFilter] = useState("");
 
-  const [reversed, setReversed] = useLocalStorage<boolean>(
+  const [reversed, setReversed] = useCookies<boolean>(
     sessionUser?.id
       ? `${sessionUser?.id}:playlists_reversed`
       : "playlists_reversed",
-    false,
+    initialReversed ?? false,
     useCallback((text) => text === "true", []),
     useCallback((value) => (value ? "true" : "false"), []),
   );
 
-  const [sortingColumn, setSortingColumn] =
-    useLocalStorage<PlaylistsSortingColumn>(
-      sessionUser?.id
-        ? `${sessionUser?.id}:playlists_sorting_column`
-        : "playlists_sorting_column",
-      PlaylistsSortingColumn.CreatedAt,
-      useCallback((text) => {
-        if (PlaylistsSortingColumnOptions.some((psco) => psco === text))
-          return text as PlaylistsSortingColumn;
-        return null;
-      }, []),
-      useCallback((psc) => psc, []),
-    );
+  const [sortingColumn, setSortingColumn] = useCookies<PlaylistsSortingColumn>(
+    sessionUser?.id
+      ? `${sessionUser?.id}:playlists_sorting_column`
+      : "playlists_sorting_column",
+    initialSortingColumn ?? PlaylistsSortingColumn.CreatedAt,
+    useCallback((text) => {
+      if (PlaylistsSortingColumnOptions.some((psco) => psco === text))
+        return text as PlaylistsSortingColumn;
+      return null;
+    }, []),
+    useCallback((psc) => psc, []),
+  );
 
   const treatedPlaylists = useMemo(() => {
     const temp = getTreatedPlaylists([...playlists], sortingColumn, filter);
@@ -63,7 +66,7 @@ export default function PlaylistFeedView({
 
   return (
     <>
-      <div className="flex flex-col items-start gap-2 border-b p-2 md:flex-row md:items-center">
+      <div className="bg-container flex flex-col items-start gap-2 border-b p-2 md:flex-row md:items-center">
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>
@@ -83,7 +86,7 @@ export default function PlaylistFeedView({
       </div>
       <ItemsView>
         {isOwnFeed && (
-          <div className="flex flex-col rounded-md border p-1 md:gap-2 md:p-2">
+          <div className="bg-container flex flex-col rounded-md border p-1 md:gap-2 md:p-2">
             <div className="flex items-start gap-2 font-bold">
               <Link
                 href={`/liked-songs`}

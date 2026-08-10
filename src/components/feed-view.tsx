@@ -1,9 +1,16 @@
 "use client";
 
 import { PostFeedView } from "~/components/post-feed-view";
-import type { IMetadata, PostObject } from "~/models/post.model";
+import type {
+  IMetadata,
+  PostObject,
+  PostsSortingColumn,
+} from "~/models/post.model";
 import PlaylistFeedView from "./playlist-feed-view";
-import type { PlaylistObject } from "~/models/playlist.model";
+import type {
+  PlaylistObject,
+  PlaylistsSortingColumn,
+} from "~/models/playlist.model";
 import { useState } from "react";
 import type { ActionStatus } from "~/models/status.model";
 import { TabLinkButton } from "./buttons/tab-link-button";
@@ -18,6 +25,11 @@ export function FeedView({
   send,
   playlists,
   isOwnFeed = false,
+  initialCollapsed,
+  initialPostsReversed,
+  initialPostsSortingColumn,
+  initialPlaylistsReversed,
+  initialPlaylistsSortingColumn,
 }: {
   posts: PostObject[];
   lastQueried: Date;
@@ -30,15 +42,21 @@ export function FeedView({
   ) => Promise<ActionStatus>;
   playlists: PlaylistObject[];
   isOwnFeed?: boolean;
+  initialCollapsed?: boolean;
+  initialPostsReversed?: boolean;
+  initialPostsSortingColumn?: PostsSortingColumn;
+  initialPlaylistsReversed?: boolean;
+  initialPlaylistsSortingColumn?: PlaylistsSortingColumn;
 }) {
   const [showPlaylists, setShowPlaylists] = useState(false);
 
   return (
     <PageView
       sessionUser={sessionUser}
+      initialCollapsed={initialCollapsed}
       sideContent={
         <>
-          <div className="p-2 text-xl font-bold">
+          <div className="bg-container p-2 pt-12 text-xl font-bold">
             {showPlaylists ? "Posts" : "Playlists"}
           </div>
           {showPlaylists ? (
@@ -48,19 +66,23 @@ export function FeedView({
               send={send}
               lastQueried={lastQueried}
               refresh={refresh}
+              initialReversed={initialPostsReversed}
+              initialSortingColumn={initialPostsSortingColumn}
             />
           ) : (
             <PlaylistFeedView
               playlists={playlists}
               sessionUser={sessionUser}
               isOwnFeed={isOwnFeed}
+              initialReversed={initialPlaylistsReversed}
+              initialSortingColumn={initialPlaylistsSortingColumn}
             />
           )}
         </>
       }
     >
-      <div className="h-16 gap-2 overflow-hidden border-b px-2">
-        <div className="grid h-full w-full grid-cols-2 place-items-center gap-1 font-bold">
+      <div className="h-16 gap-2 overflow-hidden border-b">
+        <div className="bg-container grid h-full w-full grid-cols-2 place-items-center gap-1 px-2 font-bold">
           <TabLinkButton
             className={!showPlaylists ? "border" : ""}
             onClick={() => setShowPlaylists(false)}
@@ -90,6 +112,8 @@ export function FeedView({
             send={send}
             lastQueried={lastQueried}
             refresh={refresh}
+            initialReversed={initialPostsReversed}
+            initialSortingColumn={initialPostsSortingColumn}
           />
         )}
       </div>

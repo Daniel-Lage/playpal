@@ -63,7 +63,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
     },
     where: and(
       eq(playlistsTable.userId, userId),
-      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`,
+      lastQueried && sql`${playlistsTable.createdAt} > ${lastQueried}`,
     ),
     limit: 100,
   });
@@ -107,6 +107,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
       createdAt: follow.createdAt,
       notifier: follow.follower as UserObject,
       notifierId: follow.followerId,
+      target: null,
     }),
   );
 
@@ -178,6 +179,7 @@ export async function getNotifications(userId: string, lastQueried?: Date) {
       createdAt: mention.mentioner.createdAt,
       notifier: mention.mentioner,
       notifierId: mention.mentioner.id,
+      target: null,
     });
   });
 

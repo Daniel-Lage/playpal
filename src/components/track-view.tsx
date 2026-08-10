@@ -14,7 +14,7 @@ export function TrackView({
   return (
     <button
       key={track.track.uri + track.added_at}
-      className="flex w-full items-center gap-1 rounded-md border p-1 font-bold"
+      className="bg-container flex w-full items-center gap-1 rounded-md border p-1 font-bold"
       disabled={disabled || track.is_local}
       onClick={onClick}
     >

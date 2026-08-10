@@ -1,4 +1,5 @@
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 
 import { authOptions } from "~/lib/auth";
 
@@ -18,6 +19,10 @@ import { ErrorPage } from "~/app/error-page";
 import { GetDevicesStatus } from "~/models/device.model";
 import { getDevices } from "~/api/get-devices";
 import { getQueue } from "~/api/get-queue";
+
+function storageKeyToCookieName(key: string) {
+  return `playpal.${key.replaceAll(":", ".")}`;
+}
 
 export async function generateMetadata({
   params: { playlistId },
@@ -57,6 +62,7 @@ export default async function PlaylistPage({
   params: { playlistId: string };
 }) {
   const session = await getServerSession(authOptions);
+  const cookieStore = cookies();
 
   const playlist = await getPlaylist(playlistId);
 
@@ -73,12 +79,24 @@ export default async function PlaylistPage({
     return await getNextPage(next, session?.user.access_token);
   };
 
+  const preferenceKeyPrefix = session?.user.id ? `${session.user.id}:` : "";
+  const initialCollapsed =
+    cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}side_bar_collapsed`),
+    )?.value === "true";
+  const initialShuffled =
+    cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}play_shuffled`),
+    )?.value !== "false";
+
   if (!session)
     return (
       <PlaylistPageView
         playlist={playlist}
         pagingTracks={pagingTracks}
         loadNextTracks={loadNextTracks}
+        initialCollapsed={initialCollapsed}
+        initialShuffled={initialShuffled}
       />
     );
 
@@ -110,6 +128,8 @@ export default async function PlaylistPage({
         pagingTracks={pagingTracks}
         loadNextTracks={loadNextTracks}
         sendReply={send}
+        initialCollapsed={initialCollapsed}
+        initialShuffled={initialShuffled}
       />
     );
 
@@ -152,6 +172,8 @@ export default async function PlaylistPage({
         return await getDevices(session.user.access_token);
       }}
       sendReply={send}
+      initialCollapsed={initialCollapsed}
+      initialShuffled={initialShuffled}
     />
   );
 }

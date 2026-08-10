@@ -119,7 +119,7 @@ export function PostCreator({
   );
 
   return (
-    <div className="flex flex-col gap-2 border-b px-2 pb-2">
+    <div className="bg-container flex flex-col gap-2 border-b px-2 pb-2">
       <div className="flex items-center">
         <Link
           className="flex h-12 w-12 items-center justify-center"

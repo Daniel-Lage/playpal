@@ -40,7 +40,12 @@ export function PostView({
   const router = useRouter();
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-md border px-2">
+    <div
+      className={cn(
+        "bg-container flex flex-col overflow-hidden px-2",
+        !isMainPost && "rounded-md border",
+      )}
+    >
       <div className="flex h-12 items-center text-xs md:text-base">
         <Link
           href={`/user/${post.author.id}`}
@@ -117,7 +122,7 @@ export function PostView({
       <div className="flex grow overflow-hidden text-wrap">
         {isMainPost && hasReplyBox ? (
           <div className="relative flex min-h-full w-12 items-center justify-center gap-2">
-            <div className="h-full w-1 rounded-md bg-foreground"></div>
+            <div className="h-full w-[2px] rounded-md bg-foreground"></div>
           </div>
         ) : (
           !isLastPost && (
@@ -127,12 +132,12 @@ export function PostView({
             >
               {isCutoff ? (
                 <>
-                  <div className="absolute h-3 w-1 rounded-md bg-foreground"></div>
-                  <div className="absolute h-1 w-3 rounded-md bg-foreground"></div>
+                  <div className="absolute h-3 w-[2px] rounded-md bg-foreground"></div>
+                  <div className="absolute h-[2px] w-3 rounded-md bg-foreground"></div>
                 </>
               ) : (
                 <>
-                  <div className="h-full w-1 rounded-md bg-foreground"></div>
+                  <div className="h-full w-[2px] rounded-md bg-foreground"></div>
                 </>
               )}
             </button>

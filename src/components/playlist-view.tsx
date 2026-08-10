@@ -8,17 +8,24 @@ import { unlikePlaylist } from "~/server/unlike-playlist";
 import { likePlaylist } from "~/server/like-playlist";
 import { ShareButton } from "./buttons/share-button";
 import { IconButton } from "./buttons/icon-button";
+import { cn } from "~/lib/utils";
 
 export function PlaylistView({
   playlist,
   sessionUserId,
+  focused,
 }: {
   sessionUserId?: string | null;
   playlist: PlaylistObject;
   focused?: boolean;
 }) {
   return (
-    <div className="flex flex-col rounded-md border p-1 md:gap-2 md:p-2">
+    <div
+      className={cn(
+        "bg-container flex flex-col rounded-md border p-1 md:gap-2 md:p-2",
+        focused && "rounded-none border-none",
+      )}
+    >
       <div className="flex items-start gap-2 font-bold">
         <Link
           href={`/playlist/${playlist.id}`}
@@ -88,7 +95,7 @@ export function PlaylistView({
           />
 
           <Link
-            className="flex items-center justify-center gap-1 text-xs hover:underline md:gap-2 md:text-base"
+            className="flex items-center gap-1 text-xs hover:underline md:gap-2 md:text-base"
             href={`/playlist/${playlist.id}`}
           >
             <IconButton>

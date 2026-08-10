@@ -56,10 +56,8 @@ export function UserProfileView({
       ></div>
       <div
         className={cn(
-          "flex h-14 flex-col justify-center gap-2 overflow-hidden border-b",
-          simple
-            ? "fixed top-0 w-[--main-view-w] bg-background"
-            : "border-transparent",
+          "bg-container flex h-14 flex-col justify-center gap-2 overflow-hidden border-b",
+          simple ? "fixed top-0 w-[--main-view-w]" : "border-transparent",
         )}
       >
         <div className="flex items-center gap-2 p-2">
@@ -113,7 +111,7 @@ export function UserProfileView({
           </MenuView>
         </div>
       </div>
-      <div className="flex gap-2 pl-4 text-xs font-bold text-muted-foreground md:text-base">
+      <div className="bg-container flex gap-2 pl-4 text-xs font-bold text-muted-foreground md:text-base">
         <Link href={`/user/${user.id}/followers`} className="hover:underline">
           {user.followers.length} followers
         </Link>

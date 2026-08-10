@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from "react";
 import { ItemsView } from "~/components/items-view";
 import { PostCreator } from "~/components/post-creator";
 import { Sorter } from "~/components/sorter";
-import { useLocalStorage } from "~/hooks/use-local-storage";
+import { useCookies } from "~/hooks/use-cookies";
 import type { PlaylistObject } from "~/models/playlist.model";
 import {
   type IMetadata,
@@ -29,7 +29,7 @@ export function PlaylistRepliesView({
     metadata?: IMetadata,
   ) => Promise<ActionStatus>;
 }) {
-  const [reversed, setReversed] = useLocalStorage<boolean>(
+  const [reversed, setReversed] = useCookies<boolean>(
     sessionUser?.id
       ? `${sessionUser.id}:playlist_replies_reversed`
       : "playlist_replies_reversed",
@@ -40,7 +40,8 @@ export function PlaylistRepliesView({
       [],
     ),
   );
-  const [sortingColumn, setSortingColumn] = useLocalStorage<PostsSortingColumn>(
+
+  const [sortingColumn, setSortingColumn] = useCookies<PostsSortingColumn>(
     sessionUser?.id
       ? `${sessionUser.id}:playlist_replies_sorting_column`
       : "playlist_replies_sorting_column",
@@ -87,7 +88,9 @@ export function PlaylistRepliesView({
 
   return (
     <>
-      <div className="border-b p-2 text-xl font-bold">Replies</div>
+      <div className="bg-container border-b p-2 pt-12 text-xl font-bold">
+        Replies
+      </div>
 
       {sessionUser?.image && sessionUser?.name && (
         <PostCreator
@@ -98,7 +101,7 @@ export function PlaylistRepliesView({
         />
       )}
 
-      <div className="flex flex-col items-start gap-2 p-2 md:flex-row md:items-center md:justify-between">
+      <div className="bg-container flex flex-col items-start gap-2 border-b p-2 md:flex-row md:items-center md:justify-between">
         <Sorter
           title="Sort by"
           onSelect={(value: string) =>

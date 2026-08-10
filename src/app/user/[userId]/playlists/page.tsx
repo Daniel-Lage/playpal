@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 
 import { getUser } from "~/server/get-user";
 import { authOptions } from "~/lib/auth";
@@ -7,6 +8,11 @@ import { authOptions } from "~/lib/auth";
 import PlaylistFeedView from "~/components/playlist-feed-view";
 import { getPlaylists } from "~/server/get-playlists";
 import { PageView } from "~/components/page-view";
+import type { PlaylistsSortingColumn } from "~/models/playlist.model";
+
+function storageKeyToCookieName(key: string) {
+  return `playpal.${key.replaceAll(":", ".")}`;
+}
 
 export async function generateMetadata({
   params: { userId },
@@ -54,12 +60,30 @@ export default async function PlaylistsPage({
   params: { userId: string };
 }) {
   const session = await getServerSession(authOptions);
+  const cookieStore = cookies();
 
   const playlists = await getPlaylists({ userIds: [userId] });
+  const preferenceKeyPrefix = session?.user.id ? `${session.user.id}:` : "";
+  const initialCollapsed =
+    cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}side_bar_collapsed`),
+    )?.value === "true";
+  const initialPlaylistsReversed =
+    cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}playlists_reversed`),
+    )?.value === "true";
+  const initialPlaylistsSortingColumn = cookieStore.get(
+    storageKeyToCookieName(`${preferenceKeyPrefix}playlists_sorting_column`),
+  )?.value as PlaylistsSortingColumn | undefined;
 
   return (
-    <PageView sessionUser={session?.user}>
-      <PlaylistFeedView playlists={playlists} sessionUser={session?.user} />
+    <PageView sessionUser={session?.user} initialCollapsed={initialCollapsed}>
+      <PlaylistFeedView
+        playlists={playlists}
+        sessionUser={session?.user}
+        initialReversed={initialPlaylistsReversed}
+        initialSortingColumn={initialPlaylistsSortingColumn}
+      />
     </PageView>
   );
 }

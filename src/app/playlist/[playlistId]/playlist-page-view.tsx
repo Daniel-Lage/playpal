@@ -7,7 +7,7 @@ import { type PlaylistTrack } from "~/models/track.model";
 import type { PlaylistObject } from "~/models/playlist.model";
 import { PlaylistTab } from "~/models/playlist.model";
 import { PlaylistContent } from "./playlist-content";
-import { useLocalStorage } from "~/hooks/use-local-storage";
+import { useCookies } from "~/hooks/use-cookies";
 import { signIn } from "next-auth/react";
 import { setFirstItem } from "~/helpers/set-first-item";
 import type { IMetadata } from "~/models/post.model";
@@ -38,6 +38,8 @@ export function PlaylistPageView({
   sendReply,
   loadDevices,
   isLikedSongs = false,
+  initialCollapsed,
+  initialShuffled,
 }: {
   playlist: PlaylistObject;
   pagingTracks: Paging<PlaylistTrack>;
@@ -57,10 +59,12 @@ export function PlaylistPageView({
     metadata?: IMetadata,
   ) => Promise<ActionStatus>;
   isLikedSongs?: boolean;
+  initialCollapsed?: boolean;
+  initialShuffled?: boolean;
 }) {
-  const [shuffled, setShuffled] = useLocalStorage<boolean>(
+  const [shuffled, setShuffled] = useCookies<boolean>(
     sessionUser?.id ? `${sessionUser?.id}:play_shuffled` : "play_shuffled",
-    true,
+    initialShuffled ?? true,
     useCallback((text) => text === "true", []),
     useCallback((value) => (value ? "true" : "false"), []),
   );
@@ -342,6 +346,7 @@ export function PlaylistPageView({
 
       <PageView
         sessionUser={sessionUser}
+        initialCollapsed={initialCollapsed}
         sideContent={
           !isLikedSongs && (
             <PlaylistRepliesView

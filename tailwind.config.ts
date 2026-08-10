@@ -12,6 +12,8 @@ const config: Config = {
       colors: {
         foreground: "var(--foreground)",
         background: "var(--background)",
+        container: "var(--container)",
+        sidebar: "var(--sidebar)",
         card: {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",

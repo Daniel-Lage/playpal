@@ -1,6 +1,6 @@
 "use client";
 import { useState, useCallback, useMemo } from "react";
-import { useLocalStorage } from "~/hooks/use-local-storage";
+import { useCookies } from "~/hooks/use-cookies";
 import {
   type PlaylistTrack,
   TracksSortingColumn,
@@ -23,26 +23,25 @@ export function PlaylistTracksView({
 }) {
   const [filter, setFilter] = useState("");
 
-  const [reversed, setReversed] = useLocalStorage<boolean>(
+  const [reversed, setReversed] = useCookies<boolean>(
     sessionUserId ? `${sessionUserId}:tracks_reversed` : "tracks_reversed",
     false,
     useCallback((text) => text === "true", []),
     useCallback((value) => (value ? "true" : "false"), []),
   );
 
-  const [sortingColumn, setSortingColumn] =
-    useLocalStorage<TracksSortingColumn>(
-      sessionUserId
-        ? `${sessionUserId}:tracks_sorting_column`
-        : "tracks_sorting_column",
-      TracksSortingColumn.AddedAt,
-      useCallback((text) => {
-        if (TracksSortingColumnOptions.some((tsco) => tsco === text))
-          return text as TracksSortingColumn;
-        return null;
-      }, []),
-      useCallback((tsc) => tsc, []),
-    );
+  const [sortingColumn, setSortingColumn] = useCookies<TracksSortingColumn>(
+    sessionUserId
+      ? `${sessionUserId}:tracks_sorting_column`
+      : "tracks_sorting_column",
+    TracksSortingColumn.AddedAt,
+    useCallback((text) => {
+      if (TracksSortingColumnOptions.some((tsco) => tsco === text))
+        return text as TracksSortingColumn;
+      return null;
+    }, []),
+    useCallback((tsc) => tsc, []),
+  );
 
   const treatedTracks = useMemo(() => {
     const temp = getTreatedTracks([...tracks], sortingColumn, filter);

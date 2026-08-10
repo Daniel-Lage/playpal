@@ -4,23 +4,25 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { NavButton } from "./buttons/nav-button";
 import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { cn } from "~/lib/utils";
-import { useLocalStorage } from "~/hooks/use-local-storage";
+import { useCookies } from "~/hooks/use-cookies";
 import type { SessionUser } from "~/models/user.model";
 
 export function PageView({
   children,
   sideContent,
   sessionUser,
+  initialCollapsed,
 }: {
   children: React.ReactNode;
   sideContent?: React.ReactNode;
   sessionUser?: SessionUser;
+  initialCollapsed?: boolean;
 }) {
-  const [collapsed, setCollapsed] = useLocalStorage<boolean>(
+  const [collapsed, setCollapsed] = useCookies<boolean>(
     sessionUser?.id
       ? `${sessionUser.id}:side_bar_collapsed`
       : "side_bar_collapsed",
-    false,
+    initialCollapsed ?? false,
     useCallback((text: string | null) => text === "true", []),
     useCallback(
       (value: boolean | null) => (value === true ? "true" : "false"),
@@ -62,7 +64,7 @@ export function PageView({
           }
         }}
         className={cn(
-          "fixed right-0 top-0 z-10 hidden h-screen overflow-y-auto border-l bg-background pt-12 md:flex md:flex-col",
+          "bg-sidebar fixed right-0 top-0 z-10 hidden h-screen overflow-y-auto border-l md:flex md:flex-col",
           collapsed ? "w-[96px]" : "w-[--side-bar-w]",
         )}
       >
@@ -70,7 +72,7 @@ export function PageView({
           className={cn(
             "fixed right-0 top-0 hidden justify-end p-6 md:flex",
             collapsed ? "w-[96px]" : "w-[--side-bar-w]",
-            scrolled ? "border-b border-l bg-background" : "",
+            scrolled ? "bg-container border-b border-l" : "",
           )}
         >
           <NavButton

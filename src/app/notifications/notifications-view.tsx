@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { TabLinkButton } from "~/components/buttons/tab-link-button";
 import { ItemsView } from "~/components/items-view";
+import { PlaylistView } from "~/components/playlist-view";
 import { PostView } from "~/components/post-view";
 import { UserImage } from "~/components/user-image";
 import { formatTimelapse } from "~/helpers/format-timelapse";
@@ -27,7 +28,7 @@ export default function NotificationsView({
 
   return (
     <>
-      <div className="flex flex-col border-b p-2">
+      <div className="bg-container flex flex-col border-b p-2">
         <div className="grid grid-cols-5 place-content-center gap-1">
           <TabLinkButton
             className={tab == null ? "border" : ""}
@@ -85,40 +86,44 @@ function NotificationView({
   timelapse: string;
   sessionUserId?: string | null;
 }) {
-  if (notification.type === NotificationType.Reply)
-    return (
-      <PostView
-        post={notification.notifier as PostObject}
-        sessionUserId={sessionUserId}
-        isMainPost={false}
-      />
-    );
-
-  if (notification.type === NotificationType.Follow)
-    return (
-      <NFollowView
-        notifier={notification.notifier as UserObject}
-        timelapse={timelapse}
-      />
-    );
-
-  if (notification.type === NotificationType.Like)
-    return (
-      <NLikeView
-        notifier={notification.notifier as UserObject}
-        timelapse={timelapse}
-        target={notification.target!}
-      />
-    );
-
-  if (notification.type === NotificationType.Mention)
-    return (
-      <PostView
-        post={notification.notifier as PostObject}
-        sessionUserId={sessionUserId}
-        isMainPost={false}
-      />
-    );
+  switch (notification.type) {
+    case NotificationType.Reply:
+      return (
+        <PostView
+          post={notification.notifier}
+          sessionUserId={sessionUserId}
+          isMainPost={false}
+        />
+      );
+    case NotificationType.Follow:
+      return (
+        <NFollowView notifier={notification.notifier} timelapse={timelapse} />
+      );
+    case NotificationType.Like:
+      if ("content" in notification.target)
+        return (
+          <NPostLikeView
+            notifier={notification.notifier}
+            timelapse={timelapse}
+            target={notification.target}
+          />
+        );
+      return (
+        <NPlaylistLikeView
+          notifier={notification.notifier}
+          timelapse={timelapse}
+          target={notification.target}
+        />
+      );
+    case NotificationType.Mention:
+      return (
+        <PostView
+          post={notification.notifier}
+          sessionUserId={sessionUserId}
+          isMainPost={false}
+        />
+      );
+  }
 }
 
 function NFollowView({
@@ -140,14 +145,14 @@ function NFollowView({
   );
 }
 
-function NLikeView({
+function NPostLikeView({
   notifier,
   timelapse,
   target,
 }: {
   notifier: UserObject;
   timelapse: string;
-  target: PostObject | PlaylistObject;
+  target: PostObject;
 }) {
   return (
     <>
@@ -157,16 +162,36 @@ function NLikeView({
       >
         <UserImage size={32} image={notifier.image} name={notifier.name} />
         <div>
-          <span className="font-bold">{notifier.name}</span> liked your{" "}
-          {"content" in target ? "post" : "playlist"}
+          <span className="font-bold">{notifier.name}</span> liked your post
           {" " + timelapse}
         </div>
       </Link>
-      <Link className="flex items-center p-2" href={`/post/${target.id}`}>
-        <div className="text-gray-500">
-          {"content" in target ? target.content : target.name}
+      <PostView post={target} isMainPost={false} />
+    </>
+  );
+}
+function NPlaylistLikeView({
+  notifier,
+  timelapse,
+  target,
+}: {
+  notifier: UserObject;
+  timelapse: string;
+  target: PlaylistObject;
+}) {
+  return (
+    <>
+      <Link
+        className="flex items-center gap-2 p-2"
+        href={`/user/${notifier.id}`}
+      >
+        <UserImage size={32} image={notifier.image} name={notifier.name} />
+        <div>
+          <span className="font-bold">{notifier.name}</span> liked your playlist
+          {" " + timelapse}
         </div>
       </Link>
+      <PlaylistView playlist={target} />
     </>
   );
 }

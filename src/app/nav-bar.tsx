@@ -10,16 +10,22 @@ import {
   UserRoundPen,
 } from "lucide-react";
 import { signIn } from "next-auth/react";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { NavButton } from "~/components/buttons/nav-button";
+import { PlaypalLogo } from "~/components/playpal-logo";
 import { UserImage } from "~/components/user-image";
-import { useLocalStorage } from "~/hooks/use-local-storage";
+import { useCookies } from "~/hooks/use-cookies";
 import { cn } from "~/lib/utils";
 import type { SessionUser } from "~/models/user.model";
 
-export function NavBar({ sessionUser }: { sessionUser?: SessionUser }) {
+export function NavBar({
+  sessionUser,
+  initialCollapsed = false,
+}: {
+  sessionUser?: SessionUser;
+  initialCollapsed?: boolean;
+}) {
   const profileUrl = useMemo(
     () => (sessionUser ? `/user/${sessionUser.id}` : undefined),
     [sessionUser],
@@ -27,19 +33,22 @@ export function NavBar({ sessionUser }: { sessionUser?: SessionUser }) {
   const pathname = usePathname();
 
   const scrollY = useRef(0);
+
   const [faded, setFaded] = useState(false);
 
-  const [collapsed, setCollapsed] = useLocalStorage<boolean>(
+  const [collapsed, setCollapsed] = useCookies<boolean>(
     sessionUser?.id
       ? `${sessionUser.id}:nav_bar_collapsed`
       : "nav_bar_collapsed",
-    false,
+    initialCollapsed ?? false,
     useCallback((text: string | null) => text === "true", []),
     useCallback(
       (value: boolean | null) => (value === true ? "true" : "false"),
       [],
     ),
   );
+
+  console.log("collapsed", collapsed);
 
   useEffect(() => {
     if (collapsed != null) {
@@ -75,7 +84,7 @@ export function NavBar({ sessionUser }: { sessionUser?: SessionUser }) {
     <>
       <div
         className={cn(
-          "fixed bottom-0 left-0 z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-background p-6 font-bold transition-opacity md:h-svh md:w-[--nav-bar-w] md:flex-col md:items-end md:justify-normal md:gap-6 md:border-r md:border-t-0",
+          "bg-sidebar fixed bottom-0 left-0 z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t p-6 font-bold transition-opacity md:h-svh md:w-[--nav-bar-w] md:flex-col md:items-end md:justify-normal md:gap-6 md:border-r md:border-t-0",
           faded && "opacity-40 md:opacity-100",
         )}
       >
@@ -95,14 +104,7 @@ export function NavBar({ sessionUser }: { sessionUser?: SessionUser }) {
             collapsed ? "md:w-12" : "md:w-44",
           )}
         >
-          <Image
-            width={48}
-            height={48}
-            className="aspect-square h-auto w-12 flex-shrink-0 flex-grow-0 rounded-md"
-            src="/favicon.ico"
-            alt="playpal logo"
-            priority
-          />
+          <PlaypalLogo />
         </div>
 
         <NavButton href={"/"} collapsed={collapsed} active={pathname === "/"}>

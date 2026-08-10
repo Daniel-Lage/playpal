@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 
 import { getPost } from "~/server/get-post";
 import { getUser } from "~/server/get-user";
@@ -12,6 +13,14 @@ import { getReplies } from "~/server/get-replies";
 import { ActionStatus } from "~/models/status.model";
 import { PageView } from "~/components/page-view";
 import { ErrorPage } from "~/app/error-page";
+import {
+  PostsSortingColumn,
+  type PostsSortingColumn as PostsSortingColumnType,
+} from "~/models/post.model";
+
+function storageKeyToCookieName(key: string) {
+  return `playpal.${key.replaceAll(":", ".")}`;
+}
 
 export const dynamic = "force-dynamic";
 
@@ -52,16 +61,34 @@ export default async function PostPage({
   params: { postId: string };
 }) {
   const session = await getServerSession(authOptions);
+  const cookieStore = cookies();
   const post = await getPost(postId);
 
   if (!post) return <ErrorPage />;
 
+  const preferenceKeyPrefix = session?.user.id ? `${session.user.id}:` : "";
+  const initialCollapsed =
+    cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}side_bar_collapsed`),
+    )?.value === "true";
+  const initialReversed =
+    cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}replies_reversed`),
+    )?.value === "true";
+  const initialSortingColumn =
+    (cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}replies_sorting_column`),
+    )?.value as PostsSortingColumnType | undefined) ??
+    PostsSortingColumn.CreatedAt;
+
   return (
-    <PageView sessionUser={session?.user}>
+    <PageView sessionUser={session?.user} initialCollapsed={initialCollapsed}>
       <PostPageView
         post={post}
         sessionUser={session?.user}
         lastQueried={new Date()}
+        initialReversed={initialReversed}
+        initialSortingColumn={initialSortingColumn}
         send={async (
           input: string,
           mentions: string[] | undefined,

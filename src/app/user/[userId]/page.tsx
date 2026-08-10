@@ -1,5 +1,6 @@
 import { getServerSession } from "next-auth";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 
 import { authOptions } from "~/lib/auth";
 
@@ -11,6 +12,15 @@ import { getPlaylists } from "~/server/get-playlists";
 import { FeedView } from "~/components/feed-view";
 import { getPosts } from "~/server/get-posts";
 import { ActionStatus } from "~/models/status.model";
+import {
+  PostsSortingColumn,
+  type PostsSortingColumn as PostsSortingColumnType,
+} from "~/models/post.model";
+import { PlaylistsSortingColumn } from "~/models/playlist.model";
+
+function storageKeyToCookieName(key: string) {
+  return `playpal.${key.replaceAll(":", ".")}`;
+}
 
 export async function generateMetadata({
   params: { userId },
@@ -58,8 +68,32 @@ export default async function ProfilePage({
   params: { userId: string };
 }) {
   const session = await getServerSession(authOptions);
+  const cookieStore = cookies();
   const posts = await getPosts({ userIds: [userId] });
   const playlists = await getPlaylists({ userIds: [userId] });
+  const preferenceKeyPrefix = session?.user.id ? `${session.user.id}:` : "";
+  const initialCollapsed =
+    cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}side_bar_collapsed`),
+    )?.value === "true";
+  const initialPostsReversed =
+    cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}posts_reversed`),
+    )?.value === "true";
+  const initialPostsSortingColumn =
+    (cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}posts_sorting_column`),
+    )?.value as PostsSortingColumnType | undefined) ??
+    PostsSortingColumn.CreatedAt;
+  const initialPlaylistsReversed =
+    cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}playlists_reversed`),
+    )?.value === "true";
+  const initialPlaylistsSortingColumn =
+    (cookieStore.get(
+      storageKeyToCookieName(`${preferenceKeyPrefix}playlists_sorting_column`),
+    )?.value as PlaylistsSortingColumn | undefined) ??
+    PlaylistsSortingColumn.CreatedAt;
 
   return (
     <FeedView
@@ -67,6 +101,11 @@ export default async function ProfilePage({
       playlists={playlists}
       sessionUser={session?.user}
       isOwnFeed={session?.user.id === userId}
+      initialCollapsed={initialCollapsed}
+      initialPostsReversed={initialPostsReversed}
+      initialPostsSortingColumn={initialPostsSortingColumn}
+      initialPlaylistsReversed={initialPlaylistsReversed}
+      initialPlaylistsSortingColumn={initialPlaylistsSortingColumn}
       send={
         session?.user.id === userId
           ? async (

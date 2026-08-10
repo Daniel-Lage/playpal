@@ -8,7 +8,7 @@ import {
   PostsSortingColumnOptions,
 } from "~/models/post.model";
 import { PostView } from "~/components/post-view";
-import { useLocalStorage } from "~/hooks/use-local-storage";
+import { useCookies } from "~/hooks/use-cookies";
 import { Sorter } from "~/components/sorter";
 import { PostCreator } from "~/components/post-creator";
 import { ActionStatus } from "~/models/status.model";
@@ -23,6 +23,8 @@ export function PostFeedView({
   lastQueried: lastQueriedProp,
   refresh,
   send,
+  initialReversed,
+  initialSortingColumn,
 }: {
   posts: PostObject[];
   lastQueried: Date;
@@ -33,6 +35,8 @@ export function PostFeedView({
     mentions: string[] | undefined,
     metadata: IMetadata | undefined,
   ) => Promise<ActionStatus>;
+  initialReversed?: boolean;
+  initialSortingColumn?: PostsSortingColumn;
 }) {
   const [posts, setPosts] = useState(postsProp);
 
@@ -42,9 +46,9 @@ export function PostFeedView({
 
   const lastQueried = useRef(lastQueriedProp);
 
-  const [reversed, setReversed] = useLocalStorage<boolean>(
+  const [reversed, setReversed] = useCookies<boolean>(
     sessionUser?.id ? `${sessionUser.id}:posts_reversed` : "posts_reversed",
-    false,
+    initialReversed ?? false,
     useCallback((text: string | null) => text === "true", []),
     useCallback(
       (value: boolean | null) => (value === true ? "true" : "false"),
@@ -52,11 +56,11 @@ export function PostFeedView({
     ),
   );
 
-  const [sortingColumn, setSortingColumn] = useLocalStorage<PostsSortingColumn>(
+  const [sortingColumn, setSortingColumn] = useCookies<PostsSortingColumn>(
     sessionUser?.id
       ? `${sessionUser.id}:posts_sorting_column`
       : "posts_sorting_column",
-    PostsSortingColumn.CreatedAt,
+    initialSortingColumn ?? PostsSortingColumn.CreatedAt,
     useCallback((text) => {
       if (PostsSortingColumnOptions.some((psco) => psco === text))
         return text as PostsSortingColumn;
@@ -119,7 +123,7 @@ export function PostFeedView({
 
       <div
         className={cn(
-          "flex flex-col items-start gap-2 border-b p-2 px-2 md:flex-row md:items-center md:justify-between",
+          "bg-container flex flex-col items-start gap-2 border-b p-2 px-2 md:flex-row md:items-center md:justify-between",
         )}
       >
         <Sorter

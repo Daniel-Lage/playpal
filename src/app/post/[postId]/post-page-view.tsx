@@ -6,7 +6,7 @@ import { PlaylistView } from "~/components/playlist-view";
 import { PostCreator } from "~/components/post-creator";
 import { PostView } from "~/components/post-view";
 import { Sorter } from "~/components/sorter";
-import { useLocalStorage } from "~/hooks/use-local-storage";
+import { useCookies } from "~/hooks/use-cookies";
 
 import type { IMetadata, MainPostObject } from "~/models/post.model";
 
@@ -20,6 +20,7 @@ import { ActionStatus } from "~/models/status.model";
 import { Thread } from "~/components/thread";
 import type { SessionUser } from "~/models/user.model";
 import { StatusMessage } from "~/components/message-status";
+import { cn } from "~/lib/utils";
 
 export function PostPageView({
   post,
@@ -27,6 +28,8 @@ export function PostPageView({
   lastQueried: lastQueriedProp,
   refresh,
   send,
+  initialReversed,
+  initialSortingColumn,
 }: {
   post: MainPostObject;
   lastQueried: Date;
@@ -37,6 +40,8 @@ export function PostPageView({
     mentions?: string[],
     metadata?: IMetadata,
   ) => Promise<ActionStatus>;
+  initialReversed?: boolean;
+  initialSortingColumn?: PostsSortingColumn;
 }) {
   const [replies, setReplies] = useState(post.replyThreads ?? []);
 
@@ -55,9 +60,9 @@ export function PostPageView({
     return () => clearInterval(interval);
   }, [refresh]);
 
-  const [reversed, setReversed] = useLocalStorage<boolean>(
+  const [reversed, setReversed] = useCookies<boolean>(
     sessionUser?.id ? `${sessionUser.id}:replies_reversed` : "replies_reversed",
-    false,
+    initialReversed ?? false,
     useCallback((text: string | null) => text === "true", []),
     useCallback(
       (value: boolean | null) => (value === true ? "true" : "false"),
@@ -65,11 +70,11 @@ export function PostPageView({
     ),
   );
 
-  const [sortingColumn, setSortingColumn] = useLocalStorage<PostsSortingColumn>(
+  const [sortingColumn, setSortingColumn] = useCookies<PostsSortingColumn>(
     sessionUser?.id
       ? `${sessionUser.id}:replies_sorting_column`
       : "replies_sorting_column",
-    PostsSortingColumn.CreatedAt,
+    initialSortingColumn ?? PostsSortingColumn.CreatedAt,
     useCallback((text) => {
       if (PostsSortingColumnOptions.some((psco) => psco === text))
         return text as PostsSortingColumn;
@@ -109,16 +114,20 @@ export function PostPageView({
 
   return (
     <>
-      <div className="flex flex-col border-b">
+      <div
+        className={cn(
+          "flex flex-col border-b",
+          sessionUser?.image && sessionUser?.name && "border-b-0",
+        )}
+      >
         <div className="flex justify-stretch">
           <div className="flex w-full flex-col items-stretch">
             {!!post.playlist && (
-              <div className="border-b">
-                <PlaylistView
-                  playlist={post.playlist}
-                  sessionUserId={sessionUser?.id}
-                />
-              </div>
+              <PlaylistView
+                playlist={post.playlist}
+                sessionUserId={sessionUser?.id}
+                focused={true}
+              />
             )}
 
             {post.thread && (
@@ -133,7 +142,7 @@ export function PostPageView({
               post={post}
               sessionUserId={sessionUser?.id}
               isMainPost={true}
-              hasReplyBox={true}
+              hasReplyBox={!!(sessionUser?.image && sessionUser?.name)}
             />
 
             {sessionUser?.image && sessionUser?.name && (

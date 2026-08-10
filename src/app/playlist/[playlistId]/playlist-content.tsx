@@ -37,7 +37,7 @@ export function PlaylistContent({
   isLikedSongs?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-2 border-b p-2">
+    <div className="bg-container flex flex-col gap-2 border-b p-2">
       <div className="flex flex-col items-center gap-2 md:flex-row md:items-stretch">
         <Image
           width={160}

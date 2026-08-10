@@ -16,7 +16,7 @@ export function PlayerView({
 
   return (
     <div className="margin-auto fixed bottom-20 flex w-svw justify-stretch px-6 md:bottom-6 md:w-[--main-view-w] md:px-6">
-      <div className="relative flex grow items-center justify-between self-center overflow-hidden rounded-md border border-primary bg-background pb-2 md:grow md:pb-0">
+      <div className="bg-container relative flex grow items-center justify-between self-center overflow-hidden rounded-md border border-primary pb-2 md:grow md:pb-0">
         <div className="flex min-w-0 items-center gap-1">
           {track.album.images[0]?.url ? (
             <Image
