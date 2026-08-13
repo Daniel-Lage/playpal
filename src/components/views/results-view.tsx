@@ -1,0 +1,65 @@
+"use client";
+
+import type { PostObject } from "~/models/post.model";
+import type { UserObject } from "~/models/user.model";
+import { PostView } from "~/components/views/post-view";
+import { UserView } from "~/components/views/user-view";
+import { useEffect, useRef, useState } from "react";
+import { ItemsView } from "~/components/views/items-view";
+
+export function ResultsView({
+  users: usersProp,
+  posts: postsProp,
+  sessionUserId,
+  lastQueried: lastQueriedProp,
+  refresh,
+}: {
+  users: UserObject[];
+  posts: PostObject[];
+  lastQueried: Date;
+  refresh: (
+    lastQueried: Date,
+  ) => Promise<{ users: UserObject[]; posts: PostObject[] }>;
+  sessionUserId?: string | null;
+}) {
+  const [users, setUsers] = useState(usersProp);
+  const [posts, setPosts] = useState(postsProp);
+  const lastQueried = useRef(lastQueriedProp);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refresh(lastQueried.current)
+        .then(({ users: newUsers, posts: newPosts }) => {
+          setPosts((posts) => [...newPosts, ...posts]);
+          setUsers((users) => [...newUsers, ...users]);
+          lastQueried.current = new Date();
+        })
+        .catch(console.error);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [refresh]);
+
+  if (users.length === 0 && posts.length === 0)
+    return (
+      <ItemsView>
+        <span className="text-xl text-primary">No results found</span>
+      </ItemsView>
+    );
+
+  return (
+    <ItemsView>
+      {users.length > 0 && (
+        <div className="flex flex-col overflow-hidden rounded-md">
+          <div className="w-full p-2 font-bold">Users</div>
+          {users.map((user) => (
+            <UserView key={user.id} user={user} />
+          ))}
+        </div>
+      )}
+      {posts.map((post) => (
+        <PostView key={post.id} post={post} sessionUserId={sessionUserId} />
+      ))}
+    </ItemsView>
+  );
+}

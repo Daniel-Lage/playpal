@@ -19,7 +19,7 @@ export function DevicePicker({
   devices: Device[];
 }) {
   return (
-    <div className="fixed z-10 flex h-full w-svw items-center justify-center backdrop-brightness-50 md:ml-[--nav-bar-w] md:w-[--main-view-w]">
+    <div className="fixed z-10 flex h-full w-svw items-center justify-center backdrop-brightness-50">
       <OneElementView>
         <div className="flex w-full justify-between">
           <h1 className="p-2 text-xl font-bold">Pick Device To Play On</h1>

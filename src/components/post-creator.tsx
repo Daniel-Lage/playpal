@@ -96,7 +96,7 @@ export function PostCreator({
         for (const node of flat) {
           if (node.type === "mention") {
             mentions.push(node?.attrs?.id as string);
-            urls.push(`https://playpal-fm.vercel.app/user/${node?.attrs?.id}`);
+            urls.push(`https://playpal-fm.vercel.app/users/${node?.attrs?.id}`);
           }
 
           const link = node.marks?.find((mark) => mark.type === "link") as
@@ -119,11 +119,11 @@ export function PostCreator({
   );
 
   return (
-    <div className="bg-container flex flex-col gap-2 border-b px-2 pb-2">
+    <div className="flex flex-col gap-2 border-b bg-container px-2 pb-2">
       <div className="flex items-center">
         <Link
           className="flex h-12 w-12 items-center justify-center"
-          href={`/user/${sessionUser.id}`}
+          href={`/users/${sessionUser.id}`}
         >
           <UserImage
             size={40}

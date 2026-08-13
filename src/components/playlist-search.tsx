@@ -1,0 +1,42 @@
+import type { ChangeEvent } from "react";
+import { SearchView } from "~/components/views/search-view";
+import { Sorter } from "~/components/sorter";
+
+import {
+  TracksSortingColumn,
+  TracksSortingColumnOptions,
+} from "~/models/track.model";
+
+export function PlaylistSearch({
+  sortingColumn,
+  reversed,
+  filter,
+  sortColumn,
+  reverse,
+  filterTracks,
+}: {
+  sortingColumn: TracksSortingColumn | undefined;
+  reversed: boolean;
+  filter: string;
+  sortColumn: (value: string) => void;
+  reverse: () => void;
+  filterTracks: (e: ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <div className="flex shrink-0 items-center justify-between gap-2 border-b bg-container p-2">
+      <div className="flex items-center justify-between gap-2 md:w-fit">
+        <Sorter
+          title="Sort by"
+          onSelect={sortColumn}
+          value={sortingColumn ?? TracksSortingColumn.AddedAt}
+          options={TracksSortingColumnOptions}
+          reversed={reversed}
+          reverse={reverse}
+        />
+      </div>
+      <div className="flex">
+        <SearchView value={filter} onChange={filterTracks} />
+      </div>
+    </div>
+  );
+}

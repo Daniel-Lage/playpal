@@ -58,11 +58,6 @@ interface playlistRelations {
 export type PlaylistObject = typeof playlistsTable.$inferSelect &
   playlistRelations;
 
-export enum PlaylistTab {
-  Tracks,
-  Likes,
-}
-
 export interface PlaylistChanges {
   id: string;
   name?: string;

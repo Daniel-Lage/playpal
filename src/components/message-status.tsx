@@ -1,5 +1,5 @@
 import { ActionStatus } from "~/models/status.model";
-import { PopupType, PopupView } from "./popup-view";
+import { PopupType, PopupView } from "./views/popup-view";
 import { Check, X } from "lucide-react";
 
 export function StatusMessage({
@@ -13,7 +13,7 @@ export function StatusMessage({
     return (
       <PopupView type={PopupType.Success}>
         <Check size={40} />
-        {actionDone} Sucessfully
+        {actionDone} Successfully
       </PopupView>
     );
 

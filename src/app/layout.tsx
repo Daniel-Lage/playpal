@@ -6,11 +6,9 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { authOptions } from "~/lib/auth";
-import { NavBar } from "~/app/nav-bar";
-
-function storageKeyToCookieName(key: string) {
-  return `playpal.${key.replaceAll(":", ".")}`;
-}
+import { parseBooleanCookie } from "~/helpers/parse-cookie";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
+import { PlayPalLayoutView } from "~/components/views/playpal-layout-view";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? ""),
@@ -26,31 +24,32 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-  children,
-}: Readonly<{ children: React.ReactNode }>) {
+  main,
+  side,
+}: Readonly<{ main: React.ReactNode; side: React.ReactNode }>) {
   const session = await getServerSession(authOptions);
   const cookieStore = cookies();
 
-  const navBarCollapsedKey = session?.user.id
-    ? `${session.user.id}:nav_bar_collapsed`
-    : "nav_bar_collapsed";
+  const cookiePrefix = getCookiePrefix(session?.user.id);
 
-  const initialNavBarCollapsed =
-    cookieStore.get(storageKeyToCookieName(navBarCollapsedKey))?.value ===
-    "true";
+  const initialNavBarCollapsed = parseBooleanCookie(
+    cookieStore.get(`${cookiePrefix}nav_bar_collapsed`)?.value,
+  );
 
-  console.log(initialNavBarCollapsed, "initialNavBarCollapsed");
+  const initialSideBarCollapsed = parseBooleanCookie(
+    cookieStore.get(`${cookiePrefix}side_bar_collapsed`)?.value,
+  );
 
   return (
     <html lang="en" className={GeistSans.variable}>
-      <body className="overflow-x-hidden">
-        <NavBar
-          sessionUser={session ? session.user : undefined}
-          initialCollapsed={initialNavBarCollapsed}
+      <body className="flex h-screen w-svw flex-col-reverse overflow-hidden md:flex-row">
+        <PlayPalLayoutView
+          sessionUser={session?.user}
+          main={main}
+          side={side}
+          initialNavBarCollapsed={initialNavBarCollapsed}
+          initialSideBarCollapsed={initialSideBarCollapsed}
         />
-        <main className="max-w-screen z-0 mb-24 overflow-hidden md:my-0">
-          {children}
-        </main>
       </body>
     </html>
   );
