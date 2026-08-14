@@ -6,6 +6,7 @@ import { PanelRightClose, PanelRightOpen } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { useCookies } from "~/hooks/use-cookies";
 import type { SessionUser } from "~/models/user.model";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 
 function parseSideBarCollapsedCookie(text: string | null): boolean {
   return text === "true";
@@ -27,7 +28,7 @@ export function PageView({
 
   initialCollapsed: boolean;
 }) {
-  const cookiePrefix = sessionUser ? `playpal.${sessionUser.id}:` : "playpal.";
+  const cookiePrefix = getCookiePrefix(sessionUser?.id);
 
   const [collapsed, setCollapsed] = useCookies<boolean>(
     `${cookiePrefix}side_bar_collapsed`,

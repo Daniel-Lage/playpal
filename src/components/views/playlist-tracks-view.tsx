@@ -13,6 +13,7 @@ import {
 } from "~/helpers/stringify-cookie";
 import { PlaylistSearch } from "../playlist-search";
 import { PlaylistTracks } from "../playlist-tracks";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 
 export function PlaylistTracksView({
   tracks,
@@ -30,7 +31,7 @@ export function PlaylistTracksView({
   initialReversed: boolean;
   initialSortingColumn: TracksSortingColumn;
 }) {
-  const cookiePrefix = sessionUserId ? `playpal.${sessionUserId}:` : "playpal.";
+  const cookiePrefix = getCookiePrefix(sessionUserId);
 
   const [filter, setFilter] = useState("");
 

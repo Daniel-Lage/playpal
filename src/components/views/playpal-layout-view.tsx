@@ -17,6 +17,7 @@ import { useMemo, useRef, useState } from "react";
 import { NavButton } from "~/components/buttons/nav-button";
 import { PlaypalLogo } from "~/components/playpal-logo";
 import { UserImage } from "~/components/user-image";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 import { parseBooleanCookie } from "~/helpers/parse-cookie";
 import { stringifyBooleanCookie } from "~/helpers/stringify-cookie";
 import { useCookies } from "~/hooks/use-cookies";
@@ -36,7 +37,7 @@ export function PlayPalLayoutView({
   initialNavBarCollapsed: boolean;
   initialSideBarCollapsed: boolean;
 }) {
-  const cookiePrefix = sessionUser ? `playpal.${sessionUser.id}:` : "playpal.";
+  const cookiePrefix = getCookiePrefix(sessionUser?.id);
 
   const profileUrl = useMemo(
     () => (sessionUser ? `/users/${sessionUser.id}` : undefined),
@@ -56,6 +57,19 @@ export function PlayPalLayoutView({
     initialSideBarCollapsed,
     parseBooleanCookie,
     stringifyBooleanCookie,
+  );
+
+  console.log(
+    "navBarCollapsed",
+    navBarCollapsed,
+    "initialNavBarCollapsed",
+    initialNavBarCollapsed,
+  );
+  console.log(
+    "sideBarCollapsed",
+    sideBarCollapsed,
+    "initialSideBarCollapsed",
+    initialSideBarCollapsed,
   );
 
   const mainPageScrollTop = useRef(0);

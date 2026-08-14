@@ -24,6 +24,7 @@ import {
   stringifyBooleanCookie,
   stringifyPostsSortingColumnCookie,
 } from "~/helpers/stringify-cookie";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 
 export function PostFeedView({
   posts: postsProp,
@@ -46,7 +47,7 @@ export function PostFeedView({
   initialReversed: boolean;
   initialSortingColumn: PostsSortingColumn;
 }) {
-  const cookiePrefix = sessionUser ? `playpal.${sessionUser.id}:` : "playpal.";
+  const cookiePrefix = getCookiePrefix(sessionUser?.id);
 
   const [posts, setPosts] = useState(postsProp);
 

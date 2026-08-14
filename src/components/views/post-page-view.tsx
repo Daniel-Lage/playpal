@@ -29,6 +29,7 @@ import {
   stringifyBooleanCookie,
   stringifyPostsSortingColumnCookie,
 } from "~/helpers/stringify-cookie";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 
 export function PostPageView({
   post,
@@ -52,7 +53,7 @@ export function PostPageView({
   initialReversed: boolean;
   initialSortingColumn: PostsSortingColumn;
 }) {
-  const cookiePrefix = sessionUser ? `playpal.${sessionUser.id}:` : "playpal.";
+  const cookiePrefix = getCookiePrefix(sessionUser?.id);
 
   const [replies, setReplies] = useState(post.replyThreads ?? []);
 

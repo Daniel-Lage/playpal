@@ -23,6 +23,7 @@ import {
 import { ItemsView } from "./items-view";
 import { SpotifyLink } from "../spotify-link";
 import { PlaylistView } from "./playlist-view";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 
 export default function PlaylistFeedView({
   playlists,
@@ -38,7 +39,7 @@ export default function PlaylistFeedView({
   initialReversed: boolean;
   initialSortingColumn: PlaylistsSortingColumn;
 }) {
-  const cookiePrefix = sessionUser ? `playpal.${sessionUser.id}:` : "playpal.";
+  const cookiePrefix = getCookiePrefix(sessionUser?.id);
 
   const [filter, setFilter] = useState("");
 

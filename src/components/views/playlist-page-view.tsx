@@ -22,6 +22,7 @@ import { parseBooleanCookie } from "~/helpers/parse-cookie";
 import { stringifyBooleanCookie } from "~/helpers/stringify-cookie";
 import { PlaylistContent } from "../playlist-content";
 import { PlaylistTracksView } from "./playlist-tracks-view";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 
 export function PlaylistPageView({
   playlist,
@@ -56,7 +57,7 @@ export function PlaylistPageView({
   initialTracksReversed: boolean;
   initialTracksSortingColumn: TracksSortingColumn;
 }) {
-  const cookiePrefix = sessionUser ? `playpal.${sessionUser.id}:` : "playpal.";
+  const cookiePrefix = getCookiePrefix(sessionUser?.id);
   const [shuffled, setShuffled] = useCookies<boolean>(
     `${cookiePrefix}play_shuffled`,
     initialShuffled,

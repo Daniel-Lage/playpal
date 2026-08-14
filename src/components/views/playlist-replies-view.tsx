@@ -24,6 +24,7 @@ import {
   stringifyPostsSortingColumnCookie,
 } from "~/helpers/stringify-cookie";
 import { getTreatedReplies } from "~/helpers/get-treated-replies";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 
 export function PlaylistRepliesView({
   playlist,
@@ -44,7 +45,7 @@ export function PlaylistRepliesView({
   initialReversed: boolean;
   initialSortingColumn: PostsSortingColumn;
 }) {
-  const cookiePrefix = sessionUser ? `playpal.${sessionUser.id}:` : "playpal.";
+  const cookiePrefix = getCookiePrefix(sessionUser?.id);
 
   const [reversed, setReversed] = useCookies<boolean>(
     `${cookiePrefix}playlist_replies_reversed`,

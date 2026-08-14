@@ -15,6 +15,7 @@ import { useMemo } from "react";
 import { NavButton } from "~/components/buttons/nav-button";
 import { PlaypalLogo } from "~/components/playpal-logo";
 import { UserImage } from "~/components/user-image";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 import { parseBooleanCookie } from "~/helpers/parse-cookie";
 import { stringifyBooleanCookie } from "~/helpers/stringify-cookie";
 import { useCookies } from "~/hooks/use-cookies";
@@ -29,7 +30,7 @@ export function NavBar({
 
   initialCollapsed: boolean;
 }) {
-  const cookiePrefix = sessionUser ? `playpal.${sessionUser.id}:` : "playpal.";
+  const cookiePrefix = getCookiePrefix(sessionUser?.id);
 
   const profileUrl = useMemo(
     () => (sessionUser ? `/users/${sessionUser.id}` : undefined),
