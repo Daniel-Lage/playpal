@@ -39,7 +39,12 @@ export function UserProfileView({
         <div className="flex items-center gap-2 p-2">
           <UserImage size={40} image={user.image} name={user.name} />
 
-          <div className="grow px-2 font-bold">{user.name}</div>
+          <Link
+            href={`/users/${user.id}`}
+            className="grow px-2 font-bold hover:underline"
+          >
+            {user.name}
+          </Link>
 
           <div>
             <FollowButton sessionUserId={sessionUserId} user={user} />

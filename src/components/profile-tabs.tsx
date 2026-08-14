@@ -12,17 +12,23 @@ export function ProfileTabs({ userId }: { userId: string }) {
       <ProfileTabLink
         href={`/users/${userId}`}
         title="Main"
-        pathname={pathname}
+        active={
+          pathname === `/users/${userId}` ||
+          pathname === `/users/${userId}/playlists`
+        }
       />
       <ProfileTabLink
         href={`/users/${userId}/replies`}
         title="Replies"
-        pathname={pathname}
+        active={pathname === `/users/${userId}/replies`}
       />
       <ProfileTabLink
         href={`/users/${userId}/likes`}
         title="Likes"
-        pathname={pathname}
+        active={
+          pathname === `/users/${userId}/likes` ||
+          pathname === `/users/${userId}/likes/playlists`
+        }
       />
     </div>
   );
@@ -31,17 +37,15 @@ export function ProfileTabs({ userId }: { userId: string }) {
 function ProfileTabLink({
   href,
   title,
-  pathname,
+  active,
 }: {
   href: string;
   title: string;
-  pathname: string;
+  active: boolean;
 }) {
   return (
     <Link href={href} role="button" key={title} className="w-full">
-      <TabLinkButton className={href === pathname ? "border" : ""}>
-        {title}
-      </TabLinkButton>
+      <TabLinkButton className={active ? "border" : ""}>{title}</TabLinkButton>
     </Link>
   );
 }

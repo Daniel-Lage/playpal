@@ -59,19 +59,6 @@ export function PlayPalLayoutView({
     stringifyBooleanCookie,
   );
 
-  console.log(
-    "navBarCollapsed",
-    navBarCollapsed,
-    "initialNavBarCollapsed",
-    initialNavBarCollapsed,
-  );
-  console.log(
-    "sideBarCollapsed",
-    sideBarCollapsed,
-    "initialSideBarCollapsed",
-    initialSideBarCollapsed,
-  );
-
   const mainPageScrollTop = useRef(0);
   const [mainPageScrolled, setMainPageScrolled] = useState(false);
 

@@ -5,20 +5,20 @@ import { Heart } from "lucide-react";
 import { useState } from "react";
 import { IconButton } from "./icon-button";
 import { cn } from "~/lib/utils";
+import Link from "next/link";
 
 export function LikeButton({
   hasLike,
   sessionUserId,
   count,
   href,
-  onClick,
   like,
   unlike,
   big,
 }: {
   hasLike: boolean;
   count: number;
-  href?: string;
+  href: string;
   onClick?: () => void;
   like: (suid: string) => Promise<void>;
   unlike: (suid: string) => Promise<void>;
@@ -60,14 +60,10 @@ export function LikeButton({
           <Heart />
         </IconButton>
       )}
-      <a
-        role="button"
-        href={href}
-        onClick={onClick}
-        className="hover:underline"
-      >
+
+      <Link role="button" href={href} className="hover:underline">
         {isLiked !== hasLike ? count + (isLiked ? 1 : -1) : count}
-      </a>
+      </Link>
     </div>
   );
 }
