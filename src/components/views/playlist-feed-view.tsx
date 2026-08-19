@@ -25,7 +25,7 @@ import { SpotifyLink } from "../spotify-link";
 import { PlaylistView } from "./playlist-view";
 import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 
-export default function PlaylistFeedView({
+export function PlaylistFeedView({
   playlists,
   isOwnFeed = false,
   sessionUser,

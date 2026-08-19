@@ -15,7 +15,7 @@ import type { ActionStatus } from "~/models/status.model";
 import { TabLinkButton } from "../buttons/tab-link-button";
 import { PageView } from "./page-view";
 import type { SessionUser } from "~/models/user.model";
-import PlaylistFeedView from "./playlist-feed-view";
+import { PlaylistFeedView } from "./playlist-feed-view";
 
 export function FeedView({
   posts,

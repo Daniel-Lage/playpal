@@ -1,3 +1,3 @@
-export default async function DefaultSidePage() {
-  return <></>;
+export default async function DefaultSideBar() {
+  return null;
 }

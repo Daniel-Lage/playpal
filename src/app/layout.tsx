@@ -8,7 +8,7 @@ import { cookies } from "next/headers";
 import { authOptions } from "~/lib/auth";
 import { parseBooleanCookie } from "~/helpers/parse-cookie";
 import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
-import { PlayPalLayoutView } from "~/components/views/playpal-layout-view";
+import { LayoutBody } from "~/components/views/playpal-layout-view";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXTAUTH_URL ?? ""),
@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-  main,
+  children,
   side,
-}: Readonly<{ main: React.ReactNode; side: React.ReactNode }>) {
+}: Readonly<{ children: React.ReactNode; side: React.ReactNode }>) {
   const session = await getServerSession(authOptions);
   const cookieStore = cookies();
 
@@ -43,9 +43,9 @@ export default async function RootLayout({
   return (
     <html lang="en" className={GeistSans.variable}>
       <body className="flex h-screen w-svw flex-col-reverse overflow-hidden md:flex-row">
-        <PlayPalLayoutView
+        <LayoutBody
           sessionUser={session?.user}
-          main={main}
+          main={children}
           side={side}
           initialNavBarCollapsed={initialNavBarCollapsed}
           initialSideBarCollapsed={initialSideBarCollapsed}

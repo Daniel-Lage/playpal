@@ -58,7 +58,7 @@ export default async function StartMainPage() {
     <>
       <div className="h-16 gap-2 border-b">
         <div className="grid h-full w-full grid-cols-2 place-items-center gap-1 bg-container px-2 font-bold">
-          <TabLinkButton className="border" href="/">
+          <TabLinkButton className="border" href="/home">
             Posts
           </TabLinkButton>
 

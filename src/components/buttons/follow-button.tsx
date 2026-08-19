@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { LinkButton } from "~/components/buttons/link-button";
+import { cn } from "~/lib/utils";
 import type { UserObject } from "~/models/user.model";
 import { followUser } from "~/server/follow-user";
 import { unfollowUser } from "~/server/unfollow-user";
@@ -11,9 +12,11 @@ export function FollowButton({
   sessionUserId,
 }: {
   user: UserObject;
-  sessionUserId: string | undefined;
+  sessionUserId?: string | null;
 }) {
   if (user.id === sessionUserId) return null;
+
+  const className = "self-end px-3 py-2 rounded-full text-sm";
 
   if (
     sessionUserId &&
@@ -21,7 +24,7 @@ export function FollowButton({
   )
     return (
       <LinkButton
-        className="self-end"
+        className={cn("border", className)}
         onClick={() => unfollowUser(sessionUserId, user.id)}
       >
         Unfollow
@@ -30,7 +33,7 @@ export function FollowButton({
 
   return (
     <LinkButton
-      className="self-end"
+      className={cn("bg-primary text-primary-foreground", className)}
       onClick={() =>
         sessionUserId ? followUser(sessionUserId, user.id) : signIn()
       }

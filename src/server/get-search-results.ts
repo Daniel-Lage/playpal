@@ -26,10 +26,8 @@ export async function getSearchResults(
   })) as PostObject[];
 
   const users = (await db.query.usersTable.findMany({
-    where: and(
-      ilike(usersTable.name, `%${searchQuery}%`),
-      lastQueried && sql`${postsTable.createdAt} > ${lastQueried}`,
-    ),
+    where: and(ilike(usersTable.name, `%${searchQuery}%`)),
+    with: { followers: true },
   })) as UserObject[];
 
   return { users, posts };

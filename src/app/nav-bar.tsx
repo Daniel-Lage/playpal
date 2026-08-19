@@ -51,8 +51,8 @@ export function NavBar({
         className={cn(
           "z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-sidebar p-6 font-bold transition-opacity md:h-svh md:flex-col md:items-end md:justify-normal md:gap-6 md:border-r md:border-t-0",
           collapsed
-            ? "md:w-[--collapsed-bar-width]"
-            : "md:w-[--expanded-nav-bar-width]",
+            ? "md:w-[--collapsed-side-bar-width]"
+            : "md:w-[--expanded-side-bar-width]",
         )}
       >
         <div className="hidden w-full md:flex md:flex-1">

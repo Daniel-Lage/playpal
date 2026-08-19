@@ -4,6 +4,12 @@ import { authOptions } from "~/lib/auth";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.redirect(new URL(`/`, req.url));
-  return NextResponse.redirect(new URL(`/users/${session.user.id}`, req.url));
+
+  if (session == null)
+    return NextResponse.redirect(
+      new URL(`/signin`, process.env.NEXTAUTH_URL ?? req.url),
+    );
+  return NextResponse.redirect(
+    new URL(`/users/${session.user.id}`, process.env.NEXTAUTH_URL ?? req.url),
+  );
 }

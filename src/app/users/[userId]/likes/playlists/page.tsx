@@ -11,7 +11,7 @@ import {
   parsePlaylistsSortingColumnCookie,
 } from "~/helpers/parse-cookie";
 import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
-import PlaylistFeedView from "~/components/views/playlist-feed-view";
+import { PlaylistFeedView } from "~/components/views/playlist-feed-view";
 import { TabLinkButton } from "~/components/buttons/tab-link-button";
 
 export async function generateMetadata({

@@ -12,9 +12,8 @@
 
 html {
   @apply text-black;
-  --collapsed-bar-width: 96px;
-  --expanded-nav-bar-width: 25vw;
-  --expanded-side-bar-width: 32vw;
+  --collapsed-side-bar-width: 96px;
+  --expanded-side-bar-width: 24vw;
 }
 
 body {
@@ -24,7 +23,7 @@ body {
 
 @layer base {
   :root {
-    --background: #101010;
+    --background: #171717;
     --sidebar: #171717;
     --container: #1d1d1d;
     --foreground: #d4d4d4;

@@ -53,7 +53,7 @@ export function ResultsView({
         <div className="flex flex-col overflow-hidden rounded-md">
           <div className="w-full p-2 font-bold">Users</div>
           {users.map((user) => (
-            <UserView key={user.id} user={user} />
+            <UserView key={user.id} user={user} sessionUserId={sessionUserId} />
           ))}
         </div>
       )}

@@ -17,7 +17,7 @@ import type { PlaylistObject } from "~/models/playlist.model";
 import type { PostObject } from "~/models/post.model";
 import type { UserObject } from "~/models/user.model";
 
-export default function NotificationsView({
+export function NotificationsView({
   notifications,
   sessionUserId,
 }: {

@@ -1,8 +1,9 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/lib/auth";
 import { getNotifications } from "~/server/get-notifications";
-import NotificationsView from "~/components/views/notifications-view";
 import { redirect } from "next/navigation";
+
+import { NotificationsView } from "~/components/views/notifications-view";
 
 export default async function NotificationsMainPage() {
   const session = await getServerSession(authOptions);

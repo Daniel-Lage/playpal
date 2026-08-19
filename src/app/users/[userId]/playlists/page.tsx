@@ -10,12 +10,16 @@ import {
   parsePlaylistsSortingColumnCookie,
 } from "~/helpers/parse-cookie";
 import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
-import PlaylistFeedView from "~/components/views/playlist-feed-view";
+import { PlaylistFeedView } from "~/components/views/playlist-feed-view";
 import { TabLinkButton } from "~/components/buttons/tab-link-button";
 
 export const dynamic = "force-dynamic";
 
-export default async function PlaylistsMainPage() {
+export default async function UsersPlaylistsMainPage({
+  params: { userId },
+}: {
+  params: { userId: string };
+}) {
   const session = await getServerSession(authOptions);
   const cookieStore = cookies();
   const following = session?.user.id
@@ -52,16 +56,18 @@ export default async function PlaylistsMainPage() {
     <>
       <div className="h-16 gap-2 border-b">
         <div className="grid h-full w-full grid-cols-2 place-items-center gap-1 bg-container px-2 font-bold">
-          <TabLinkButton href="/">Posts</TabLinkButton>
+          <TabLinkButton href={`/users/${userId}`}>Posts</TabLinkButton>
 
-          <TabLinkButton className="border" href="/playlists">
+          <TabLinkButton className="border" href={`/users/${userId}/playlists`}>
             Playlists
           </TabLinkButton>
         </div>
       </div>
+
       <PlaylistFeedView
         playlists={playlists}
         sessionUser={session?.user}
+        isOwnFeed={session?.user.id === userId}
         initialReversed={initialPlaylistsReversed}
         initialSortingColumn={initialPlaylistsSortingColumn}
       />

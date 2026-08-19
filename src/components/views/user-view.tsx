@@ -1,17 +1,25 @@
-import type { User } from "next-auth";
 import Link from "next/link";
 import type { UserObject } from "~/models/user.model";
 import { UserImage } from "../user-image";
+import { FollowButton } from "../buttons/follow-button";
 
-export function UserView({ user }: { user: User | UserObject }) {
+export function UserView({
+  user,
+  sessionUserId,
+}: {
+  user: UserObject;
+  sessionUserId?: string | null;
+}) {
   return (
-    <Link
-      key={user.id}
-      className="flex grow-0 items-center rounded-md p-2 hover:underline"
-      href={`/users/${user.id}`}
-    >
+    <div key={user.id} className="flex grow-0 items-center rounded-md p-2">
       <UserImage size={48} image={user.image} name={user.name} />
-      <div className="px-2 font-bold">{user?.name}</div>
-    </Link>
+      <Link
+        href={`/users/${user.id}`}
+        className="flex-1 px-2 font-bold hover:underline"
+      >
+        {user?.name}
+      </Link>
+      <FollowButton user={user} sessionUserId={sessionUserId} />
+    </div>
   );
 }

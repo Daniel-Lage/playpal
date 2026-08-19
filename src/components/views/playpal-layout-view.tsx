@@ -24,7 +24,7 @@ import { useCookies } from "~/hooks/use-cookies";
 import { cn } from "~/lib/utils";
 import type { SessionUser } from "~/models/user.model";
 
-export function PlayPalLayoutView({
+export function LayoutBody({
   sessionUser,
   main,
   side,
@@ -62,21 +62,18 @@ export function PlayPalLayoutView({
   const mainPageScrollTop = useRef(0);
   const [mainPageScrolled, setMainPageScrolled] = useState(false);
 
-  const sideBarScrollTop = useRef(0);
-  const [sideBarScrolled, setSideBarScrolled] = useState(false);
-
   return (
     <>
       <div
         className={cn(
-          "absolute z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-sidebar p-6 font-bold transition-opacity md:relative md:h-svh md:flex-col md:items-end md:justify-normal md:gap-6 md:border-r md:border-t-0",
+          "absolute z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-sidebar p-6 font-bold transition-opacity md:relative md:h-svh md:flex-col md:items-end md:justify-center md:border-r md:border-t-0",
           navBarCollapsed
-            ? "md:w-[--collapsed-bar-width]"
-            : "md:w-[--expanded-nav-bar-width]",
+            ? "md:w-[--collapsed-side-bar-width]"
+            : "md:w-[--expanded-side-bar-width]",
           mainPageScrolled && "opacity-40 md:opacity-100",
         )}
       >
-        <div className="hidden w-full md:flex md:flex-1">
+        <div className="hidden md:absolute md:top-6 md:flex">
           <NavButton
             onClick={() => setNavBarCollapsed((prev) => !prev)}
             collapsed={true}
@@ -86,98 +83,102 @@ export function PlayPalLayoutView({
           </NavButton>
         </div>
 
-        <div
-          className={cn(
-            "hidden md:block md:w-44",
-            navBarCollapsed ? "md:w-12" : "md:w-44",
-          )}
-        >
-          <PlaypalLogo />
-        </div>
-
-        <NavButton
-          href={"/"}
-          collapsed={navBarCollapsed}
-          active={pathname === "/"}
-        >
-          <House strokeWidth={pathname === "/" ? 4 : 3} />
-          {!navBarCollapsed && <span className="hidden md:block">Home</span>}
-        </NavButton>
-
-        <NavButton
-          href={"/search"}
-          collapsed={navBarCollapsed}
-          active={pathname === "/search"}
-        >
-          <Search strokeWidth={pathname === "/search" ? 4 : 3} />
-          {!navBarCollapsed && <span className="hidden md:block">Search</span>}
-        </NavButton>
-
-        <NavButton
-          href={"/notifications"}
-          collapsed={navBarCollapsed}
-          active={pathname === "/notifications"}
-        >
-          <Bell strokeWidth={pathname === "/notifications" ? 4 : 3} />
-          {!navBarCollapsed && (
-            <span className="hidden md:block">Notifications</span>
-          )}
-        </NavButton>
-
-        <div className="hidden md:flex md:flex-1"></div>
-
-        {!!profileUrl ? (
-          sessionUser?.name ? (
-            <NavButton
-              href={pathname.startsWith(profileUrl) ? pathname : profileUrl}
-              collapsed={navBarCollapsed}
-              active={pathname.startsWith(profileUrl)}
-            >
-              <div className="relative flex w-6 items-center justify-center">
-                <div
-                  className={cn(
-                    "absolute h-9 w-9 shrink-0",
-                    navBarCollapsed ? "md:h-12 md:w-12" : "",
-                  )}
-                >
-                  <UserImage
-                    size={36}
-                    className={navBarCollapsed ? "md:h-12 md:w-12" : ""}
-                    image={sessionUser?.image}
-                    name={"You"}
-                  />
-                </div>
-              </div>
-              {!navBarCollapsed && (
-                <span className="hidden md:block">{sessionUser.name}</span>
-              )}
-            </NavButton>
-          ) : (
-            <NavButton
-              href={"/setup"}
-              collapsed={navBarCollapsed}
-              active={pathname === "/setup"}
-            >
-              <UserRoundPen strokeWidth={pathname === "/setup" ? 4 : 3} />
-
-              {!navBarCollapsed && (
-                <span className="hidden md:block">Set Up</span>
-              )}
-            </NavButton>
-          )
-        ) : (
-          <NavButton
-            collapsed={navBarCollapsed}
-            active={pathname === "/signin"}
-            onClick={() => signIn()}
+        <div className="flex md:flex-col md:gap-6">
+          <div
+            className={cn(
+              "hidden md:block",
+              navBarCollapsed ? "md:w-12" : "md:w-[16vw]",
+            )}
           >
-            <LogIn strokeWidth={pathname === "/signin" ? 4 : 3} />
+            <PlaypalLogo />
+          </div>
 
+          <NavButton
+            href={"/home"}
+            collapsed={navBarCollapsed}
+            active={pathname === "/home"}
+          >
+            <House strokeWidth={pathname === "/home" ? 4 : 3} />
+            {!navBarCollapsed && <span className="hidden md:block">Home</span>}
+          </NavButton>
+
+          <NavButton
+            href={"/search"}
+            collapsed={navBarCollapsed}
+            active={pathname === "/search"}
+          >
+            <Search strokeWidth={pathname === "/search" ? 4 : 3} />
             {!navBarCollapsed && (
-              <span className="hidden md:block">Sign In</span>
+              <span className="hidden md:block">Search</span>
             )}
           </NavButton>
-        )}
+
+          <NavButton
+            href={"/notifications"}
+            collapsed={navBarCollapsed}
+            active={pathname === "/notifications"}
+          >
+            <Bell strokeWidth={pathname === "/notifications" ? 4 : 3} />
+            {!navBarCollapsed && (
+              <span className="hidden md:block">Notifications</span>
+            )}
+          </NavButton>
+        </div>
+
+        <div className="absolute bottom-6">
+          {!!profileUrl ? (
+            sessionUser?.name ? (
+              <NavButton
+                href={pathname.startsWith(profileUrl) ? pathname : profileUrl}
+                collapsed={navBarCollapsed}
+                active={pathname.startsWith(profileUrl)}
+              >
+                <div className="relative flex w-6 items-center justify-center">
+                  <div
+                    className={cn(
+                      "absolute h-9 w-9 shrink-0",
+                      navBarCollapsed ? "md:h-12 md:w-12" : "",
+                    )}
+                  >
+                    <UserImage
+                      size={36}
+                      className={navBarCollapsed ? "md:h-12 md:w-12" : ""}
+                      image={sessionUser?.image}
+                      name={"You"}
+                    />
+                  </div>
+                </div>
+                {!navBarCollapsed && (
+                  <span className="hidden md:block">{sessionUser.name}</span>
+                )}
+              </NavButton>
+            ) : (
+              <NavButton
+                href={"/setup"}
+                collapsed={navBarCollapsed}
+                active={pathname === "/setup"}
+              >
+                <UserRoundPen strokeWidth={pathname === "/setup" ? 4 : 3} />
+
+                {!navBarCollapsed && (
+                  <span className="hidden md:block">Set Up</span>
+                )}
+              </NavButton>
+            )
+          ) : (
+            <NavButton
+              collapsed={navBarCollapsed}
+              active={pathname === "/signin"}
+              onClick={() => signIn()}
+            >
+              <LogIn strokeWidth={pathname === "/signin" ? 4 : 3} />
+
+              {!navBarCollapsed && (
+                <span className="hidden md:block">Sign In</span>
+              )}
+            </NavButton>
+          )}
+        </div>
       </div>
 
       <div
@@ -199,32 +200,13 @@ export function PlayPalLayoutView({
 
       <div
         className={cn(
-          "hidden h-full max-h-screen overflow-y-auto border-l bg-sidebar md:flex md:flex-col",
+          "hidden h-full max-h-screen border-l bg-sidebar p-6 md:flex md:flex-col md:justify-center",
           sideBarCollapsed
-            ? "md:w-[--collapsed-bar-width]"
+            ? "md:w-[--collapsed-side-bar-width]"
             : "md:w-[--expanded-side-bar-width]",
         )}
-        onScroll={(e) => {
-          const target = e.currentTarget;
-          if (target.scrollTop - 10 > sideBarScrollTop.current) {
-            sideBarScrollTop.current = target.scrollTop;
-            setSideBarScrolled(true);
-          }
-          if (target.scrollTop === 0) {
-            sideBarScrollTop.current = target.scrollTop;
-            setSideBarScrolled(false);
-          }
-        }}
       >
-        <div
-          className={cn(
-            "absolute right-0 hidden justify-end p-6 md:flex",
-            sideBarCollapsed
-              ? "md:w-[--collapsed-bar-width]"
-              : "md:w-[--expanded-side-bar-width]",
-            sideBarScrolled ? "border-b border-l bg-container" : "",
-          )}
-        >
+        <div className="md:absolute md:top-6 md:flex">
           <NavButton
             onClick={() => setSideBarCollapsed((prev) => !prev)}
             collapsed={true}
@@ -233,7 +215,9 @@ export function PlayPalLayoutView({
             {sideBarCollapsed ? <PanelRightOpen /> : <PanelRightClose />}
           </NavButton>
         </div>
-        {sideBarCollapsed ? null : side}
+        <div className="flex flex-col gap-6 md:max-w-[16vw]">
+          {sideBarCollapsed ? null : side}
+        </div>
       </div>
     </>
   );

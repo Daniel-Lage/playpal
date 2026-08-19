@@ -49,7 +49,7 @@ export function PageView({
         className={cn(
           "hidden h-full max-h-screen overflow-y-auto border-l bg-sidebar md:flex md:flex-col",
           collapsed
-            ? "md:w-[--collapsed-bar-width]"
+            ? "md:w-[--collapsed-side-bar-width]"
             : "md:w-[--expanded-side-bar-width]",
         )}
         onScroll={(e) => {
@@ -68,7 +68,7 @@ export function PageView({
           className={cn(
             "absolute right-0 hidden justify-end p-6 md:flex",
             collapsed
-              ? "md:w-[--collapsed-bar-width]"
+              ? "md:w-[--collapsed-side-bar-width]"
               : "md:w-[--expanded-side-bar-width]",
             scrolled ? "border-b border-l bg-container" : "",
           )}

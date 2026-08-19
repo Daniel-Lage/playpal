@@ -6,7 +6,13 @@ import { ItemsView } from "./items-view";
 import { SearchView } from "./search-view";
 import { useMemo, useState } from "react";
 
-export function UserFeedView({ users }: { users: UserObject[] }) {
+export function UserFeedView({
+  users,
+  sessionUserId,
+}: {
+  users: UserObject[];
+  sessionUserId?: string | null;
+}) {
   const [filter, setFilter] = useState("");
 
   const treatedUsers = useMemo(() => {
@@ -27,8 +33,21 @@ export function UserFeedView({ users }: { users: UserObject[] }) {
         />
       </div>
       <ItemsView>
-        {treatedUsers.map((user) => (
-          <UserView key={user.id} user={user} />
+        {treatedUsers.map((user, index) => (
+          <>
+            {index !== 0 && (
+              <div
+                key={user.id + "divider"}
+                className="mx-4 h-[1px] bg-border text-center"
+              ></div>
+            )}
+
+            <UserView
+              key={user.id + "view"}
+              user={user}
+              sessionUserId={sessionUserId}
+            />
+          </>
         ))}
       </ItemsView>
     </>
