@@ -9,7 +9,7 @@ export async function getUsersFollowing(
 ): Promise<FollowObject[]> {
   const follows = await db.query.followsTable.findMany({
     where: eq(followsTable.followerId, userId),
-    with: { followee: true },
+    with: { followee: { with: { followers: true } } },
   });
 
   return follows;

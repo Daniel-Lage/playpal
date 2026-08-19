@@ -12,23 +12,8 @@
 
 html {
   @apply text-black;
-  --nav-bar-expanded: 1;
-  --nav-bar-collapsed: 0;
-  --side-bar-expanded: 1;
-  --side-bar-collapsed: 0;
-  --collapsed-bar-width: 96px;
-  --expanded-nav-bar-width: 25vw;
-  --nav-bar-w: calc(
-    (var(--collapsed-bar-width) * var(--nav-bar-collapsed)) +
-      (var(--expanded-nav-bar-width) * var(--nav-bar-expanded))
-  );
-  --expanded-side-bar-width: 32vw;
-  --side-bar-w: calc(
-    (var(--collapsed-bar-width) * var(--side-bar-collapsed)) +
-      (var(--expanded-side-bar-width) * var(--side-bar-expanded))
-  );
-
-  --main-view-w: calc(100vw - var(--nav-bar-w) - var(--side-bar-w));
+  --collapsed-side-bar-width: 96px;
+  --expanded-side-bar-width: 24vw;
 }
 
 body {
@@ -38,7 +23,7 @@ body {
 
 @layer base {
   :root {
-    --background: #101010;
+    --background: #171717;
     --sidebar: #171717;
     --container: #1d1d1d;
     --foreground: #d4d4d4;

@@ -41,7 +41,7 @@ export function ContentRenderer({ content }: { content: string }) {
       <a
         target="_blank"
         rel="noopener noreferrer nofollow"
-        href={`https://playpal-fm.vercel.app/user/${props.node?.attrs?.id}`}
+        href={`https://playpal-fm.vercel.app/users/${props.node?.attrs?.id}`}
         style={{ textDecoration: "none" }}
       >
         {props.node?.attrs?.mentionSuggestionChar + props.node?.attrs?.label}

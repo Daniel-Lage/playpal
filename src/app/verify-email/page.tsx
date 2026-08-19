@@ -5,8 +5,8 @@ import { OneElementView } from "~/components/one-element-view";
 export default async function VerifyEmailPage() {
   return (
     <OneElementView>
-      <h1 className="p-2 text-xl font-bold">Check your email</h1>A sign in link
-      has been sent to your email address.
+      <p className="p-2 text-xl font-bold">Check your email</p>
+      <p>A sign in link has been sent to your email address.</p>
       <Link href="/">
         <LinkButton>Return</LinkButton>
       </Link>

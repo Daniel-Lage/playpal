@@ -14,8 +14,15 @@ import { GetDevicesStatus } from "~/models/device.model";
 import { getDevices } from "~/api/get-devices";
 import { redirect } from "next/navigation";
 import { getQueue } from "~/api/get-queue";
-import { PlaylistPageView } from "../playlist/[playlistId]/playlist-page-view";
+
 import type { PlaylistObject } from "~/models/playlist.model";
+import { cookies } from "next/headers";
+import {
+  parseBooleanCookie,
+  parseTracksSortingColumnCookie,
+} from "~/helpers/parse-cookie";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
+import { PlaylistPageView } from "~/components/views/playlist-page-view";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -32,6 +39,22 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function LikedSongsPage() {
   const session = await getServerSession(authOptions);
+
+  const cookiePrefix = getCookiePrefix(session?.user.id);
+
+  const cookieStore = cookies();
+
+  const initialShuffled = parseBooleanCookie(
+    cookieStore.get(`${cookiePrefix}play_shuffled`)?.value,
+  );
+
+  const initialTracksReversed = parseBooleanCookie(
+    cookieStore.get(`${cookiePrefix}tracks_reversed`)?.value,
+  );
+
+  const initialTracksSortingColumn = parseTracksSortingColumnCookie(
+    cookieStore.get(`${cookiePrefix}tracks_sorting_column`)?.value,
+  );
 
   if (!session) {
     redirect("/api/auth/signin");
@@ -64,6 +87,9 @@ export default async function LikedSongsPage() {
         pagingTracks={pagingTracks}
         loadNextTracks={loadNextTracks}
         isLikedSongs={true}
+        initialShuffled={initialShuffled}
+        initialTracksReversed={initialTracksReversed}
+        initialTracksSortingColumn={initialTracksSortingColumn}
       />
     );
 
@@ -106,6 +132,9 @@ export default async function LikedSongsPage() {
 
         return await getDevices(session.user.access_token);
       }}
+      initialShuffled={initialShuffled}
+      initialTracksReversed={initialTracksReversed}
+      initialTracksSortingColumn={initialTracksSortingColumn}
     />
   );
 }

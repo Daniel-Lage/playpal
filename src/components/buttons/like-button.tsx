@@ -3,23 +3,22 @@
 import { signIn } from "next-auth/react";
 import { Heart } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
 import { IconButton } from "./icon-button";
 import { cn } from "~/lib/utils";
+import Link from "next/link";
 
 export function LikeButton({
   hasLike,
   sessionUserId,
   count,
   href,
-  onClick,
   like,
   unlike,
   big,
 }: {
   hasLike: boolean;
   count: number;
-  href?: string;
+  href: string;
   onClick?: () => void;
   like: (suid: string) => Promise<void>;
   unlike: (suid: string) => Promise<void>;
@@ -61,15 +60,10 @@ export function LikeButton({
           <Heart />
         </IconButton>
       )}
-      {href ? (
-        <Link href={href} className="hover:underline">
-          {isLiked !== hasLike ? count + (isLiked ? 1 : -1) : count}
-        </Link>
-      ) : (
-        <button className="hover:underline" onClick={onClick}>
-          {isLiked !== hasLike ? count + (isLiked ? 1 : -1) : count}
-        </button>
-      )}
+
+      <Link role="button" href={href} className="hover:underline">
+        {isLiked !== hasLike ? count + (isLiked ? 1 : -1) : count}
+      </Link>
     </div>
   );
 }

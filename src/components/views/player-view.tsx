@@ -1,0 +1,106 @@
+import Image from "next/image";
+import { PlayButton } from "../buttons/play-button";
+import { Pause, Play } from "lucide-react";
+import { useEffect, useState } from "react";
+import { formatTime } from "~/helpers/format-time";
+
+export function PlayerView({
+  playerState,
+  togglePlay,
+}: {
+  playerState?: Spotify.PlaybackState;
+  togglePlay: () => void;
+}) {
+  if (playerState?.track_window.current_track == null) return null;
+  const track = playerState?.track_window.current_track;
+
+  return (
+    <div className="margin-auto fixed bottom-20 flex w-svw justify-stretch px-6 md:bottom-6 md:px-6">
+      <div className="relative flex grow items-center justify-between self-center overflow-hidden rounded-md border border-primary bg-container pb-2 md:grow md:pb-0">
+        <div className="flex min-w-0 items-center gap-1">
+          {track.album.images[0]?.url ? (
+            <Image
+              width={48}
+              height={48}
+              className="m-1 aspect-square h-auto w-12 flex-shrink-0 flex-grow-0 rounded-md"
+              src={track.album.images[0]?.url ?? ""}
+              alt={track.album.name}
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-md bg-border" />
+          )}
+
+          <div className="min-w-0 flex-1 font-bold md:w-32">
+            <div className="truncate text-left text-sm">{track.name}</div>
+            <div className="truncate text-left text-xs">
+              {track.artists.map((artist) => artist.name).join(", ")}
+            </div>
+          </div>
+        </div>
+
+        <ProgressBar
+          initialValue={playerState.position}
+          limit={track.duration_ms}
+          paused={playerState.paused}
+        />
+
+        <div className="m-1">
+          <PlayButton onClick={togglePlay}>
+            {playerState.paused ? (
+              <Play
+                fill="var(--primary-foreground)"
+                stroke="var(--primary-foreground)"
+              />
+            ) : (
+              <Pause
+                fill="var(--primary-foreground)"
+                stroke="var(--primary-foreground)"
+              />
+            )}
+          </PlayButton>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProgressBar({
+  initialValue,
+  limit,
+  paused,
+}: {
+  initialValue: number;
+  limit: number;
+  paused: boolean;
+}) {
+  const [progress, setProgress] = useState(initialValue);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (!paused) {
+        setProgress((prev) => Math.min(prev + 1000, limit));
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [limit, paused, initialValue]);
+
+  useEffect(() => {
+    setProgress(initialValue);
+  }, [initialValue]);
+
+  return (
+    <>
+      <div className="hidden md:block">{formatTime(progress)}</div>
+      <div className="absolute bottom-0 flex h-2 w-full grow overflow-hidden rounded-full bg-black md:relative md:bottom-auto md:m-1 md:w-auto">
+        <div
+          className={`player-bar grow-0 bg-white`}
+          style={{
+            width: `${(progress / limit) * 100}%`,
+          }}
+        ></div>
+      </div>
+      <div className="hidden md:block">{formatTime(limit)}</div>
+    </>
+  );
+}

@@ -1,5 +1,5 @@
 import type { PlaylistTrack } from "~/models/track.model";
-import { getTokens } from "./get-tokens";
+import { getTokens } from "~/api/get-tokens";
 import type { Paging } from "~/models/paging.model";
 import type { ApiError } from "~/models/error.model";
 

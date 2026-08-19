@@ -11,10 +11,13 @@ import {
 } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { NavButton } from "~/components/buttons/nav-button";
 import { PlaypalLogo } from "~/components/playpal-logo";
 import { UserImage } from "~/components/user-image";
+import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
+import { parseBooleanCookie } from "~/helpers/parse-cookie";
+import { stringifyBooleanCookie } from "~/helpers/stringify-cookie";
 import { useCookies } from "~/hooks/use-cookies";
 import { cn } from "~/lib/utils";
 import type { SessionUser } from "~/models/user.model";
@@ -24,68 +27,32 @@ export function NavBar({
   initialCollapsed = false,
 }: {
   sessionUser?: SessionUser;
-  initialCollapsed?: boolean;
+
+  initialCollapsed: boolean;
 }) {
+  const cookiePrefix = getCookiePrefix(sessionUser?.id);
+
   const profileUrl = useMemo(
-    () => (sessionUser ? `/user/${sessionUser.id}` : undefined),
+    () => (sessionUser ? `/users/${sessionUser.id}` : undefined),
     [sessionUser],
   );
   const pathname = usePathname();
 
-  const scrollY = useRef(0);
-
-  const [faded, setFaded] = useState(false);
-
   const [collapsed, setCollapsed] = useCookies<boolean>(
-    sessionUser?.id
-      ? `${sessionUser.id}:nav_bar_collapsed`
-      : "nav_bar_collapsed",
-    initialCollapsed ?? false,
-    useCallback((text: string | null) => text === "true", []),
-    useCallback(
-      (value: boolean | null) => (value === true ? "true" : "false"),
-      [],
-    ),
+    `${cookiePrefix}nav_bar_collapsed`,
+    initialCollapsed,
+    parseBooleanCookie,
+    stringifyBooleanCookie,
   );
-
-  console.log("collapsed", collapsed);
-
-  useEffect(() => {
-    if (collapsed != null) {
-      document.documentElement.style.setProperty(
-        "--nav-bar-collapsed",
-        collapsed ? "1" : "0",
-      );
-      document.documentElement.style.setProperty(
-        "--nav-bar-expanded",
-        collapsed ? "0" : "1",
-      );
-    }
-  }, [collapsed]);
-
-  useEffect(() => {
-    window.addEventListener("scroll", () => {
-      if (window.scrollY - 10 > scrollY.current) {
-        scrollY.current = window.scrollY;
-        setFaded(true);
-      }
-      if (window.scrollY + 10 < scrollY.current) {
-        scrollY.current = window.scrollY;
-        setFaded(false);
-      }
-
-      if (window.innerHeight + window.scrollY >= document.body.offsetHeight) {
-        setFaded(false);
-      }
-    });
-  }, []);
 
   return (
     <>
       <div
         className={cn(
-          "bg-sidebar fixed bottom-0 left-0 z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t p-6 font-bold transition-opacity md:h-svh md:w-[--nav-bar-w] md:flex-col md:items-end md:justify-normal md:gap-6 md:border-r md:border-t-0",
-          faded && "opacity-40 md:opacity-100",
+          "z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-sidebar p-6 font-bold transition-opacity md:h-svh md:flex-col md:items-end md:justify-normal md:gap-6 md:border-r md:border-t-0",
+          collapsed
+            ? "md:w-[--collapsed-side-bar-width]"
+            : "md:w-[--expanded-side-bar-width]",
         )}
       >
         <div className="hidden w-full md:flex md:flex-1">

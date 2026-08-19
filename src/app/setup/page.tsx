@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/lib/auth";
 import { redirect } from "next/navigation";
-import { SetUpView } from "./setup-view";
+import { SetUpView } from "~/components/views/setup-view";
 import { utapi } from "~/server/uploadthing";
 
 export default async function SignInPage() {

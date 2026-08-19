@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { PostView } from "~/components/post-view";
+import { PostView } from "~/components/views/post-view";
 import { cn } from "~/lib/utils";
 import type { PostObject } from "~/models/post.model";
 

@@ -2,33 +2,28 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-function storageKeyToCookieName(key: string) {
-  return `playpal.${key.replaceAll(":", ".")}`;
-}
-
 export function useCookies<T>(
   key: string,
   fallback: T,
   parse: (text: string | null) => T | null,
   stringify: (value: T) => string,
 ): [T, (value: T | ((prev: T) => T)) => void] {
-  const cookieName = storageKeyToCookieName(key);
   const [value, setValue] = useState<T>(() => fallback);
 
   useEffect(() => {
     const storedValue = document.cookie
       .split("; ")
-      .find((cookie) => cookie.startsWith(`${cookieName}=`))
-      ?.slice(cookieName.length + 1);
+      .find((cookie) => cookie.startsWith(`${key}=`))
+      ?.slice(key.length + 1);
 
     setValue(parse(storedValue ?? null) ?? fallback);
-  }, [cookieName, fallback, parse]);
+  }, [key, fallback, parse]);
 
   const setCookie = useCallback(
     (newValue: T) => {
-      document.cookie = `${cookieName}=${encodeURIComponent(stringify(newValue))}; path=/; max-age=31536000; samesite=lax`;
+      document.cookie = `${key}=${encodeURIComponent(stringify(newValue))}; path=/; max-age=31536000; samesite=lax`;
     },
-    [cookieName, stringify],
+    [key, stringify],
   );
 
   const update = useCallback(
