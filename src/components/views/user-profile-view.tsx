@@ -50,16 +50,15 @@ export function UserProfileView({
             <FollowButton sessionUserId={sessionUserId} user={user} />
           </div>
 
-          {user.id === sessionUserId &&
-            (providerAccountId != null ? (
-              <SpotifyLink
-                external_url={`https://open.spotify.com/users/${providerAccountId}`}
-              />
-            ) : (
-              <LinkButton onClick={() => signIn("spotify")}>
-                Connect Spotify Account
-              </LinkButton>
-            ))}
+          {providerAccountId != null ? (
+            <SpotifyLink
+              external_url={`https://open.spotify.com/user/${providerAccountId}`}
+            />
+          ) : user.id === sessionUserId ? (
+            <LinkButton onClick={() => signIn("spotify")}>
+              Connect Spotify Account
+            </LinkButton>
+          ) : null}
 
           <MenuView>
             {user.id === sessionUserId ? (

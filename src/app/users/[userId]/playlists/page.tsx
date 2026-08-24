@@ -3,8 +3,6 @@ import { cookies } from "next/headers";
 
 import { authOptions } from "~/lib/auth";
 import { getPlaylists } from "~/server/get-playlists";
-import { getUsersFollowing } from "~/server/get-users-following";
-import { getUsersLikes } from "~/server/get-users-likes";
 import {
   parseBooleanCookie,
   parsePlaylistsSortingColumnCookie,
@@ -22,25 +20,8 @@ export default async function UsersPlaylistsMainPage({
 }) {
   const session = await getServerSession(authOptions);
   const cookieStore = cookies();
-  const following = session?.user.id
-    ? [
-        ...(await getUsersFollowing(session.user.id)),
-        { followeeId: session.user.id },
-      ]
-    : undefined;
-  const userIds = following?.map((value) => value.followeeId);
 
-  const playlists = await getPlaylists({ userIds });
-
-  if (userIds)
-    for (const userId of userIds) {
-      const { playlists: userPlaylistsLikes } = await getUsersLikes(userId);
-      playlists.push(
-        ...userPlaylistsLikes.filter(
-          (playlist) => !playlists.some((value) => value.id === playlist.id),
-        ),
-      );
-    }
+  const playlists = await getPlaylists({ userIds: [userId] });
 
   const cookiePrefix = getCookiePrefix(session?.user.id);
 

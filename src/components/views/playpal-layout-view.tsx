@@ -66,7 +66,7 @@ export function LayoutBody({
     <>
       <div
         className={cn(
-          "absolute z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-sidebar p-6 font-bold transition-opacity md:relative md:h-svh md:flex-col md:items-end md:justify-center md:border-r md:border-t-0",
+          "absolute z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-sidebar p-6 font-bold transition-opacity md:relative md:h-svh md:flex-col md:items-end md:justify-center md:gap-2 md:border-r md:border-t-0",
           navBarCollapsed
             ? "md:w-[--collapsed-side-bar-width]"
             : "md:w-[--expanded-side-bar-width]",
@@ -83,49 +83,45 @@ export function LayoutBody({
           </NavButton>
         </div>
 
-        <div className="flex md:flex-col md:gap-6">
-          <div
-            className={cn(
-              "hidden md:block",
-              navBarCollapsed ? "md:w-12" : "md:w-[16vw]",
-            )}
-          >
-            <PlaypalLogo />
-          </div>
-
-          <NavButton
-            href={"/home"}
-            collapsed={navBarCollapsed}
-            active={pathname === "/home"}
-          >
-            <House strokeWidth={pathname === "/home" ? 4 : 3} />
-            {!navBarCollapsed && <span className="hidden md:block">Home</span>}
-          </NavButton>
-
-          <NavButton
-            href={"/search"}
-            collapsed={navBarCollapsed}
-            active={pathname === "/search"}
-          >
-            <Search strokeWidth={pathname === "/search" ? 4 : 3} />
-            {!navBarCollapsed && (
-              <span className="hidden md:block">Search</span>
-            )}
-          </NavButton>
-
-          <NavButton
-            href={"/notifications"}
-            collapsed={navBarCollapsed}
-            active={pathname === "/notifications"}
-          >
-            <Bell strokeWidth={pathname === "/notifications" ? 4 : 3} />
-            {!navBarCollapsed && (
-              <span className="hidden md:block">Notifications</span>
-            )}
-          </NavButton>
+        <div
+          className={cn(
+            "hidden md:block",
+            navBarCollapsed ? "md:w-12" : "md:w-[16vw]",
+          )}
+        >
+          <PlaypalLogo />
         </div>
 
-        <div className="absolute bottom-6">
+        <NavButton
+          href={"/home"}
+          collapsed={navBarCollapsed}
+          active={pathname === "/home"}
+        >
+          <House strokeWidth={pathname === "/home" ? 4 : 3} />
+          {!navBarCollapsed && <span className="hidden md:block">Home</span>}
+        </NavButton>
+
+        <NavButton
+          href={"/search"}
+          collapsed={navBarCollapsed}
+          active={pathname === "/search"}
+        >
+          <Search strokeWidth={pathname === "/search" ? 4 : 3} />
+          {!navBarCollapsed && <span className="hidden md:block">Search</span>}
+        </NavButton>
+
+        <NavButton
+          href={"/notifications"}
+          collapsed={navBarCollapsed}
+          active={pathname === "/notifications"}
+        >
+          <Bell strokeWidth={pathname === "/notifications" ? 4 : 3} />
+          {!navBarCollapsed && (
+            <span className="hidden md:block">Notifications</span>
+          )}
+        </NavButton>
+
+        <div className="bottom-6 md:absolute">
           {!!profileUrl ? (
             sessionUser?.name ? (
               <NavButton
