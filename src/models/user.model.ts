@@ -21,6 +21,17 @@ export interface SpotifyUser extends SimplifiedUser {
   product: "premium" | "free" | "open";
 }
 
+export interface SpotifyProfile extends SpotifyUser {
+  account_id: string;
+  images: [
+    {
+      url: "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228";
+      height: 300;
+      width: 300;
+    },
+  ];
+}
+
 export type SessionUser = User & {
   access_token: string | null;
   expires_at: number | null;

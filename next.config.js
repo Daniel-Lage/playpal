@@ -8,6 +8,7 @@ await import("./src/env.js");
 const config = {
   images: {
     remotePatterns: [
+      // spotify images
       {
         protocol: "https",
         hostname: "**.scdn.co",
@@ -16,7 +17,11 @@ const config = {
         protocol: "https",
         hostname: "**.spotifycdn.com",
       },
+
+      // youtube images
       { protocol: "https", hostname: "**.ytimg.com" },
+
+      // uploadthing images
       {
         protocol: "https",
         hostname: process.env.UPLOADTHING_APP_ID + ".ufs.sh",

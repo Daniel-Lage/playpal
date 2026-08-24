@@ -9,6 +9,7 @@ import { loadPlaylists } from "~/server/load-playlists";
 import { eq } from "drizzle-orm";
 import { sendVerificationRequest } from "./custom-verification-request";
 import { getTokens } from "~/api/get-tokens";
+import { getProfile } from "~/api/get-profile";
 
 const spotifyAuthUrl = new URL("https://accounts.spotify.com/authorize");
 
@@ -56,6 +57,24 @@ export const authOptions: NextAuthOptions = {
       if (!account) {
         return session;
       }
+
+      if (user.image != null) {
+        const { hostname } = new URL(user.image);
+        if (
+          hostname.endsWith("scdn.co") ||
+          hostname.endsWith("spotifycdn.com")
+        ) {
+          const spotifyProfile = await getProfile(account.access_token);
+
+          session.user.image = spotifyProfile?.images?.[0]?.url ?? user.image;
+
+          await db
+            .update(schema.usersTable)
+            .set({ image: session.user.image })
+            .where(eq(schema.usersTable.id, user.id));
+        }
+      }
+
       const now = Math.floor(new Date().getTime() / 1000);
 
       const createdAtSeconds = Math.floor(account.createdAt.getTime() / 1000);
