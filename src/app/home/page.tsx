@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 
+import type { Metadata } from "next";
 import { getPosts } from "~/server/get-posts";
 import { authOptions } from "~/lib/auth";
 import { PostType, type IMetadata } from "~/models/post.model";
@@ -19,14 +20,25 @@ import { TabLinkButton } from "~/components/buttons/tab-link-button";
 
 export const dynamic = "force-dynamic";
 
-export default async function StartMainPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Playpal | Home",
+    description: "Playpal Home Page",
+    openGraph: {
+      type: "website",
+      images: ["/favicon.ico"],
+      url: `${process.env.NEXTAUTH_URL}/home`,
+    },
+  };
+}
+export default async function HomePage() {
   const session = await getServerSession(authOptions);
   const cookieStore = cookies();
   const following = session?.user.id
     ? [
-        ...(await getUsersFollowing(session.user.id)),
-        { followeeId: session.user.id },
-      ]
+      ...(await getUsersFollowing(session.user.id)),
+      { followeeId: session.user.id },
+    ]
     : undefined;
   const userIds = following?.map((value) => value.followeeId);
 

@@ -5,7 +5,7 @@ import { getUser } from "~/server/get-user";
 import { ErrorPage } from "~/components/error-page";
 import { ProfileTabs } from "~/components/profile-tabs";
 
-export default async function ProfileLayout({
+export default async function UsersLayout({
   params,
   children,
 }: {

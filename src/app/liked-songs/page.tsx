@@ -26,10 +26,9 @@ import { PlaylistPageView } from "~/components/views/playlist-page-view";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: `Playpal | Liked Songs`,
+    title: "Playpal | Liked Songs",
+    description: "Your Liked Songs",
     openGraph: {
-      title: `Playpal | Liked Songs`,
-      description: `Your Liked Songs`,
       type: "music.playlist",
       images: ["/liked-songs.jpg"],
       url: `${process.env.NEXTAUTH_URL}/liked-songs`,

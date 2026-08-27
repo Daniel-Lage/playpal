@@ -27,6 +27,17 @@ const config = {
         hostname: process.env.UPLOADTHING_APP_ID + ".ufs.sh",
         pathname: "/f/*",
       },
+
+      //
+      {
+        protocol: "https",
+        hostname: "playpal-fm.vercel.app",
+      },
+
+      {
+        protocol: "http",
+        hostname: "localhost",
+      }
     ],
   },
 };

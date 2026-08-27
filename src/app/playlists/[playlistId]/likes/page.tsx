@@ -13,30 +13,27 @@ export async function generateMetadata({
 
   if (!playlist)
     return {
-      title: `Playpal | playlist`,
+      title: "Playpal | Playlist | Likes",
+      description: "Playlist not found",
       openGraph: {
-        title: `Playpal | playlist`,
-        description: `Playlist Not Found`,
         type: "music.playlist",
         images: ["/playpal.ico"],
-        url: `${process.env.NEXTAUTH_URL}/playlists/${playlistId}`,
+        url: `${process.env.NEXTAUTH_URL}/playlists/${playlistId}/likes`,
       },
     };
 
   return {
-    title: `${playlist.name} | Playpal`,
+    title: `Playpal | ${playlist.name} | Likes`,
     description: `Playlist - ${playlist.owner?.name} - ${playlist.totalTracks} tracks`,
     openGraph: {
-      description: `Playlist - ${playlist.owner?.name} - ${playlist.totalTracks} tracks`,
-      title: `${playlist.name} | Playpal`,
       type: "music.playlist",
       images: [playlist.image],
-      url: `${process.env.NEXTAUTH_URL}/playlists/${playlistId}`,
+      url: `${process.env.NEXTAUTH_URL}/playlists/${playlistId}/likes`,
     },
   };
 }
 
-export default async function PlaylistLikesMainPage({
+export default async function PlaylistLikesPage({
   params: { playlistId },
 }: {
   params: { playlistId: string };

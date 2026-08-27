@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/lib/auth";
 import { getNotifications } from "~/server/get-notifications";
@@ -5,7 +6,19 @@ import { redirect } from "next/navigation";
 
 import { NotificationsView } from "~/components/views/notifications-view";
 
-export default async function NotificationsMainPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Playpal | Notifications",
+    description: "Your recent Playpal notifications",
+    openGraph: {
+      type: "website",
+      images: ["/favicon.ico"],
+      url: `${process.env.NEXTAUTH_URL}/notifications`,
+    },
+  };
+}
+
+export default async function NotificationsPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) {

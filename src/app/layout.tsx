@@ -10,14 +10,14 @@ import { parseBooleanCookie } from "~/helpers/parse-cookie";
 import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 import { LayoutBody } from "~/components/views/playpal-layout-view";
 
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXTAUTH_URL ?? ""),
+  metadataBase: new URL(`${process.env.NEXTAUTH_URL}`),
   title: "PlayPal",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
   openGraph: {
-    title: "PlayPal",
     images: ["/favicon.ico"],
-    url: process.env.NEXTAUTH_URL,
+    url: `${process.env.NEXTAUTH_URL}`,
     type: "website",
     siteName: "Playpal",
   },

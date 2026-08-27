@@ -16,6 +16,8 @@ import {
   parsePostsSortingColumnCookie,
 } from "~/helpers/parse-cookie";
 import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
+import { generateText, type JSONContent } from "@tiptap/react";
+import { generateTextExtensions } from "~/lib/generate-text-extensions";
 
 export const dynamic = "force-dynamic";
 
@@ -26,30 +28,35 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const post = await getPost(postId);
 
-  if (!post?.author)
+  if (!post)
     return {
-      title: "Playpal | post",
+      title: "Playpal | Post",
+      description: "Post not found",
       openGraph: {
         images: ["/favicon.ico"],
-        title: "Playpal | Post",
-        description: "A post on Playpal",
+        type: "article",
         url: `${process.env.NEXTAUTH_URL}/posts/${postId}`,
       },
     };
 
+  const content = generateText(
+    JSON.parse(post.content) as JSONContent,
+    generateTextExtensions,
+  );
+
   return {
-    title: `Playpal | post by ${post?.author.name}`,
+    title: `Playpal | ${post?.author.name} | Post`,
+    description: content,
     openGraph: {
-      images: [post?.author?.image ?? "/favicon.ico"],
-      title: `Playpal | Post by ${post?.author.name}`,
-      description: post.content,
-      creators: [`${process.env.NEXTAUTH_URL}/users/${post?.author.id}`],
+      images: [post.author?.image ?? "/favicon.ico"],
+      type: "article",
+      authors: [`${process.env.NEXTAUTH_URL}/users/${post?.author.id}`],
       url: `${process.env.NEXTAUTH_URL}/posts/${postId}`,
     },
   };
 }
 
-export default async function PostMainPage({
+export default async function PostPage({
   params: { postId },
 }: {
   params: { postId: string };

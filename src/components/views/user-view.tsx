@@ -15,7 +15,7 @@ export function UserView({
       <UserImage size={48} image={user.image} name={user.name} />
       <Link
         href={`/users/${user.id}`}
-        className="flex-1 px-2 font-bold hover:underline"
+        className="flex-1 px-2 font-bold hover:underline overflow-hidden text-ellipsis whitespace-nowrap"
       >
         {user?.name}
       </Link>

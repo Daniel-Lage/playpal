@@ -155,10 +155,10 @@ export function PlaylistPageView({
       if (shuffled)
         newQueue = start
           ? setFirstItem(
-              queue,
-              start,
-              (other) => other.track.uri === start.track.uri,
-            )
+            queue,
+            start,
+            (other) => other.track.uri === start.track.uri,
+          )
           : queue;
       else {
         let currentTracks = tracksPageRef.current;
@@ -167,11 +167,11 @@ export function PlaylistPageView({
         );
         let startIndex = start
           ? Math.max(
-              playableTracks.findIndex(
-                (other) => other.track.uri === start.track.uri,
-              ),
-              0,
-            )
+            playableTracks.findIndex(
+              (other) => other.track.uri === start.track.uri,
+            ),
+            0,
+          )
           : 0;
 
         while (
@@ -188,8 +188,8 @@ export function PlaylistPageView({
           );
           startIndex = start
             ? playableTracks.findIndex(
-                (other) => other.track.uri === start.track.uri,
-              )
+              (other) => other.track.uri === start.track.uri,
+            )
             : 0;
         }
 
@@ -320,12 +320,6 @@ export function PlaylistPageView({
 
   return (
     <>
-      {status === ActionStatus.Active && (
-        <div className="fixed z-10 flex h-full w-svw items-center justify-center backdrop-brightness-50">
-          <div className="h-16 w-16 animate-spin rounded-full border-8 border-primary border-b-transparent"></div>
-        </div>
-      )}
-
       {devices && deviceId && (
         <DevicePicker
           devices={devices && [...devices]}
@@ -340,6 +334,7 @@ export function PlaylistPageView({
       )}
 
       <PlaylistContent
+        status={status}
         play={handlePlay}
         disabled={status === ActionStatus.Active}
         shuffled={shuffled}

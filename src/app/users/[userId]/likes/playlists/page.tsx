@@ -23,38 +23,27 @@ export async function generateMetadata({
 
   if (!user)
     return {
-      title: "PlayPal | Profile",
+      title: "PlayPal | User | Liked playlists",
       openGraph: {
-        title: "PlayPal | Profile",
+        title: "PlayPal | User | Liked playlists",
         type: "profile",
         images: ["/favicon.ico"],
-        url: `${process.env.NEXTAUTH_URL}/profile`,
-      },
-    };
-
-  if (!user.image)
-    return {
-      title: `Playpal | ${user.name}`,
-      openGraph: {
-        title: `Playpal | ${user.name}`,
-        type: "profile",
-        images: ["/favicon.ico"],
-        url: `${process.env.NEXTAUTH_URL}/profile`,
+        url: `${process.env.NEXTAUTH_URL}/users/${userId}/likes/playlists`,
       },
     };
 
   return {
-    title: `Playpal | ${user.name}`,
+    title: `Playpal | ${user.name} | Liked playlists`,
     openGraph: {
-      title: `Playpal | ${user.name}`,
-      images: [user.image],
+      title: `Playpal | ${user.name} | Liked playlists`,
+      images: [user.image ?? "/favicon.ico"],
       type: "profile",
-      url: `${process.env.NEXTAUTH_URL}/users/${userId}`,
+      url: `${process.env.NEXTAUTH_URL}/users/${userId}/likes/playlists`,
     },
   };
 }
 
-export default async function LikesPage({
+export default async function UsersPlaylistLikesPage({
   params: { userId },
 }: {
   params: { userId: string };

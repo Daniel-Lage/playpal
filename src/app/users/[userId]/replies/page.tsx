@@ -22,27 +22,25 @@ export async function generateMetadata({
 
   if (!user)
     return {
-      title: "PlayPal | replies",
+      title: "PlayPal | User | Replies",
       openGraph: {
-        title: "PlayPal | replies",
         type: "profile",
         images: ["/favicon.ico"],
-        url: `${process.env.NEXTAUTH_URL}/profile`,
+        url: `${process.env.NEXTAUTH_URL}/users/${userId}/replies`,
       },
     };
 
   return {
-    title: `Playpal | ${user.name} replies`,
+    title: `Playpal | ${user.name} | Replies`,
     openGraph: {
-      title: `Playpal | ${user.name} replies`,
       images: [user.image ?? "/favicon.ico"],
       type: "profile",
-      url: `${process.env.NEXTAUTH_URL}/users/${userId}`,
+      url: `${process.env.NEXTAUTH_URL}/users/${userId}/replies`,
     },
   };
 }
 
-export default async function RepliesPage({
+export default async function UsersRepliesPage({
   params: { userId },
 }: {
   params: { userId: string };

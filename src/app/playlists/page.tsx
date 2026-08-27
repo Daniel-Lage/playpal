@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 
@@ -15,14 +16,26 @@ import { TabLinkButton } from "~/components/buttons/tab-link-button";
 
 export const dynamic = "force-dynamic";
 
-export default async function PlaylistsMainPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: "Playpal | Playlists",
+    description: "Explore playlists on Playpal",
+    openGraph: {
+      type: "website",
+      images: ["/favicon.ico"],
+      url: `${process.env.NEXTAUTH_URL}/playlists`,
+    },
+  };
+}
+
+export default async function PlaylistsPage() {
   const session = await getServerSession(authOptions);
   const cookieStore = cookies();
   const following = session?.user.id
     ? [
-        ...(await getUsersFollowing(session.user.id)),
-        { followeeId: session.user.id },
-      ]
+      ...(await getUsersFollowing(session.user.id)),
+      { followeeId: session.user.id },
+    ]
     : undefined;
   const userIds = following?.map((value) => value.followeeId);
 

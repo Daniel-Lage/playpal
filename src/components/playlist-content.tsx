@@ -1,6 +1,6 @@
 "use client";
 
-import { Play, Shuffle } from "lucide-react";
+import { LoaderCircle, Play, Shuffle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { IconButton } from "~/components/buttons/icon-button";
@@ -14,6 +14,7 @@ import type { PlaylistTrack } from "~/models/track.model";
 import { likePlaylist } from "~/server/like-playlist";
 import { unlikePlaylist } from "~/server/unlike-playlist";
 import { RepliesButton } from "./buttons/replies-button";
+import { ActionStatus } from "~/models/status.model";
 
 export function PlaylistContent({
   playlist,
@@ -23,6 +24,7 @@ export function PlaylistContent({
   switchShuffled,
   play,
   isLikedSongs = false,
+  status,
 }: {
   playlist: PlaylistObject;
   disabled: boolean;
@@ -31,9 +33,10 @@ export function PlaylistContent({
   switchShuffled: () => void;
   play: (start?: PlaylistTrack) => void;
   isLikedSongs?: boolean;
+  status: ActionStatus;
 }) {
   return (
-    <div className="flex flex-col gap-2 border-b bg-container p-2">
+    <div className="flex flex-col gap-2 border-b bg-container p-2 md:gap-4 md:p-4">
       {isLikedSongs && (
         <div className="flex flex-col items-center gap-2 md:flex-row md:items-stretch">
           <Image
@@ -79,10 +82,17 @@ export function PlaylistContent({
 
       <div className="flex grow items-end gap-4 rounded-md">
         <PlayButton disabled={disabled} onClick={() => play()}>
-          <Play
-            fill="var(--primary-foreground)"
-            stroke="var(--primary-foreground)"
-          />
+          {status === ActionStatus.Active ?
+            <LoaderCircle
+              stroke="var(--primary-foreground)"
+              className="animate-spin"
+            /> :
+
+
+            <Play
+              fill="var(--primary-foreground)"
+              stroke="var(--primary-foreground)"
+            />}
         </PlayButton>
 
         <IconButton

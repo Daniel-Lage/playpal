@@ -14,10 +14,39 @@ import {
 import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 import { PostFeedView } from "~/components/views/post-feed-view";
 import { TabLinkButton } from "~/components/buttons/tab-link-button";
+import type { Metadata } from "next";
+import { getUser } from "~/server/get-user";
 
 export const dynamic = "force-dynamic";
 
-export default async function UsersMainPage({
+export async function generateMetadata({
+  params: { userId },
+}: {
+  params: { userId: string };
+}): Promise<Metadata> {
+  const user = await getUser(userId);
+
+  if (!user)
+    return {
+      title: "PlayPal | User | Posts",
+      openGraph: {
+        type: "profile",
+        images: ["/favicon.ico"],
+        url: `${process.env.NEXTAUTH_URL}/users/${userId}`,
+      },
+    };
+
+  return {
+    title: `Playpal | ${user.name} | Posts`,
+    openGraph: {
+      images: [user.image ?? "/favicon.ico"],
+      type: "profile",
+      url: `${process.env.NEXTAUTH_URL}/users/${userId}`,
+    },
+  };
+}
+
+export default async function UsersPage({
   params: { userId },
 }: {
   params: { userId: string };

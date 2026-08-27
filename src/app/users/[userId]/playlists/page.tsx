@@ -10,10 +10,39 @@ import {
 import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 import { PlaylistFeedView } from "~/components/views/playlist-feed-view";
 import { TabLinkButton } from "~/components/buttons/tab-link-button";
+import { getUser } from "~/server/get-user";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export default async function UsersPlaylistsMainPage({
+export async function generateMetadata({
+  params: { userId },
+}: {
+  params: { userId: string };
+}): Promise<Metadata> {
+  const user = await getUser(userId);
+
+  if (!user)
+    return {
+      title: "PlayPal | User | Playlists",
+      openGraph: {
+        type: "profile",
+        images: ["/favicon.ico"],
+        url: `${process.env.NEXTAUTH_URL}/users/${userId}/playlists`,
+      },
+    };
+
+  return {
+    title: `Playpal | ${user.name} | Playlists`,
+    openGraph: {
+      images: [user.image ?? "/favicon.ico"],
+      type: "profile",
+      url: `${process.env.NEXTAUTH_URL}/users/${userId}/playlists`,
+    },
+  };
+}
+
+export default async function UsersPlaylistsPage({
   params: { userId },
 }: {
   params: { userId: string };

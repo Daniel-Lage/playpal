@@ -45,6 +45,7 @@ body {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -58,12 +59,15 @@ body {
   0% {
     transform: translateY(400px);
   }
+
   10% {
     transform: translateY(0);
   }
+
   90% {
     transform: translateY(0);
   }
+
   100% {
     transform: translateY(400px);
   }
@@ -75,12 +79,12 @@ body {
   outline: none;
 }
 
-.tiptap > p > a {
+.tiptap>p>a {
   color: var(--primary);
   text-decoration: underline;
 }
 
-.tiptap > p > span[data-type="mention"] {
+.tiptap>p>span[data-type="mention"] {
   color: var(--primary);
 }
 

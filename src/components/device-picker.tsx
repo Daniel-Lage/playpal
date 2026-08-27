@@ -6,6 +6,7 @@ import type { Device } from "~/models/device.model";
 import { MenuButton } from "./buttons/menu-button";
 import { OneElementView } from "./one-element-view";
 import { IconButton } from "./buttons/icon-button";
+import { Modal } from "./modal";
 
 export function DevicePicker({
   pickWebPlayer,
@@ -19,7 +20,7 @@ export function DevicePicker({
   devices: Device[];
 }) {
   return (
-    <div className="fixed z-10 flex h-full w-svw items-center justify-center backdrop-brightness-50">
+    <Modal>
       <OneElementView>
         <div className="flex w-full justify-between">
           <h1 className="p-2 text-xl font-bold">Pick Device To Play On</h1>
@@ -38,7 +39,7 @@ export function DevicePicker({
           </MenuButton>
         ))}
       </OneElementView>
-    </div>
+    </Modal>
   );
 }
 
