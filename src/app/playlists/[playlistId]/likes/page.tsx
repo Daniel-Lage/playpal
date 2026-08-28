@@ -3,6 +3,8 @@ import { getPlaylist } from "~/server/get-playlist";
 import { ErrorPage } from "~/components/error-page";
 import { UserFeedView } from "~/components/views/user-feed-view";
 import type { UserObject } from "~/models/user.model";
+import { PlaylistDisplay } from "~/components/playlist-display";
+import { LinkButton } from "~/components/buttons/link-button";
 
 export async function generateMetadata({
   params: { playlistId },
@@ -44,9 +46,15 @@ export default async function PlaylistLikesPage({
 
   return (
     <>
-      <div className="flex flex-col gap-2 bg-container p-2">
-        <div className="ml-2 font-bold">Liked By</div>
+      <PlaylistDisplay playlist={playlist} />
+
+      <div className="flex justify-between gap-2 bg-container p-2 md:px-4">
+        <div className="font-bold">Likes</div>
+        <LinkButton href={`/playlists/${playlist.id}`} className="font-bold">
+          Back to Playlist
+        </LinkButton>
       </div>
+
       <UserFeedView
         users={(playlist.likes ?? [])
           .map((like) => like?.liker as UserObject)

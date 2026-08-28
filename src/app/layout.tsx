@@ -8,8 +8,7 @@ import { cookies } from "next/headers";
 import { authOptions } from "~/lib/auth";
 import { parseBooleanCookie } from "~/helpers/parse-cookie";
 import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
-import { LayoutBody } from "~/components/views/playpal-layout-view";
-
+import { LayoutBody } from "~/components/layout-body";
 
 export const metadata: Metadata = {
   metadataBase: new URL(`${process.env.NEXTAUTH_URL}`),

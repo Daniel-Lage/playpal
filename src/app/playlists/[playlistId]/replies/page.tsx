@@ -16,6 +16,8 @@ import { getCookiePrefix } from "~/helpers/get-cookie-prefix";
 import { PlaylistRepliesView } from "~/components/views/playlist-replies-view";
 import { postPlaylistReply } from "~/server/post-playlist-reply";
 import type { IMetadata } from "~/models/post.model";
+import { PlaylistDisplay } from "~/components/playlist-display";
+import { LinkButton } from "~/components/buttons/link-button";
 
 export async function generateMetadata({
   params: { playlistId },
@@ -88,12 +90,22 @@ export default async function PlaylistRepliesPage({
   );
 
   return (
-    <PlaylistRepliesView
-      playlist={playlist}
-      sessionUser={session?.user}
-      send={send}
-      initialReversed={initialReversed}
-      initialSortingColumn={initialRepliesSortingColumn}
-    />
+    <>
+      <PlaylistDisplay playlist={playlist} />
+
+      <div className="flex justify-between gap-2 bg-container p-2 md:px-4">
+        <div className="font-bold">Replies</div>
+        <LinkButton href={`/playlists/${playlist.id}`} className="font-bold">
+          Back to Playlist
+        </LinkButton>
+      </div>
+      <PlaylistRepliesView
+        playlist={playlist}
+        sessionUser={session?.user}
+        send={send}
+        initialReversed={initialReversed}
+        initialSortingColumn={initialRepliesSortingColumn}
+      />
+    </>
   );
 }

@@ -148,7 +148,7 @@ function getTreatedPlaylists(
       const key = {
         [PlaylistsSortingColumn.CreatedAt]: () => 0, // default
         [PlaylistsSortingColumn.Length]: (playlist: PlaylistObject) =>
-          -playlist.totalTracks,
+          playlist.totalTracks,
         [PlaylistsSortingColumn.Name]: (playlist: PlaylistObject) =>
           playlist.name.toLowerCase(),
         [PlaylistsSortingColumn.Likes]: (playlist: PlaylistObject) =>

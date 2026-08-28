@@ -66,7 +66,7 @@ export function LayoutBody({
     <>
       <div
         className={cn(
-          "absolute z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-sidebar p-6 font-bold transition-opacity md:relative md:h-svh md:flex-col md:items-end md:justify-center md:gap-2 md:border-r md:border-t-0",
+          "absolute z-50 flex h-12 w-screen shrink-0 items-center justify-around border-t bg-sidebar p-6 font-bold transition-all md:relative md:h-svh md:flex-col md:items-end md:justify-center md:gap-2 md:border-r md:border-t-0",
           navBarCollapsed
             ? "md:w-[--collapsed-side-bar-width]"
             : "md:w-[--expanded-side-bar-width]",
@@ -189,14 +189,15 @@ export function LayoutBody({
             setMainPageScrolled(false);
           }
         }}
-        className="h-full max-h-screen flex-1 overflow-y-scroll"
+        className="h-full max-h-screen flex-1 overflow-y-scroll pb-12 md:mb-0"
+        id="main-view"
       >
         {main}
       </div>
 
       <div
         className={cn(
-          "hidden h-full max-h-screen border-l bg-sidebar p-6 md:flex md:flex-col md:justify-center",
+          "hidden h-full max-h-screen border-l bg-sidebar p-6 transition-all md:flex md:flex-col md:justify-center",
           sideBarCollapsed
             ? "md:w-[--collapsed-side-bar-width]"
             : "md:w-[--expanded-side-bar-width]",

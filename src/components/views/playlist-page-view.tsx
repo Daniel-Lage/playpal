@@ -35,8 +35,6 @@ export function PlaylistPageView({
   loadDevices,
   isLikedSongs = false,
   initialShuffled,
-  initialTracksReversed,
-  initialTracksSortingColumn,
 }: {
   playlist: PlaylistObject;
   pagingTracks: Paging<PlaylistTrack>;
@@ -155,10 +153,10 @@ export function PlaylistPageView({
       if (shuffled)
         newQueue = start
           ? setFirstItem(
-            queue,
-            start,
-            (other) => other.track.uri === start.track.uri,
-          )
+              queue,
+              start,
+              (other) => other.track.uri === start.track.uri,
+            )
           : queue;
       else {
         let currentTracks = tracksPageRef.current;
@@ -167,11 +165,11 @@ export function PlaylistPageView({
         );
         let startIndex = start
           ? Math.max(
-            playableTracks.findIndex(
-              (other) => other.track.uri === start.track.uri,
-            ),
-            0,
-          )
+              playableTracks.findIndex(
+                (other) => other.track.uri === start.track.uri,
+              ),
+              0,
+            )
           : 0;
 
         while (
@@ -188,8 +186,8 @@ export function PlaylistPageView({
           );
           startIndex = start
             ? playableTracks.findIndex(
-              (other) => other.track.uri === start.track.uri,
-            )
+                (other) => other.track.uri === start.track.uri,
+              )
             : 0;
         }
 
@@ -351,9 +349,6 @@ export function PlaylistPageView({
           playTrack={handlePlay}
           tracks={tracksPage.items}
           disabled={status === ActionStatus.Active}
-          sessionUserId={sessionUser?.id}
-          initialReversed={initialTracksReversed}
-          initialSortingColumn={initialTracksSortingColumn}
         />
         <div ref={bottomRef} className="h-1 w-full" />
         {loadingNextPage && (

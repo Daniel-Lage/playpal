@@ -15,6 +15,7 @@ import { ConfirmDialog } from "~/components/confirm-dialog";
 import { MenuButton } from "~/components/buttons/menu-button";
 import { LinkButton } from "~/components/buttons/link-button";
 import { cn } from "~/lib/utils";
+import { useEffect, useState } from "react";
 
 export function UserProfileView({
   user,
@@ -27,13 +28,35 @@ export function UserProfileView({
 }) {
   const router = useRouter();
 
+  const [mainPageScrolled, setMainPageScrolled] = useState(false);
+
+  useEffect(() => {
+    const mainView = document.getElementById("main-view");
+    if (!mainView) return;
+
+    const handleScroll = () => {
+      if (mainView.scrollTop > 0) {
+        setMainPageScrolled(true);
+      } else {
+        setMainPageScrolled(false);
+      }
+    };
+
+    mainView.addEventListener("scroll", handleScroll);
+
+    return () => {
+      mainView.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   if (!user?.name || !user.image) return null;
 
   return (
     <>
       <div
         className={cn(
-          "flex h-14 shrink-0 flex-col justify-center gap-2 overflow-hidden border-b border-transparent bg-container",
+          "sticky top-0 flex h-14 w-full shrink-0 flex-col justify-center gap-2 overflow-hidden border-b border-transparent bg-container",
+          mainPageScrolled && "border-b border-border",
         )}
       >
         <div className="flex items-center gap-2 p-2">

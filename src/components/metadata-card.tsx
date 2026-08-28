@@ -3,8 +3,6 @@ import Link from "next/link";
 import type { IMetadata } from "~/models/post.model";
 
 export function MetadataCard({ metadata }: { metadata: IMetadata }) {
-  console.log(metadata);
-
   return (
     <Link
       href={metadata?.og_url ?? ""}

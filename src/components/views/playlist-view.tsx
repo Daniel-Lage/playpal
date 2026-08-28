@@ -65,6 +65,9 @@ export function PlaylistView({
                 </>
               )}
             </div>
+            <div className="text-wrap text-sm font-light md:text-base">
+              {playlist.totalTracks} tracks
+            </div>
             {!!playlist.description && (
               <div className="text-wrap text-sm font-light md:text-base">
                 {playlist.description.length > 53

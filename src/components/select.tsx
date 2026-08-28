@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, Menu } from "lucide-react";
+import { ArrowDownWideNarrow, ArrowUpNarrowWide, Circle } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
@@ -23,12 +23,16 @@ export function Select({
   options,
   value,
   disabled,
+  reversed,
+  reverse,
 }: {
   title: string;
   onSelect: ((value: string) => void) | undefined;
   options: string[];
   value: string;
   disabled?: boolean;
+  reversed?: boolean;
+  reverse?: () => void;
 }) {
   const [open, setOpen] = React.useState(false);
 
@@ -38,10 +42,9 @@ export function Select({
         <Button
           role="combobox"
           aria-expanded={open}
-          className="justify-between md:w-40"
+          className="w-40 justify-between"
         >
           {title}
-          <Menu />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] border-none p-0">
@@ -53,17 +56,41 @@ export function Select({
                   key={option}
                   value={option}
                   onSelect={(option) => {
+                    if (value === option) {
+                      reverse?.();
+                      return;
+                    }
+
                     onSelect?.(option);
-                    setOpen(false);
                   }}
                 >
+                  <div className="[&_svg]:size-2">
+                    <Circle
+                      fill={value === option ? "currentColor" : "none"}
+                      className={cn(
+                        value === option ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                  </div>
                   {option}
-                  <Check
-                    className={cn(
-                      "ml-auto",
-                      value === option ? "opacity-100" : "opacity-0",
-                    )}
-                  />
+                  {reverse != null &&
+                    (reversed ? (
+                      <ArrowUpNarrowWide
+                        fill={value === option ? "currentColor" : "none"}
+                        className={cn(
+                          "ml-auto",
+                          value === option ? "opacity-100" : "opacity-0",
+                        )}
+                      />
+                    ) : (
+                      <ArrowDownWideNarrow
+                        fill={value === option ? "currentColor" : "none"}
+                        className={cn(
+                          "ml-auto",
+                          value === option ? "opacity-100" : "opacity-0",
+                        )}
+                      />
+                    ))}
                 </CommandItem>
               ))}
             </CommandGroup>
